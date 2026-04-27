@@ -8,6 +8,7 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/health" element={<HealthPage />} />
+      <Route path="/status" element={<HealthPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

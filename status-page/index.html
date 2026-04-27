@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Acompanhamento do desenvolvimento do sistema Arminda." />
+    <meta name="robots" content="noindex" />
+    <title>Arminda — Acompanhamento do desenvolvimento</title>
+
+    <!-- Tipografia: Fraunces (display) + IBM Plex Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <!-- ============================================================
+         Cabeçalho institucional
+         ============================================================ -->
+    <header class="page-header">
+      <div class="container">
+        <div class="brand">
+          <span class="brand-mark">A</span>
+          <div class="brand-text">
+            <span class="brand-eyebrow">Acompanhamento de desenvolvimento</span>
+            <span class="brand-name" data-bind="projeto.nome">Arminda</span>
+          </div>
+        </div>
+        <div class="header-meta">
+          <span class="meta-label">Última atualização</span>
+          <span class="meta-value" data-bind="ultima_atualizacao_fmt">—</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         Hero — visão geral
+         ============================================================ -->
+    <section class="hero">
+      <div class="container">
+        <p class="hero-eyebrow">Painel de acompanhamento</p>
+        <h1 class="hero-title">
+          O sistema <em>Arminda</em> está em construção.
+        </h1>
+        <p class="hero-lead" data-bind="projeto.descricao">—</p>
+
+        <div class="overview-grid">
+          <div class="overview-cell">
+            <span class="cell-label">Início</span>
+            <span class="cell-value" data-bind="projeto.inicio_fmt">—</span>
+          </div>
+          <div class="overview-cell">
+            <span class="cell-label">Previsão de lançamento</span>
+            <span class="cell-value" data-bind="projeto.previsao_fmt">—</span>
+          </div>
+          <div class="overview-cell">
+            <span class="cell-label">Etapa atual</span>
+            <span class="cell-value" data-bind="bloco_atual_titulo">—</span>
+          </div>
+          <div class="overview-cell">
+            <span class="cell-label">Progresso geral</span>
+            <span class="cell-value cell-value-large">
+              <span data-bind="progresso_geral_pct">0</span><span class="cell-unit">%</span>
+            </span>
+            <div class="overview-progress">
+              <div class="overview-progress-fill" data-progress-bar="geral"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Cronograma (Gantt simplificado)
+         ============================================================ -->
+    <section class="section section-timeline">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-number">01</span>
+          <div>
+            <h2 class="section-title">Cronograma</h2>
+            <p class="section-lead">
+              Visão completa das oito etapas de construção, com previsão
+              mês a mês.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <!-- preenchido por JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Detalhe das etapas (blocos)
+         ============================================================ -->
+    <section class="section section-blocos">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-number">02</span>
+          <div>
+            <h2 class="section-title">Etapas em detalhe</h2>
+            <p class="section-lead">
+              Cada etapa é entregue de forma independente, testada e
+              documentada antes de avançar para a próxima.
+            </p>
+          </div>
+        </div>
+
+        <div class="blocos" id="blocos">
+          <!-- preenchido por JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Changelog
+         ============================================================ -->
+    <section class="section section-changelog">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-number">03</span>
+          <div>
+            <h2 class="section-title">Últimas atualizações</h2>
+            <p class="section-lead">
+              Registro contínuo de marcos, entregas e decisões do projeto.
+            </p>
+          </div>
+        </div>
+
+        <ol class="changelog" id="changelog">
+          <!-- preenchido por JS -->
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Relatórios quinzenais
+         ============================================================ -->
+    <section class="section section-relatorios">
+      <div class="container">
+        <div class="section-head">
+          <span class="section-number">04</span>
+          <div>
+            <h2 class="section-title">Relatórios quinzenais</h2>
+            <p class="section-lead">
+              Documentos consolidados enviados a cada 15 dias com o
+              andamento detalhado do projeto.
+            </p>
+          </div>
+        </div>
+
+        <div class="relatorios" id="relatorios">
+          <!-- preenchido por JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         Rodapé
+         ============================================================ -->
+    <footer class="page-footer">
+      <div class="container footer-grid">
+        <div>
+          <p class="footer-eyebrow">Responsável técnico</p>
+          <p class="footer-name" data-bind="contato.responsavel">—</p>
+          <p class="footer-meta">
+            <span data-bind="contato.papel">—</span>
+            <span class="footer-sep">·</span>
+            <span data-bind="contato.cidade">—</span>
+          </p>
+        </div>
+        <div>
+          <p class="footer-eyebrow">Sobre este painel</p>
+          <p class="footer-text">
+            Este painel é atualizado a cada nova entrega do projeto.
+            As datas previstas refletem o planejamento atual e podem ser
+            ajustadas conforme o andamento.
+          </p>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <span class="footer-copy">
+          Arminda · Acompanhamento de desenvolvimento ·
+          <span data-bind="ultima_atualizacao_fmt_long">—</span>
+        </span>
+      </div>
+    </footer>
+
+    <script src="assets/script.js"></script>
+  </body>
+</html>

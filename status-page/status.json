@@ -1,0 +1,172 @@
+{
+  "projeto": {
+    "nome": "Arminda",
+    "descricao": "Sistema SaaS de folha de pagamento e gestão de pessoal para prefeituras brasileiras.",
+    "inicio": "2026-04-27",
+    "previsao_lancamento": "2027-04-27"
+  },
+  "ultima_atualizacao": "2026-04-27",
+  "bloco_atual": 0,
+  "progresso_geral_pct": 5,
+  "blocos": [
+    {
+      "numero": 0,
+      "titulo": "Estrutura inicial",
+      "descricao": "Configuração do repositório, ambiente de desenvolvimento, arquitetura base e documentação fundacional do projeto.",
+      "periodo": "Abril 2026",
+      "data_inicio": "2026-04-27",
+      "data_fim_prevista": "2026-04-27",
+      "data_fim_real": "2026-04-27",
+      "status": "concluido",
+      "progresso_pct": 100,
+      "entregas": [
+        "Repositório criado e organizado",
+        "Backend Django configurado",
+        "Frontend Vite + React configurado",
+        "Documentação fundacional (roadmap, arquitetura, padrões)",
+        "Pipeline de integração contínua ativo"
+      ]
+    },
+    {
+      "numero": 1,
+      "titulo": "Fundação multi-tenant e cadastros",
+      "descricao": "Estruturação da base do sistema: isolamento por município, cadastros centrais (servidores, cargos, vínculos) e primeiro importador da base do sistema atual.",
+      "periodo": "Maio – Junho 2026",
+      "data_inicio": "2026-05-01",
+      "data_fim_prevista": "2026-06-30",
+      "data_fim_real": null,
+      "status": "em_andamento",
+      "progresso_pct": 0,
+      "entregas": [
+        "Modelo multi-tenant (cada município isolado)",
+        "Autenticação e controle de acesso",
+        "Cadastro de servidor, cargo, vínculo e lotação",
+        "Histórico funcional auditado",
+        "Importador inicial do sistema atual",
+        "Telas básicas de cadastro"
+      ]
+    },
+    {
+      "numero": 2,
+      "titulo": "Engine de cálculo de folha",
+      "descricao": "Implementação do coração do sistema: linguagem de fórmulas para rubricas, cálculo de folha mensal e geração de holerites.",
+      "periodo": "Julho – Agosto 2026",
+      "data_inicio": "2026-07-01",
+      "data_fim_prevista": "2026-08-31",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Linguagem de fórmulas configurável (DSL)",
+        "Cálculo de folha mensal ordinária",
+        "Incidências (INSS, IRRF, FGTS, previdência)",
+        "Geração de holerite",
+        "Testes de paridade contra sistema atual"
+      ]
+    },
+    {
+      "numero": 3,
+      "titulo": "Folhas especiais",
+      "descricao": "Cobertura completa dos eventos não-mensais: 13º salário, férias, rescisões, licenças e adiantamentos.",
+      "periodo": "Setembro 2026",
+      "data_inicio": "2026-09-01",
+      "data_fim_prevista": "2026-09-30",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Cálculo de 13º (1ª e 2ª parcelas)",
+        "Férias (com abono e adiantamento)",
+        "Rescisões",
+        "Licença-prêmio",
+        "Folha complementar"
+      ]
+    },
+    {
+      "numero": 4,
+      "titulo": "Obrigações legais federais",
+      "descricao": "Integração com órgãos federais: eSocial, SEFIP, CAGED, RAIS, DIRF e demais obrigações acessórias.",
+      "periodo": "Outubro – Novembro 2026",
+      "data_inicio": "2026-10-01",
+      "data_fim_prevista": "2026-11-30",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Envio de eventos eSocial",
+        "Geração de SEFIP",
+        "Geração de CAGED",
+        "Geração de RAIS e DIRF",
+        "Informe de rendimentos do servidor",
+        "DCTFWeb"
+      ]
+    },
+    {
+      "numero": 5,
+      "titulo": "Integração com Tribunal de Contas",
+      "descricao": "Geração e envio de remessas para o TCE, começando pelo TCE-MA e com arquitetura para outros estados.",
+      "periodo": "Dezembro 2026",
+      "data_inicio": "2026-12-01",
+      "data_fim_prevista": "2026-12-31",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Adaptador para TCE-MA",
+        "Framework para novos TCEs",
+        "Geração e validação de remessas",
+        "Histórico de envios"
+      ]
+    },
+    {
+      "numero": 6,
+      "titulo": "Operação piloto em município real",
+      "descricao": "Validação do sistema em produção, operando em paralelo ao sistema atual. Etapa decisiva para garantir paridade total.",
+      "periodo": "Janeiro 2027",
+      "data_inicio": "2027-01-01",
+      "data_fim_prevista": "2027-01-31",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Operação paralela por 3 competências",
+        "Validação cruzada de cada lançamento",
+        "Correção de divergências",
+        "Treinamento da equipe da prefeitura"
+      ]
+    },
+    {
+      "numero": 7,
+      "titulo": "Diferenciação e modernização",
+      "descricao": "Funcionalidades que tornam o Arminda um produto único: app do servidor, integração WhatsApp, dashboards e inteligência artificial aplicada.",
+      "periodo": "Fevereiro – Abril 2027",
+      "data_inicio": "2027-02-01",
+      "data_fim_prevista": "2027-04-30",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Portal do servidor (web e mobile)",
+        "Bot WhatsApp para consultas",
+        "Painéis de indicadores em tempo real",
+        "Alertas inteligentes de anomalias",
+        "Importador universal de outros sistemas",
+        "API pública para integrações"
+      ]
+    }
+  ],
+  "changelog": [
+    {
+      "data": "2026-04-27",
+      "tipo": "marco",
+      "titulo": "Bloco 0 concluído — projeto iniciado",
+      "descricao": "Repositório, ambiente de desenvolvimento, backend Django, frontend e documentação fundacional foram estruturados. O projeto está pronto para entrar na construção do Bloco 1."
+    }
+  ],
+  "relatorios": [],
+  "contato": {
+    "responsavel": "Darlan Velozo",
+    "papel": "Desenvolvedor",
+    "cidade": "Teresina · PI"
+  }
+}

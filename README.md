@@ -41,11 +41,15 @@ Ver [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) para o racional das decisões.
 ```
 Arminda_Software/
 ├── backend/        Django + DRF — API e regras de negócio
-├── frontend/       Vite + React — interface web
-├── docs/           Documentação (arquitetura, roadmap, ADRs)
+├── frontend/       Vite + React — interface web do produto
+├── status-page/    Painel público de acompanhamento (cliente)
+├── docs/           Documentação (arquitetura, roadmap, ADRs, relatórios)
 ├── scripts/        Utilitários de dev (setup, importadores, etc.)
 └── docker-compose.yml
 ```
+
+**Painel de acompanhamento:** `https://darlanvelozo.github.io/Arminda_Software/`
+Atualizado a cada entrega. Para editar, ver [status-page/README.md](status-page/README.md).
 
 ---
 

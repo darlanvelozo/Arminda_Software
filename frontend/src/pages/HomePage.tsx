@@ -15,10 +15,10 @@ function HomePage() {
         </p>
         <div className="flex flex-wrap justify-center gap-3 pt-6">
           <Link
-            to="/health"
+            to="/status"
             className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Verificar status
+            Status do sistema
           </Link>
           <a
             href="https://github.com/darlanvelozo/Arminda_Software"
