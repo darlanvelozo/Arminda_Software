@@ -1,0 +1,104 @@
+# ============================================================
+# Arminda — .gitignore
+# ============================================================
+
+# ---------- Python / Django ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+develop-eggs/
+.installed.cfg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+backend/static_collected/
+
+# Migrations geradas localmente que não devem ir pro repo durante dev inicial
+# (descomente se preferir não versionar migrations enquanto schema instável)
+# backend/apps/*/migrations/0*.py
+
+# Coverage / pytest
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# mypy / ruff
+.mypy_cache/
+.ruff_cache/
+
+# ---------- Node / Frontend ----------
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# Logs npm/yarn/pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testes frontend
+coverage/
+
+# ---------- Variáveis de ambiente / segredos ----------
+.env
+.env.*
+!.env.example
+
+# ---------- IDEs e editores ----------
+.vscode/
+!.vscode/settings.json.example
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---------- Docker ----------
+docker-compose.override.yml
+
+# ---------- Dados sensíveis e backups ----------
+*.fdb
+*.FDB
+*.bak
+*.dump
+*.sql.gz
+backups/
+dumps/
+data/
+uploads/
+tmp/
+
+# ---------- Documentos de trabalho local ----------
+notas/
+scratch/
+TODO.local.md

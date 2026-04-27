@@ -1,0 +1,70 @@
+[project]
+name = "arminda-backend"
+version = "0.1.0"
+description = "Arminda — backend Django para folha de pagamento municipal"
+requires-python = ">=3.12"
+
+# ============================================================
+# Ruff — formatação e lint
+# ============================================================
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".venv",
+    "venv",
+    "migrations",
+    "static_collected",
+    "media",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "DJ",  # flake8-django
+    "C90", # mccabe complexity
+]
+ignore = [
+    "E501",  # line too long — formatter cuida
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/migrations/*.py" = ["E501"]
+"**/settings/*.py" = ["F403", "F405"]
+
+# ============================================================
+# Pytest
+# ============================================================
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "arminda.settings.dev"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "-v",
+]
+testpaths = ["tests", "apps"]
+
+# ============================================================
+# Coverage
+# ============================================================
+[tool.coverage.run]
+source = ["apps", "arminda"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/settings/*",
+    "manage.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

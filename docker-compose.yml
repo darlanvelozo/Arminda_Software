@@ -1,0 +1,38 @@
+name: arminda
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: arminda-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-arminda}
+      POSTGRES_USER: ${POSTGRES_USER:-arminda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-arminda_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - arminda_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-arminda}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: arminda-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - arminda_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  arminda_postgres_data:
+  arminda_redis_data:
