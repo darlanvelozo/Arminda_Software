@@ -21,13 +21,13 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: arminda_test
+          POSTGRES_DB: arminda
           POSTGRES_USER: arminda
           POSTGRES_PASSWORD: arminda_test_password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U arminda"
+          --health-cmd "pg_isready -U arminda -d arminda"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -73,7 +73,7 @@ jobs:
           DJANGO_DEBUG: "True"
           POSTGRES_HOST: localhost
           POSTGRES_PORT: "5432"
-          POSTGRES_DB: arminda_test
+          POSTGRES_DB: arminda
           POSTGRES_USER: arminda
           POSTGRES_PASSWORD: arminda_test_password
           CELERY_BROKER_URL: redis://localhost:6379/1
@@ -86,7 +86,7 @@ jobs:
           DJANGO_DEBUG: "True"
           POSTGRES_HOST: localhost
           POSTGRES_PORT: "5432"
-          POSTGRES_DB: arminda_test
+          POSTGRES_DB: arminda
           POSTGRES_USER: arminda
           POSTGRES_PASSWORD: arminda_test_password
           CELERY_BROKER_URL: redis://localhost:6379/1
