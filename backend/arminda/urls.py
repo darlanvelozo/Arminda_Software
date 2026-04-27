@@ -43,14 +43,16 @@ def status_page(_request):
 
     all_ok = all(c["status"] == "ok" for c in checks.values())
 
-    return JsonResponse({
-        "status": "ok" if all_ok else "degraded",
-        "service": "arminda",
-        "version": "0.1.0",
-        "uptime": f"{hours}h {minutes}m {seconds}s",
-        "uptime_seconds": uptime_seconds,
-        "checks": checks,
-    })
+    return JsonResponse(
+        {
+            "status": "ok" if all_ok else "degraded",
+            "service": "arminda",
+            "version": "0.1.0",
+            "uptime": f"{hours}h {minutes}m {seconds}s",
+            "uptime_seconds": uptime_seconds,
+            "checks": checks,
+        }
+    )
 
 
 urlpatterns = [

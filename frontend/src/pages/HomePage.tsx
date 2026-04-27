@@ -4,9 +4,7 @@ function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
       <div className="max-w-2xl text-center space-y-6">
-        <h1 className="text-5xl font-bold tracking-tight text-primary">
-          Arminda
-        </h1>
+        <h1 className="text-5xl font-bold tracking-tight text-primary">Arminda</h1>
         <p className="text-xl text-muted-foreground">
           Folha de pagamento e gestão de pessoal para prefeituras.
         </p>

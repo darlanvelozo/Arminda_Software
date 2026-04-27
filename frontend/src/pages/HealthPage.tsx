@@ -43,9 +43,7 @@ function StatusBadge({ status }: { status: string }) {
           : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
       }`}
     >
-      <span
-        className={`h-2 w-2 rounded-full ${isOk ? "bg-green-500" : "bg-red-500"}`}
-      />
+      <span className={`h-2 w-2 rounded-full ${isOk ? "bg-green-500" : "bg-red-500"}`} />
       {isOk ? "Operacional" : "Com problemas"}
     </span>
   );
@@ -85,9 +83,7 @@ function HealthPage() {
           {isLoading && (
             <div className="flex items-center justify-center gap-2">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <span className="text-sm text-muted-foreground">
-                Verificando servicos...
-              </span>
+              <span className="text-sm text-muted-foreground">Verificando servicos...</span>
             </div>
           )}
 
@@ -97,14 +93,10 @@ function HealthPage() {
                 <span className="h-2 w-2 rounded-full bg-red-500" />
                 Fora do ar
               </span>
-              <p className="text-sm text-muted-foreground">
-                Nao foi possivel conectar ao backend.
-              </p>
+              <p className="text-sm text-muted-foreground">Nao foi possivel conectar ao backend.</p>
               <p className="text-xs text-muted-foreground">
                 Verifique se o servidor esta rodando em{" "}
-                <code className="rounded bg-muted px-1 py-0.5">
-                  http://localhost:8000
-                </code>
+                <code className="rounded bg-muted px-1 py-0.5">http://localhost:8000</code>
               </p>
             </div>
           )}
@@ -113,8 +105,7 @@ function HealthPage() {
             <div className="space-y-1">
               <StatusBadge status={statusQuery.data.status} />
               <p className="text-xs text-muted-foreground pt-1">
-                v{statusQuery.data.version} &middot; Uptime:{" "}
-                {statusQuery.data.uptime}
+                v{statusQuery.data.version} &middot; Uptime: {statusQuery.data.uptime}
               </p>
             </div>
           )}
@@ -135,40 +126,29 @@ function HealthPage() {
                 </span>
                 <div>
                   <p className="text-sm font-medium">API REST</p>
-                  <p className="text-xs text-muted-foreground">
-                    Django REST Framework
-                  </p>
+                  <p className="text-xs text-muted-foreground">Django REST Framework</p>
                 </div>
               </div>
-              <StatusBadge
-                status={healthQuery.data ? "ok" : "error"}
-              />
+              <StatusBadge status={healthQuery.data ? "ok" : "error"} />
             </div>
 
             {/* Dynamic checks from /status/ */}
-            {Object.entries(statusQuery.data.checks).map(
-              ([name, check]) => (
-                <div
-                  key={name}
-                  className="flex items-center justify-between px-6 py-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-sm">
-                      DB
-                    </span>
-                    <div>
-                      <p className="text-sm font-medium capitalize">
-                        {name === "database" ? "Banco de Dados" : name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {check.detail}
-                      </p>
-                    </div>
+            {Object.entries(statusQuery.data.checks).map(([name, check]) => (
+              <div key={name} className="flex items-center justify-between px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-sm">
+                    DB
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium capitalize">
+                      {name === "database" ? "Banco de Dados" : name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{check.detail}</p>
                   </div>
-                  <StatusBadge status={check.status} />
                 </div>
-              ),
-            )}
+                <StatusBadge status={check.status} />
+              </div>
+            ))}
           </div>
         )}
 
@@ -189,9 +169,7 @@ function HealthPage() {
           <Link to="/" className="text-primary hover:underline">
             &larr; Voltar
           </Link>
-          <span className="text-xs">
-            Atualiza a cada 30s
-          </span>
+          <span className="text-xs">Atualiza a cada 30s</span>
         </div>
       </div>
     </main>

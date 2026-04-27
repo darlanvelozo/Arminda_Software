@@ -18,17 +18,12 @@ function renderWithProviders(ui: React.ReactNode) {
 describe("HomePage", () => {
   it("renderiza o título Arminda", () => {
     renderWithProviders(<HomePage />);
-    expect(
-      screen.getByRole("heading", { name: /arminda/i, level: 1 }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /arminda/i, level: 1 })).toBeInTheDocument();
   });
 
   it("mostra link para o repositório no GitHub", () => {
     renderWithProviders(<HomePage />);
     const link = screen.getByRole("link", { name: /repositório/i });
-    expect(link).toHaveAttribute(
-      "href",
-      "https://github.com/darlanvelozo/Arminda_Software",
-    );
+    expect(link).toHaveAttribute("href", "https://github.com/darlanvelozo/Arminda_Software");
   });
 });
