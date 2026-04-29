@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-04-29",
   "bloco_atual": 1,
-  "progresso_geral_pct": 15,
+  "progresso_geral_pct": 22,
   "blocos": [
     {
       "numero": 0,
@@ -36,12 +36,15 @@
       "data_fim_prevista": "2026-06-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 25,
+      "progresso_pct": 45,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
         "✅ Autenticação JWT e controle de acesso (RBAC por município)",
         "✅ Histórico funcional auditado (simple-history ativo)",
-        "Cadastro de servidor, cargo, vínculo e lotação (API REST — em andamento)",
+        "✅ Cadastro de servidor, cargo, vínculo, lotação, dependente e documento via API REST",
+        "✅ Validação de CPF, PIS/PASEP e datas brasileiras",
+        "✅ Endpoint de histórico de servidor + upload de documentos digitalizados",
+        "Serviços de admissão, desligamento e transferência (em andamento)",
         "Importador inicial do sistema atual (Fiorilli SIP → Postgres)",
         "Telas básicas de cadastro (frontend autenticado)"
       ]
@@ -156,6 +159,24 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-04-29",
+      "tipo": "entrega",
+      "titulo": "Cadastros centrais via API REST disponíveis",
+      "descricao": "Foram entregues os cadastros completos de servidor, vínculo funcional, dependente e documento, além de cargo e lotação. Inclui validação de CPF e PIS/PASEP, controle de acesso por papel, isolamento real entre municípios e endpoint de histórico de cada servidor. 126 testes automatizados, 96% de cobertura. Performance medida: 100 servidores criados via API em ~5 segundos."
+    },
+    {
+      "data": "2026-04-29",
+      "tipo": "marco",
+      "titulo": "Fundação técnica do Bloco 1 concluída",
+      "descricao": "Multi-tenant ativo (cada município opera em schema isolado no PostgreSQL), autenticação por JWT, controle de acesso por papel (RBAC), auditoria automática de mudanças e usuário customizado por e-mail. A base sobre a qual o resto do produto é construído está pronta."
+    },
+    {
+      "data": "2026-04-28",
+      "tipo": "processo",
+      "titulo": "Sistema de contexto distribuído implantado",
+      "descricao": "Cada parte do projeto passou a ter regras escritas que devem ser consultadas antes de implementar e um registro vivo do que foi feito. Garante que nenhuma alteração ocorra fora de padrão."
+    },
     {
       "data": "2026-04-27",
       "tipo": "marco",
