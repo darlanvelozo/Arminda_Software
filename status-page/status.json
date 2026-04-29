@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-04-29",
   "bloco_atual": 1,
-  "progresso_geral_pct": 28,
+  "progresso_geral_pct": 32,
   "blocos": [
     {
       "numero": 0,
@@ -36,7 +36,7 @@
       "data_fim_prevista": "2026-06-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 60,
+      "progresso_pct": 70,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
         "✅ Autenticação JWT e controle de acesso (RBAC por município)",
@@ -47,8 +47,9 @@
         "✅ Serviços de admissão, desligamento e transferência com regras de negócio em transação atômica",
         "✅ Cadastro de rubricas (esqueleto, sem cálculo ainda)",
         "✅ Comando para criar usuário e atribuir papel via linha de comando",
-        "Importador inicial do sistema atual (Fiorilli SIP → Postgres)",
-        "Telas básicas de cadastro (frontend autenticado)"
+        "✅ Frontend autenticado: tela de login, layout, troca de município, dashboard",
+        "Telas de domínio (servidor/cargo/lotação/rubrica) — em andamento",
+        "Importador inicial do sistema atual (Fiorilli SIP → Postgres)"
       ]
     },
     {
@@ -161,6 +162,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-04-29",
+      "tipo": "entrega",
+      "titulo": "Frontend autenticado disponível",
+      "descricao": "A interface web do Arminda agora tem login real, layout completo (sidebar + topbar) e troca de município ativo para usuários que operam em mais de uma prefeitura. Tipos TypeScript dos contratos de API são gerados automaticamente a partir do schema OpenAPI do backend, evitando dessincronização. As telas de cadastro de domínio entram na próxima onda."
+    },
     {
       "data": "2026-04-29",
       "tipo": "validacao",

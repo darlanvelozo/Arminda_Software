@@ -35,6 +35,102 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.3 — Onda 1.3a: Frontend autenticado · 2026-04-29
+
+> Primeira fatia do frontend autenticado. O esqueleto de login, layout
+> e troca de tenant está pronto. Telas de domínio (Servidor, Cargo,
+> Lotação, Rubrica) entram na Onda 1.3b.
+
+#### Adicionado
+
+- **feat(frontend):** Geração automática de tipos OpenAPI via
+  `openapi-typescript` (ADR-0008).
+  - `npm run gen:types` lê `/api/schema/?format=json` do backend
+    rodando em `:8000` e escreve `src/types/api.ts`.
+  - `npm run gen:types:offline` lê do snapshot `openapi-schema.json`
+    commitado.
+  - `src/types/index.ts` faz aliases legíveis: `Servidor`,
+    `CargoWrite`, `AdmissaoInput`, `LoginResponse`, etc.
+  - Tipos manuais à mão são proibidos em código novo a partir desta
+    ADR (com exceções documentadas para `UserMe` e
+    `HistoricoServidorEntry`, onde drf-spectacular não tipa o
+    response — TODO: adicionar `@extend_schema` no backend).
+
+- **feat(frontend/auth):** Camada completa de autenticação JWT.
+  - `src/lib/auth-storage.ts` — wrappers de localStorage para tokens
+    e tenant ativo.
+  - `src/lib/auth.ts` — `login()`, `logout()`, `fetchMe()`.
+  - `src/lib/auth-context.tsx` — `<AuthProvider>` + `useAuth()` hook
+    com `user`, `activeTenant`, `papelAtual`, `switchTenant`.
+  - `src/lib/api.ts` reescrito: interceptor de request injeta
+    `Authorization: Bearer <access>` + `X-Tenant: <schema>`;
+    interceptor de response tenta refresh em 401 (com lock para evitar
+    múltiplas chamadas concorrentes), redireciona para `/login` se
+    refresh falhar.
+
+- **feat(frontend/components):** 11 primitivos shadcn/ui adicionados
+  via `npx shadcn add` (button, input, label, card, dropdown-menu,
+  sheet, separator, avatar, skeleton, sonner, form). Versionados em
+  `src/components/ui/`.
+
+- **feat(frontend/layout):** AppShell + Sidebar + Topbar.
+  - `Sidebar` com 6 itens (Dashboard, Servidores, Cargos, Lotações,
+    Rubricas, Relatórios) — esconde abaixo de `lg`.
+  - `Topbar` com seletor de município (dropdown se >1, label estático
+    se 1) + dropdown de perfil com logout.
+  - Trocar de município chama `queryClient.clear()` para evitar
+    vazamento de cache entre tenants.
+
+- **feat(frontend/pages):**
+  - `LoginPage` (`/login`) — formulário com validação HTML5,
+    mensagens de erro com `code` do backend, redireciona pós-login.
+  - `SelecionarMunicipioPage` (`/selecionar-municipio`) — escolha de
+    tenant para usuários com 2+ municípios.
+  - `DashboardPage` (`/`) — placeholder com cards de atalhos.
+  - `EmConstrucaoPage` — placeholder reutilizado em
+    `/servidores`, `/cargos`, `/lotacoes`, `/rubricas`, `/relatorios`.
+  - `<RequireAuth>` wrapper para rotas autenticadas.
+
+- **test(frontend):** 8 testes novos.
+  - `auth-storage.test.ts` (5): tokens round-trip, tenant ativo,
+    clear total, comportamento sem storage.
+  - `LoginPage.test.tsx` (3): render, submit chama `login()` com
+    payload correto, mensagem de erro aparece em falha.
+  - `test/utils.tsx` com helpers `renderWithProviders` e
+    `renderWithAuth`.
+
+#### Modificado
+
+- **chore(frontend/deps):** instalado `openapi-typescript` (dev),
+  `@testing-library/user-event` (dev). 11 primitivos shadcn trazem
+  Radix + sonner + react-hook-form + next-themes.
+- **chore(frontend):** `main.tsx` envolve `<App />` em `<AuthProvider>`
+  + `<Toaster>` (sonner). `App.tsx` reescrito com rotas autenticadas.
+- **chore(.gitignore):** já incluía `*.tsbuildinfo` (commit anterior).
+
+#### Validações
+
+- `npx tsc --noEmit` — limpo.
+- `npm run lint` — 3 warnings (fast-refresh em arquivos shadcn padrão
+  e em `auth-context.tsx` que exporta hook + provider — aceitável).
+- `npm run format` — verde.
+- `npm run build` — 451 KB / 141 KB gzip.
+- `npm test` — **10/10 passando** (5 storage + 3 login + 2 HomePage
+  legado).
+- Backend: 193 testes mantidos verdes, 97% cobertura.
+
+#### Próximos passos
+
+- **Onda 1.3b** (~1 sem): Servidor (lista + detalhe + admissão),
+  Cargo CRUD, Lotação CRUD, Rubrica esqueleto.
+  Hooks de API tipados consumindo `components["schemas"][...]`.
+  Endpoint `@extend_schema` no backend para tipar `UserMe` e
+  `HistoricoServidorEntry` (eliminar tipagem manual).
+- Adicionar `@extend_schema` no `MeView` para que o `gen:types` tipe
+  o response de `/api/auth/me/`.
+
+---
+
 ### Bloco 1.2 — Onda 3 (hotfix): admin do Django + cobertura HTML · 2026-04-29
 
 > ⚠ Bug identificado por **navegação manual do usuário** que minha

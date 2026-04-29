@@ -1,0 +1,4659 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Arminda API",
+        "version": "0.2.0-dev",
+        "description": "API do sistema Arminda — folha de pagamento e gestao de pessoal municipal."
+    },
+    "paths": {
+        "/api/auth/login/": {
+            "post": {
+                "operationId": "auth_login_create",
+                "description": "POST /api/auth/login/ — autentica e retorna tokens.",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ArmindaTokenObtainPair"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ArmindaTokenObtainPair"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ArmindaTokenObtainPair"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ArmindaTokenObtainPair"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/auth/logout/": {
+            "post": {
+                "operationId": "auth_logout_create",
+                "description": "POST /api/auth/logout/ — blacklist o refresh token informado.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/me/": {
+            "get": {
+                "operationId": "auth_me_retrieve",
+                "description": "GET /api/auth/me/ — retorna o usuario autenticado + papeis.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/auth/refresh/": {
+            "post": {
+                "operationId": "auth_refresh_create",
+                "description": "POST /api/auth/refresh/ — gera novo access a partir do refresh.",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRefresh"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRefresh"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRefresh"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenRefresh"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/payroll/rubricas/": {
+            "get": {
+                "operationId": "payroll_rubricas_list",
+                "description": "CRUD de rubricas (provento, desconto, informativa) do tenant atual.\n\nDSL de calculo (campo `formula`) sera implementada no Bloco 2;\naqui aceitamos como TextField sem interpretacao.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "ativo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "codigo",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "incide_fgts",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "incide_inss",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "incide_irrf",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "nome",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "tipo",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "desconto",
+                                "informativa",
+                                "provento"
+                            ]
+                        },
+                        "description": "* `provento` - Provento\n* `desconto` - Desconto\n* `informativa` - Informativa"
+                    }
+                ],
+                "tags": [
+                    "payroll"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedRubricaListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "payroll_rubricas_create",
+                "description": "CRUD de rubricas (provento, desconto, informativa) do tenant atual.\n\nDSL de calculo (campo `formula`) sera implementada no Bloco 2;\naqui aceitamos como TextField sem interpretacao.",
+                "tags": [
+                    "payroll"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RubricaWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RubricaWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RubricaWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RubricaWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/payroll/rubricas/{id}/": {
+            "get": {
+                "operationId": "payroll_rubricas_retrieve",
+                "description": "CRUD de rubricas (provento, desconto, informativa) do tenant atual.\n\nDSL de calculo (campo `formula`) sera implementada no Bloco 2;\naqui aceitamos como TextField sem interpretacao.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this rubrica.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "payroll"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RubricaDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "payroll_rubricas_update",
+                "description": "CRUD de rubricas (provento, desconto, informativa) do tenant atual.\n\nDSL de calculo (campo `formula`) sera implementada no Bloco 2;\naqui aceitamos como TextField sem interpretacao.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this rubrica.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "payroll"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RubricaWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RubricaWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RubricaWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RubricaWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "payroll_rubricas_partial_update",
+                "description": "CRUD de rubricas (provento, desconto, informativa) do tenant atual.\n\nDSL de calculo (campo `formula`) sera implementada no Bloco 2;\naqui aceitamos como TextField sem interpretacao.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this rubrica.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "payroll"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedRubricaWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedRubricaWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedRubricaWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RubricaWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "payroll_rubricas_destroy",
+                "description": "CRUD de rubricas (provento, desconto, informativa) do tenant atual.\n\nDSL de calculo (campo `formula`) sera implementada no Bloco 2;\naqui aceitamos como TextField sem interpretacao.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this rubrica.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "payroll"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/cargos/": {
+            "get": {
+                "operationId": "people_cargos_list",
+                "description": "CRUD de cargos do municipio (tenant atual).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "ativo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "codigo",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "nivel_escolaridade",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "fundamental",
+                                "medio",
+                                "pos_graduacao",
+                                "superior",
+                                "tecnico"
+                            ]
+                        },
+                        "description": "* `fundamental` - Fundamental\n* `medio` - Medio\n* `tecnico` - Tecnico\n* `superior` - Superior\n* `pos_graduacao` - Pos-graduacao"
+                    },
+                    {
+                        "in": "query",
+                        "name": "nome",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedCargoListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_cargos_create",
+                "description": "CRUD de cargos do municipio (tenant atual).",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CargoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CargoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CargoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CargoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/cargos/{id}/": {
+            "get": {
+                "operationId": "people_cargos_retrieve",
+                "description": "CRUD de cargos do municipio (tenant atual).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this cargo.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CargoDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_cargos_update",
+                "description": "CRUD de cargos do municipio (tenant atual).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this cargo.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CargoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CargoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CargoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CargoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_cargos_partial_update",
+                "description": "CRUD de cargos do municipio (tenant atual).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this cargo.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCargoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCargoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedCargoWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CargoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_cargos_destroy",
+                "description": "CRUD de cargos do municipio (tenant atual).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this cargo.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/dependentes/": {
+            "get": {
+                "operationId": "people_dependentes_list",
+                "description": "CRUD de dependentes (filtrar por ?servidor=<id>).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "ir",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "nome",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "parentesco",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "conjuge",
+                                "enteado",
+                                "filho",
+                                "outro",
+                                "pai_mae"
+                            ]
+                        },
+                        "description": "* `conjuge` - Conjuge\n* `filho` - Filho(a)\n* `enteado` - Enteado(a)\n* `pai_mae` - Pai/Mae\n* `outro` - Outro"
+                    },
+                    {
+                        "in": "query",
+                        "name": "salario_familia",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "servidor",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedDependenteListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_dependentes_create",
+                "description": "CRUD de dependentes (filtrar por ?servidor=<id>).",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DependenteWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DependenteWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DependenteWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DependenteWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/dependentes/{id}/": {
+            "get": {
+                "operationId": "people_dependentes_retrieve",
+                "description": "CRUD de dependentes (filtrar por ?servidor=<id>).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this dependente.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DependenteDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_dependentes_update",
+                "description": "CRUD de dependentes (filtrar por ?servidor=<id>).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this dependente.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DependenteWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DependenteWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DependenteWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DependenteWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_dependentes_partial_update",
+                "description": "CRUD de dependentes (filtrar por ?servidor=<id>).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this dependente.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedDependenteWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedDependenteWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedDependenteWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DependenteWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_dependentes_destroy",
+                "description": "CRUD de dependentes (filtrar por ?servidor=<id>).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this dependente.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/documentos/": {
+            "get": {
+                "operationId": "people_documentos_list",
+                "description": "CRUD de documentos digitalizados (upload via multipart).",
+                "parameters": [
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "servidor",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "tipo",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "carteira_trabalho",
+                                "certificado",
+                                "comprovante_residencia",
+                                "cpf",
+                                "outro",
+                                "rg",
+                                "titulo_eleitor"
+                            ]
+                        },
+                        "description": "* `rg` - RG\n* `cpf` - CPF\n* `titulo_eleitor` - Titulo de eleitor\n* `carteira_trabalho` - Carteira de trabalho\n* `certificado` - Certificado/Diploma\n* `comprovante_residencia` - Comprovante de residencia\n* `outro` - Outro"
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedDocumentoListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_documentos_create",
+                "description": "CRUD de documentos digitalizados (upload via multipart).",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoWrite"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/documentos/{id}/": {
+            "get": {
+                "operationId": "people_documentos_retrieve",
+                "description": "CRUD de documentos digitalizados (upload via multipart).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this documento.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_documentos_update",
+                "description": "CRUD de documentos digitalizados (upload via multipart).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this documento.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoWrite"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocumentoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_documentos_partial_update",
+                "description": "CRUD de documentos digitalizados (upload via multipart).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this documento.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedDocumentoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedDocumentoWrite"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedDocumentoWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_documentos_destroy",
+                "description": "CRUD de documentos digitalizados (upload via multipart).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this documento.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/lotacoes/": {
+            "get": {
+                "operationId": "people_lotacoes_list",
+                "description": "CRUD de lotacoes (secretarias) do municipio.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "ativo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "codigo",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "lotacao_pai",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "nome",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "raiz",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedLotacaoListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_lotacoes_create",
+                "description": "CRUD de lotacoes (secretarias) do municipio.",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LotacaoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LotacaoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LotacaoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LotacaoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/lotacoes/{id}/": {
+            "get": {
+                "operationId": "people_lotacoes_retrieve",
+                "description": "CRUD de lotacoes (secretarias) do municipio.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this lotacao.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LotacaoDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_lotacoes_update",
+                "description": "CRUD de lotacoes (secretarias) do municipio.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this lotacao.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LotacaoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LotacaoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LotacaoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LotacaoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_lotacoes_partial_update",
+                "description": "CRUD de lotacoes (secretarias) do municipio.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this lotacao.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedLotacaoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedLotacaoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedLotacaoWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LotacaoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_lotacoes_destroy",
+                "description": "CRUD de lotacoes (secretarias) do municipio.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this lotacao.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/servidores/": {
+            "get": {
+                "operationId": "people_servidores_list",
+                "description": "CRUD de servidores do municipio + endpoint de historico.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "ativo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "cargo",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "lotacao",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "matricula",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "nome",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "regime",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "sexo",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "F",
+                                "M"
+                            ]
+                        },
+                        "description": "* `M` - Masculino\n* `F` - Feminino"
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedServidorListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_servidores_create",
+                "description": "CRUD de servidores do municipio + endpoint de historico.",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServidorWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServidorWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServidorWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServidorWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/servidores/{id}/": {
+            "get": {
+                "operationId": "people_servidores_retrieve",
+                "description": "CRUD de servidores do municipio + endpoint de historico.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this servidor.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServidorDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_servidores_update",
+                "description": "CRUD de servidores do municipio + endpoint de historico.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this servidor.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServidorWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServidorWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServidorWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServidorWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_servidores_partial_update",
+                "description": "CRUD de servidores do municipio + endpoint de historico.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this servidor.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedServidorWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedServidorWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedServidorWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServidorWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_servidores_destroy",
+                "description": "CRUD de servidores do municipio + endpoint de historico.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this servidor.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/servidores/{id}/desligar/": {
+            "post": {
+                "operationId": "people_servidores_desligar_create",
+                "description": "POST /api/people/servidores/<id>/desligar/ — encerra vinculos + inativa.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this servidor.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DesligamentoInput"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DesligamentoInput"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DesligamentoInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DesligamentoInput"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/servidores/{id}/historico/": {
+            "get": {
+                "operationId": "people_servidores_historico_retrieve",
+                "description": "GET /api/people/servidores/{id}/historico/ — versoes simple-history.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this servidor.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServidorDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/servidores/admitir/": {
+            "post": {
+                "operationId": "people_servidores_admitir_create",
+                "description": "POST /api/people/servidores/admitir/ — cria Servidor + Vinculo (atomico).",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdmissaoInput"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdmissaoInput"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AdmissaoInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdmissaoInput"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/vinculos/": {
+            "get": {
+                "operationId": "people_vinculos_list",
+                "description": "CRUD de vinculos funcionais (servidor x cargo x lotacao).",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "admitido_apos",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "admitido_ate",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "ativo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "cargo",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "lotacao",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "ordering",
+                        "required": false,
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "regime",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "celetista",
+                                "comissionado",
+                                "estagiario",
+                                "estatutario",
+                                "temporario"
+                            ]
+                        },
+                        "description": "* `estatutario` - Estatutario\n* `celetista` - Celetista\n* `comissionado` - Comissionado\n* `temporario` - Temporario\n* `estagiario` - Estagiario"
+                    },
+                    {
+                        "name": "search",
+                        "required": false,
+                        "in": "query",
+                        "description": "A search term.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "servidor",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedVinculoListList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "people_vinculos_create",
+                "description": "CRUD de vinculos funcionais (servidor x cargo x lotacao).",
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VinculoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VinculoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VinculoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VinculoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/people/vinculos/{id}/": {
+            "get": {
+                "operationId": "people_vinculos_retrieve",
+                "description": "CRUD de vinculos funcionais (servidor x cargo x lotacao).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this vinculo funcional.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VinculoDetail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "operationId": "people_vinculos_update",
+                "description": "CRUD de vinculos funcionais (servidor x cargo x lotacao).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this vinculo funcional.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VinculoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VinculoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VinculoWrite"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VinculoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "people_vinculos_partial_update",
+                "description": "CRUD de vinculos funcionais (servidor x cargo x lotacao).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this vinculo funcional.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVinculoWrite"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVinculoWrite"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedVinculoWrite"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VinculoWrite"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "people_vinculos_destroy",
+                "description": "CRUD de vinculos funcionais (servidor x cargo x lotacao).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this vinculo funcional.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/people/vinculos/{id}/transferir/": {
+            "post": {
+                "operationId": "people_vinculos_transferir_create",
+                "description": "POST /api/people/vinculos/<id>/transferir/ — encerra atual + cria novo.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "A unique integer value identifying this vinculo funcional.",
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "people"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransferenciaInput"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransferenciaInput"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransferenciaInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {
+                        "cookieAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransferenciaInput"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AdmissaoInput": {
+                "type": "object",
+                "description": "Input para POST /api/people/servidores/admitir/.\n\nEspelha apps.people.services.admissao.DadosAdmissao.",
+                "properties": {
+                    "matricula": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "sexo": {
+                        "type": "string",
+                        "maxLength": 1
+                    },
+                    "estado_civil": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "pis_pasep": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "telefone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "cargo_id": {
+                        "type": "integer"
+                    },
+                    "lotacao_id": {
+                        "type": "integer"
+                    },
+                    "regime": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "data_admissao": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "salario_base": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$"
+                    },
+                    "carga_horaria": {
+                        "type": "integer",
+                        "maximum": 60,
+                        "minimum": 1,
+                        "default": 40
+                    }
+                },
+                "required": [
+                    "cargo_id",
+                    "cpf",
+                    "data_admissao",
+                    "data_nascimento",
+                    "lotacao_id",
+                    "matricula",
+                    "nome",
+                    "regime",
+                    "salario_base",
+                    "sexo"
+                ]
+            },
+            "ArmindaTokenObtainPair": {
+                "type": "object",
+                "description": "Login: gera tokens com claims customizadas e retorna dados do usuario.",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "writeOnly": true
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true
+                    }
+                },
+                "required": [
+                    "email",
+                    "password"
+                ]
+            },
+            "BlankEnum": {
+                "enum": [
+                    ""
+                ]
+            },
+            "CargoDetail": {
+                "type": "object",
+                "description": "Versao completa para retrieve.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cbo": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "nivel_escolaridade": {
+                        "$ref": "#/components/schemas/NivelEscolaridadeEnum"
+                    },
+                    "nivel_escolaridade_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "atualizado_em",
+                    "codigo",
+                    "criado_em",
+                    "id",
+                    "nivel_escolaridade_display",
+                    "nome"
+                ]
+            },
+            "CargoList": {
+                "type": "object",
+                "description": "Versao enxuta para listagem.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "nivel_escolaridade": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/NivelEscolaridadeEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "nivel_escolaridade_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ativo": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "ativo",
+                    "codigo",
+                    "id",
+                    "nivel_escolaridade",
+                    "nivel_escolaridade_display",
+                    "nome"
+                ]
+            },
+            "CargoWrite": {
+                "type": "object",
+                "description": "Versao para create/update.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cbo": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "nivel_escolaridade": {
+                        "$ref": "#/components/schemas/NivelEscolaridadeEnum"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "codigo",
+                    "id",
+                    "nome"
+                ]
+            },
+            "DependenteDetail": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "parentesco": {
+                        "$ref": "#/components/schemas/ParentescoEnum"
+                    },
+                    "parentesco_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ir": {
+                        "type": "boolean",
+                        "title": "Dependente para IR"
+                    },
+                    "salario_familia": {
+                        "type": "boolean"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "atualizado_em",
+                    "criado_em",
+                    "data_nascimento",
+                    "id",
+                    "nome",
+                    "parentesco",
+                    "parentesco_display",
+                    "servidor"
+                ]
+            },
+            "DependenteList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "parentesco": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ParentescoEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "parentesco_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date",
+                        "readOnly": true
+                    },
+                    "ir": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "title": "Dependente para IR"
+                    },
+                    "salario_familia": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "data_nascimento",
+                    "id",
+                    "ir",
+                    "nome",
+                    "parentesco",
+                    "parentesco_display",
+                    "salario_familia",
+                    "servidor"
+                ]
+            },
+            "DependenteWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "parentesco": {
+                        "$ref": "#/components/schemas/ParentescoEnum"
+                    },
+                    "ir": {
+                        "type": "boolean",
+                        "title": "Dependente para IR"
+                    },
+                    "salario_familia": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "data_nascimento",
+                    "id",
+                    "nome",
+                    "parentesco",
+                    "servidor"
+                ]
+            },
+            "DesligamentoInput": {
+                "type": "object",
+                "description": "Input para POST /api/people/servidores/<id>/desligar/.",
+                "properties": {
+                    "data_desligamento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "motivo": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
+                },
+                "required": [
+                    "data_desligamento"
+                ]
+            },
+            "DocumentoDetail": {
+                "type": "object",
+                "description": "Mesmo que List por ora — todos os campos sao basicos.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "tipo": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TipoC3eEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "tipo_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "descricao": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "arquivo": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "data_upload": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "arquivo",
+                    "data_upload",
+                    "descricao",
+                    "id",
+                    "servidor",
+                    "tipo",
+                    "tipo_display"
+                ]
+            },
+            "DocumentoList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "tipo": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TipoC3eEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "tipo_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "descricao": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "arquivo": {
+                        "type": "string",
+                        "format": "uri",
+                        "readOnly": true
+                    },
+                    "data_upload": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "arquivo",
+                    "data_upload",
+                    "descricao",
+                    "id",
+                    "servidor",
+                    "tipo",
+                    "tipo_display"
+                ]
+            },
+            "DocumentoWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "tipo": {
+                        "$ref": "#/components/schemas/TipoC3eEnum"
+                    },
+                    "descricao": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "arquivo": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                },
+                "required": [
+                    "arquivo",
+                    "id",
+                    "servidor",
+                    "tipo"
+                ]
+            },
+            "EstadoCivilEnum": {
+                "enum": [
+                    "solteiro",
+                    "casado",
+                    "divorciado",
+                    "viuvo",
+                    "uniao_estavel"
+                ],
+                "type": "string",
+                "description": "* `solteiro` - Solteiro(a)\n* `casado` - Casado(a)\n* `divorciado` - Divorciado(a)\n* `viuvo` - Viuvo(a)\n* `uniao_estavel` - Uniao estavel"
+            },
+            "LotacaoDetail": {
+                "type": "object",
+                "description": "Versao completa com resumo do pai.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "sigla": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "lotacao_pai": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "lotacao_pai_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "atualizado_em",
+                    "codigo",
+                    "criado_em",
+                    "id",
+                    "lotacao_pai_nome",
+                    "nome"
+                ]
+            },
+            "LotacaoList": {
+                "type": "object",
+                "description": "Versao enxuta para listagem.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "sigla": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ativo": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "ativo",
+                    "codigo",
+                    "id",
+                    "nome",
+                    "sigla"
+                ]
+            },
+            "LotacaoWrite": {
+                "type": "object",
+                "description": "Versao para create/update.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "sigla": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "lotacao_pai": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "codigo",
+                    "id",
+                    "nome"
+                ]
+            },
+            "NivelEscolaridadeEnum": {
+                "enum": [
+                    "fundamental",
+                    "medio",
+                    "tecnico",
+                    "superior",
+                    "pos_graduacao"
+                ],
+                "type": "string",
+                "description": "* `fundamental` - Fundamental\n* `medio` - Medio\n* `tecnico` - Tecnico\n* `superior` - Superior\n* `pos_graduacao` - Pos-graduacao"
+            },
+            "PaginatedCargoListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CargoList"
+                        }
+                    }
+                }
+            },
+            "PaginatedDependenteListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DependenteList"
+                        }
+                    }
+                }
+            },
+            "PaginatedDocumentoListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DocumentoList"
+                        }
+                    }
+                }
+            },
+            "PaginatedLotacaoListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LotacaoList"
+                        }
+                    }
+                }
+            },
+            "PaginatedRubricaListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RubricaList"
+                        }
+                    }
+                }
+            },
+            "PaginatedServidorListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ServidorList"
+                        }
+                    }
+                }
+            },
+            "PaginatedVinculoListList": {
+                "type": "object",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "properties": {
+                    "count": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "next": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                        "type": "string",
+                        "nullable": true,
+                        "format": "uri",
+                        "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/VinculoList"
+                        }
+                    }
+                }
+            },
+            "ParentescoEnum": {
+                "enum": [
+                    "conjuge",
+                    "filho",
+                    "enteado",
+                    "pai_mae",
+                    "outro"
+                ],
+                "type": "string",
+                "description": "* `conjuge` - Conjuge\n* `filho` - Filho(a)\n* `enteado` - Enteado(a)\n* `pai_mae` - Pai/Mae\n* `outro` - Outro"
+            },
+            "PatchedCargoWrite": {
+                "type": "object",
+                "description": "Versao para create/update.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cbo": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "nivel_escolaridade": {
+                        "$ref": "#/components/schemas/NivelEscolaridadeEnum"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedDependenteWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "parentesco": {
+                        "$ref": "#/components/schemas/ParentescoEnum"
+                    },
+                    "ir": {
+                        "type": "boolean",
+                        "title": "Dependente para IR"
+                    },
+                    "salario_familia": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedDocumentoWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "tipo": {
+                        "$ref": "#/components/schemas/TipoC3eEnum"
+                    },
+                    "descricao": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "arquivo": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                }
+            },
+            "PatchedLotacaoWrite": {
+                "type": "object",
+                "description": "Versao para create/update.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "sigla": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "lotacao_pai": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedRubricaWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "tipo": {
+                        "$ref": "#/components/schemas/Tipo721Enum"
+                    },
+                    "incide_inss": {
+                        "type": "boolean"
+                    },
+                    "incide_irrf": {
+                        "type": "boolean"
+                    },
+                    "incide_fgts": {
+                        "type": "boolean"
+                    },
+                    "formula": {
+                        "type": "string",
+                        "title": "Formula de calculo",
+                        "description": "DSL de calculo (sera implementada no Bloco 2)"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedServidorWrite": {
+                "type": "object",
+                "description": "Validacao + normalizacao de CPF/PIS/datas.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "matricula": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "sexo": {
+                        "$ref": "#/components/schemas/SexoEnum"
+                    },
+                    "estado_civil": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/EstadoCivilEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "pis_pasep": {
+                        "type": "string",
+                        "title": "PIS/PASEP",
+                        "maxLength": 20
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                    },
+                    "telefone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "logradouro": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "numero": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "complemento": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "bairro": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "cidade": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "uf": {
+                        "type": "string",
+                        "maxLength": 2
+                    },
+                    "cep": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "PatchedVinculoWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "cargo": {
+                        "type": "integer"
+                    },
+                    "lotacao": {
+                        "type": "integer"
+                    },
+                    "regime": {
+                        "$ref": "#/components/schemas/RegimeEnum"
+                    },
+                    "data_admissao": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "data_demissao": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "carga_horaria": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "description": "Horas semanais"
+                    },
+                    "salario_base": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "RegimeEnum": {
+                "enum": [
+                    "estatutario",
+                    "celetista",
+                    "comissionado",
+                    "temporario",
+                    "estagiario"
+                ],
+                "type": "string",
+                "description": "* `estatutario` - Estatutario\n* `celetista` - Celetista\n* `comissionado` - Comissionado\n* `temporario` - Temporario\n* `estagiario` - Estagiario"
+            },
+            "RubricaDetail": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "tipo": {
+                        "$ref": "#/components/schemas/Tipo721Enum"
+                    },
+                    "tipo_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "incide_inss": {
+                        "type": "boolean"
+                    },
+                    "incide_irrf": {
+                        "type": "boolean"
+                    },
+                    "incide_fgts": {
+                        "type": "boolean"
+                    },
+                    "formula": {
+                        "type": "string",
+                        "title": "Formula de calculo",
+                        "description": "DSL de calculo (sera implementada no Bloco 2)"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "atualizado_em",
+                    "codigo",
+                    "criado_em",
+                    "id",
+                    "nome",
+                    "tipo",
+                    "tipo_display"
+                ]
+            },
+            "RubricaList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "tipo": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Tipo721Enum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "tipo_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ativo": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "ativo",
+                    "codigo",
+                    "id",
+                    "nome",
+                    "tipo",
+                    "tipo_display"
+                ]
+            },
+            "RubricaWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "tipo": {
+                        "$ref": "#/components/schemas/Tipo721Enum"
+                    },
+                    "incide_inss": {
+                        "type": "boolean"
+                    },
+                    "incide_irrf": {
+                        "type": "boolean"
+                    },
+                    "incide_fgts": {
+                        "type": "boolean"
+                    },
+                    "formula": {
+                        "type": "string",
+                        "title": "Formula de calculo",
+                        "description": "DSL de calculo (sera implementada no Bloco 2)"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "codigo",
+                    "id",
+                    "nome",
+                    "tipo"
+                ]
+            },
+            "ServidorDetail": {
+                "type": "object",
+                "description": "Versao completa — inclui dependentes e vinculos.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "matricula": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "sexo": {
+                        "$ref": "#/components/schemas/SexoEnum"
+                    },
+                    "sexo_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "estado_civil": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/EstadoCivilEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "estado_civil_display": {
+                        "type": "string",
+                        "readOnly": true,
+                        "default": ""
+                    },
+                    "pis_pasep": {
+                        "type": "string",
+                        "title": "PIS/PASEP",
+                        "maxLength": 20
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                    },
+                    "telefone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "logradouro": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "numero": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "complemento": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "bairro": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "cidade": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "uf": {
+                        "type": "string",
+                        "maxLength": 2
+                    },
+                    "cep": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "dependentes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/_DependenteEmbutido"
+                        },
+                        "readOnly": true
+                    },
+                    "vinculos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/_VinculoEmbutido"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "atualizado_em",
+                    "cpf",
+                    "criado_em",
+                    "data_nascimento",
+                    "dependentes",
+                    "estado_civil_display",
+                    "id",
+                    "matricula",
+                    "nome",
+                    "sexo",
+                    "sexo_display",
+                    "vinculos"
+                ]
+            },
+            "ServidorList": {
+                "type": "object",
+                "description": "Versao enxuta — uso em listagem (paginada).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "matricula": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "ativo": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "ativo",
+                    "cpf",
+                    "id",
+                    "matricula",
+                    "nome"
+                ]
+            },
+            "ServidorWrite": {
+                "type": "object",
+                "description": "Validacao + normalizacao de CPF/PIS/datas.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "matricula": {
+                        "type": "string",
+                        "maxLength": 30
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "maxLength": 14
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "sexo": {
+                        "$ref": "#/components/schemas/SexoEnum"
+                    },
+                    "estado_civil": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/EstadoCivilEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/BlankEnum"
+                            }
+                        ]
+                    },
+                    "pis_pasep": {
+                        "type": "string",
+                        "title": "PIS/PASEP",
+                        "maxLength": 20
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                    },
+                    "telefone": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "logradouro": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "numero": {
+                        "type": "string",
+                        "maxLength": 20
+                    },
+                    "complemento": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "bairro": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "cidade": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "uf": {
+                        "type": "string",
+                        "maxLength": 2
+                    },
+                    "cep": {
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "cpf",
+                    "data_nascimento",
+                    "id",
+                    "matricula",
+                    "nome",
+                    "sexo"
+                ]
+            },
+            "SexoEnum": {
+                "enum": [
+                    "M",
+                    "F"
+                ],
+                "type": "string",
+                "description": "* `M` - Masculino\n* `F` - Feminino"
+            },
+            "Tipo721Enum": {
+                "enum": [
+                    "provento",
+                    "desconto",
+                    "informativa"
+                ],
+                "type": "string",
+                "description": "* `provento` - Provento\n* `desconto` - Desconto\n* `informativa` - Informativa"
+            },
+            "TipoC3eEnum": {
+                "enum": [
+                    "rg",
+                    "cpf",
+                    "titulo_eleitor",
+                    "carteira_trabalho",
+                    "certificado",
+                    "comprovante_residencia",
+                    "outro"
+                ],
+                "type": "string",
+                "description": "* `rg` - RG\n* `cpf` - CPF\n* `titulo_eleitor` - Titulo de eleitor\n* `carteira_trabalho` - Carteira de trabalho\n* `certificado` - Certificado/Diploma\n* `comprovante_residencia` - Comprovante de residencia\n* `outro` - Outro"
+            },
+            "TokenRefresh": {
+                "type": "object",
+                "properties": {
+                    "access": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "refresh": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "access",
+                    "refresh"
+                ]
+            },
+            "TransferenciaInput": {
+                "type": "object",
+                "description": "Input para POST /api/people/vinculos/<id>/transferir/.",
+                "properties": {
+                    "nova_lotacao_id": {
+                        "type": "integer"
+                    },
+                    "data_transferencia": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "required": [
+                    "data_transferencia",
+                    "nova_lotacao_id"
+                ]
+            },
+            "VinculoDetail": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "cargo": {
+                        "type": "integer"
+                    },
+                    "cargo_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "lotacao": {
+                        "type": "integer"
+                    },
+                    "lotacao_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "regime": {
+                        "$ref": "#/components/schemas/RegimeEnum"
+                    },
+                    "regime_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "data_admissao": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "data_demissao": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "carga_horaria": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "description": "Horas semanais"
+                    },
+                    "salario_base": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    },
+                    "criado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "atualizado_em": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "atualizado_em",
+                    "cargo",
+                    "cargo_nome",
+                    "criado_em",
+                    "data_admissao",
+                    "id",
+                    "lotacao",
+                    "lotacao_nome",
+                    "regime",
+                    "regime_display",
+                    "salario_base",
+                    "servidor"
+                ]
+            },
+            "VinculoList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor_matricula": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "servidor_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "cargo": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "cargo_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "lotacao": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "lotacao_sigla": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "regime": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RegimeEnum"
+                            }
+                        ],
+                        "readOnly": true
+                    },
+                    "data_admissao": {
+                        "type": "string",
+                        "format": "date",
+                        "readOnly": true
+                    },
+                    "data_demissao": {
+                        "type": "string",
+                        "format": "date",
+                        "readOnly": true,
+                        "nullable": true
+                    },
+                    "ativo": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "ativo",
+                    "cargo",
+                    "cargo_nome",
+                    "data_admissao",
+                    "data_demissao",
+                    "id",
+                    "lotacao",
+                    "lotacao_sigla",
+                    "regime",
+                    "servidor",
+                    "servidor_matricula",
+                    "servidor_nome"
+                ]
+            },
+            "VinculoWrite": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "servidor": {
+                        "type": "integer"
+                    },
+                    "cargo": {
+                        "type": "integer"
+                    },
+                    "lotacao": {
+                        "type": "integer"
+                    },
+                    "regime": {
+                        "$ref": "#/components/schemas/RegimeEnum"
+                    },
+                    "data_admissao": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "data_demissao": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "carga_horaria": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "description": "Horas semanais"
+                    },
+                    "salario_base": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "cargo",
+                    "data_admissao",
+                    "id",
+                    "lotacao",
+                    "regime",
+                    "salario_base",
+                    "servidor"
+                ]
+            },
+            "_DependenteEmbutido": {
+                "type": "object",
+                "description": "Embutido em ServidorDetailSerializer.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "nome": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "parentesco": {
+                        "$ref": "#/components/schemas/ParentescoEnum"
+                    },
+                    "data_nascimento": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "ir": {
+                        "type": "boolean",
+                        "title": "Dependente para IR"
+                    },
+                    "salario_familia": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "data_nascimento",
+                    "id",
+                    "nome",
+                    "parentesco"
+                ]
+            },
+            "_VinculoEmbutido": {
+                "type": "object",
+                "description": "Embutido em ServidorDetailSerializer (apenas vinculos ativos).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "cargo": {
+                        "type": "integer"
+                    },
+                    "cargo_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "lotacao": {
+                        "type": "integer"
+                    },
+                    "lotacao_nome": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "regime": {
+                        "$ref": "#/components/schemas/RegimeEnum"
+                    },
+                    "regime_display": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "data_admissao": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "data_demissao": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "carga_horaria": {
+                        "type": "integer",
+                        "maximum": 2147483647,
+                        "minimum": 0,
+                        "description": "Horas semanais"
+                    },
+                    "salario_base": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,10}(?:\\.\\d{0,2})?$"
+                    },
+                    "ativo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "cargo",
+                    "cargo_nome",
+                    "data_admissao",
+                    "id",
+                    "lotacao",
+                    "lotacao_nome",
+                    "regime",
+                    "regime_display",
+                    "salario_base"
+                ]
+            }
+        },
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "sessionid"
+            },
+            "jwtAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

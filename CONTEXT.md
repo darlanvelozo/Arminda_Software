@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.2 — Onda 3 ✅ (Services + Rubrica + criar_usuario) → Onda 4 (Hardening)**
+> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.3 — Onda 1.3a ✅ (frontend autenticado: login + layout) → Onda 1.3b (telas de domínio)**
 
 ---
 
@@ -185,6 +185,7 @@ Decisões formais ficam em `docs/adr/`. Resumo do já decidido:
 | [0005](docs/adr/0005-custom-user.md) | User customizado em `apps.core.User` (login por e-mail) | Aceito |
 | [0006](docs/adr/0006-multi-tenant-implementacao.md) | Implementação concreta do multi-tenant (refina ADR-0004) | Aceito |
 | [0007](docs/adr/0007-jwt-rbac.md) | Autenticação JWT + RBAC escopado por município | Aceito |
+| [0008](docs/adr/0008-openapi-types-typescript.md) | Geração de tipos TS via `openapi-typescript` | Aceito |
 
 **Quando criar ADR:** sempre que a decisão **influencia futuras decisões** ou **é difícil de reverter**.
 
