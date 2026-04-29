@@ -163,9 +163,15 @@
   "changelog": [
     {
       "data": "2026-04-29",
+      "tipo": "validacao",
+      "titulo": "Smoke end-to-end completo do backend",
+      "descricao": "O sistema foi validado de ponta a ponta com servidor real e usuários reais: login JWT, todos os CRUDs, fluxos de admissão/desligamento/transferência, histórico funcional com autor capturado, isolamento entre municípios e respostas de erro com códigos estáveis. Um bug de tratamento de CPF inválido foi detectado e corrigido. Frontend também foi validado (lint, testes, build de produção). 181 testes automatizados, 97% de cobertura."
+    },
+    {
+      "data": "2026-04-29",
       "tipo": "entrega",
       "titulo": "Regras de negócio de RH em transação atômica",
-      "descricao": "Os fluxos de admissão, desligamento e transferência de servidor passaram a ser executados como serviços com invariantes de domínio explícitas e em transação única — não dá mais para deixar um servidor sem vínculo, ou desligar duas vezes. Cadastro de rubricas (sem cálculo, ainda) também foi disponibilizado. Total: 179 testes automatizados, 97% de cobertura."
+      "descricao": "Os fluxos de admissão, desligamento e transferência de servidor passaram a ser executados como serviços com invariantes de domínio explícitas e em transação única — não dá mais para deixar um servidor sem vínculo, ou desligar duas vezes. Cadastro de rubricas (sem cálculo, ainda) também foi disponibilizado."
     },
     {
       "data": "2026-04-29",

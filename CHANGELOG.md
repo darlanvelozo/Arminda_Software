@@ -78,12 +78,22 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
     `--staff-arminda`, `--superuser`, `--precisa-trocar-senha`.
   - Senha via `--password` ou `--senha-stdin` (evita histórico shell).
 
-- **test:** 53 testes novos.
-  - 16 admissão (caminho feliz + cada um dos 13 codes + atomicidade)
+- **test:** 55 testes novos.
+  - 18 admissão (caminho feliz + cada um dos 15 codes incluindo
+    `CPF_INVALIDO` e `PIS_INVALIDO` + atomicidade)
   - 6 desligamento, 6 transferência
   - 8 endpoints @action (HTTP + RBAC + propagação de code)
   - 5 Rubrica CRUD + RBAC + isolamento
   - 12 criar_usuario (cobre todos os flags)
+
+#### Fix
+
+- **fix(people/services):** `admitir_servidor` agora captura
+  `django.core.exceptions.ValidationError` de `validar_cpf` e
+  `validar_pis_pasep` e re-levanta como `AdmissaoInvalidaError` com
+  `code=CPF_INVALIDO` ou `PIS_INVALIDO`. **Antes:** CPF/PIS inválidos
+  retornavam HTTP 500. **Detectado em:** smoke E2E manual via curl.
+  Cobertura de teste adicionada (`test_cpf_invalido`, `test_pis_invalido`).
 
 #### Validações
 

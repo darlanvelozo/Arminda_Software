@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 
 from apps.core.validators import validar_cpf, validar_pis_pasep
@@ -92,8 +93,21 @@ def admitir_servidor(dados: DadosAdmissao) -> Servidor:
             code="MATRICULA_DUPLICADA",
         )
 
-    cpf_normalizado = validar_cpf(dados.cpf)
-    pis_normalizado = validar_pis_pasep(dados.pis_pasep) if dados.pis_pasep else ""
+    try:
+        cpf_normalizado = validar_cpf(dados.cpf)
+    except DjangoValidationError as exc:
+        raise AdmissaoInvalidaError(
+            "CPF invalido.", code="CPF_INVALIDO"
+        ) from exc
+
+    try:
+        pis_normalizado = (
+            validar_pis_pasep(dados.pis_pasep) if dados.pis_pasep else ""
+        )
+    except DjangoValidationError as exc:
+        raise AdmissaoInvalidaError(
+            "PIS/PASEP invalido.", code="PIS_INVALIDO"
+        ) from exc
 
     servidor = Servidor.objects.create(
         matricula=dados.matricula.strip(),
