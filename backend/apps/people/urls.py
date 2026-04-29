@@ -1,11 +1,16 @@
-"""
-URLs do app people.
+"""URLs do app people (rotas tenant — exigem header X-Tenant)."""
 
-Roteamento da API será definido nos próximos blocos.
-"""
+from __future__ import annotations
+
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from apps.people.views import CargoViewSet, LotacaoViewSet
 
 app_name = "people"
 
-urlpatterns: list = [
-    # path("", views.IndexView.as_view(), name="index"),
-]
+router = DefaultRouter()
+router.register("cargos", CargoViewSet, basename="cargo")
+router.register("lotacoes", LotacaoViewSet, basename="lotacao")
+
+urlpatterns = [path("", include(router.urls))]

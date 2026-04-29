@@ -35,6 +35,82 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.2 — Onda 1: Validators + CRUD Cargo/Lotação · 2026-04-29
+
+> Primeira onda de cadastros via API REST. Valida o pattern (3 serializers,
+> ViewSet, permissions por papel, filtros, isolamento) que vai se repetir
+> nas ondas 2–4 com Servidor/Vínculo/Dependente/Documento/Rubrica.
+
+#### Adicionado
+
+- **feat(core/validators):** `apps/core/validators.py` com `validar_cpf`,
+  `validar_pis_pasep`, `validar_codigo_ibge`. Aceitam string com ou sem
+  máscara, retornam dígitos normalizados, levantam `ValidationError` com
+  `code` estável (`CPF_INVALIDO`, `PIS_INVALIDO`, `IBGE_INVALIDO`).
+  - **Por quê:** dados brasileiros aparecem em vários models (Servidor,
+    Dependente, Município) — centralizar evita reimplementação.
+  - **Decisão:** ficam **só na fronteira HTTP (serializer)** + camada de
+    service. Não em Django field validators (que ignoram retorno e não
+    normalizam). Pattern: `def validate_cpf(self, value): return validar_cpf(value)`.
+  - 27 testes (`apps/core/tests/test_validators.py`).
+
+- **feat(people):** CRUD de **Cargo** e **Lotação** via API REST.
+  - Endpoints: `/api/people/cargos/` e `/api/people/lotacoes/` (GET list,
+    POST, GET detail, PATCH, PUT, DELETE).
+  - **3 serializers por modelo** (List/Detail/Write) — pattern do
+    `backend/apps/CONTEXT.md`.
+  - **`_PapelPorAcaoMixin`** em `apps/people/views.py`: leitura exige
+    `IsLeituraMunicipio`, escrita exige `IsRHMunicipio`.
+  - **FilterSets** (`apps/people/filters.py`): `?codigo=X`, `?nome__icontains=X`,
+    `?nivel_escolaridade=X`, `?ativo=true`, `?raiz=true` (Lotação).
+  - **Search e ordering** globais via `SearchFilter` + `OrderingFilter`
+    adicionados em `REST_FRAMEWORK.DEFAULT_FILTER_BACKENDS`.
+  - **Detail enriquecido**: `nivel_escolaridade_display`, `lotacao_pai_nome`.
+  - **Validação de ciclo** em LotaçãoWriteSerializer: lotação não pode ser
+    pai de si mesma.
+  - **Normalização**: `codigo` automaticamente upper + strip.
+
+- **test:** 25 testes HTTP (18 Cargo + 7 Lotação) cobrindo:
+  - CRUD completo (list/retrieve/create/update/partial/destroy).
+  - RBAC: leitura permite GET, bloqueia POST/PATCH/DELETE; staff_arminda
+    passa em qualquer tenant.
+  - Isolamento entre tenants (criar em A não aparece em B; mesmo
+    `codigo` em A e B é permitido).
+  - Filtros (`?nivel_escolaridade=`, `?raiz=true`) e search (`?search=`).
+  - Erros: 401 sem auth, 400 sem tenant, 403 sem papel, 400 código vazio
+    ou duplicado, 400 ciclo de hierarquia.
+
+#### Modificado
+
+- **chore(settings):** `DEFAULT_FILTER_BACKENDS` ganha `SearchFilter` e
+  `OrderingFilter` para ativar `search_fields`/`ordering_fields` nos viewsets.
+
+- **fix(test):** `test_x_tenant_com_codigo_ibge_resolve` e
+  `test_x_tenant_inexistente_retorna_400` agora batem em
+  `/api/people/cargos/` (era `/api/people/`, que virou root do router).
+
+#### Removido
+
+- **chore(settings):** `backend/arminda/settings/local.py` — incompatível
+  com `django-tenants` (multi-tenant exige PostgreSQL; SQLite não tem
+  schemas). Bloco 1+ não suporta mais "rodar sem Postgres".
+
+#### Validações realizadas
+
+- `pytest` — **100/100 passando** em ~30s.
+- `pytest --cov` — **96% de cobertura** geral.
+- `ruff format` + `ruff check` — verdes.
+- `python manage.py check` — sem warnings.
+
+#### Próximos passos
+
+- **Bloco 1.2 — Onda 2** (5 dias): CRUD de Servidor + VinculoFuncional
+  + Dependente + Documento, com validação de CPF/PIS via
+  `apps.core.validators`, endpoint de histórico (`simple_history`),
+  perf baseline (100 servidores < 30s).
+
+---
+
 ### Bloco 1.1 — Fundação técnica (multi-tenant + auth + RBAC) · 2026-04-29
 
 > ⚠ **BREAKING.** O schema do banco foi reestruturado de zero. A DB de dev precisa ser recriada (drop & migrate). Nenhum dado de Bloco 0 é compatível.

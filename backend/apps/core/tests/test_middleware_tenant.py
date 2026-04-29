@@ -56,16 +56,17 @@ class TestResolucaoPorHeader:
         from rest_framework_simplejwt.tokens import RefreshToken
 
         token = RefreshToken.for_user(usuario_admin_a).access_token
-        # Como ainda nao temos rota tenant funcional, validamos so a resolucao
-        # via "/api/people/": 404 = tenant resolveu (404 do url dispatcher);
-        # 400 com TENANT_NAO_ENCONTRADO = falhou no middleware.
+        # Resolucao via codigo IBGE: validar que nao volta TENANT_NAO_ENCONTRADO.
+        # /api/people/cargos/ existe (router); admin_municipio em tenant_a tem
+        # IsLeituraMunicipio, entao retorna 200 (lista vazia).
         response = api_client.get(
-            "/api/people/",
+            "/api/people/cargos/",
             HTTP_AUTHORIZATION=f"Bearer {token}",
             HTTP_X_TENANT=tenant_a.codigo_ibge,
         )
-        assert response.status_code == 404, (
-            f"Esperava 404 (sem rota), recebeu {response.status_code}: " f"{response.content[:200]}"
+        assert response.status_code == 200, (
+            f"Esperava 200 (codigo IBGE resolveu), recebeu {response.status_code}: "
+            f"{response.content[:200]}"
         )
 
     def test_x_tenant_inexistente_retorna_400(self, api_client, usuario_admin_a):
@@ -73,7 +74,7 @@ class TestResolucaoPorHeader:
 
         token = RefreshToken.for_user(usuario_admin_a).access_token
         response = api_client.get(
-            "/api/people/",
+            "/api/people/cargos/",
             HTTP_AUTHORIZATION=f"Bearer {token}",
             HTTP_X_TENANT="nao-existe",
         )

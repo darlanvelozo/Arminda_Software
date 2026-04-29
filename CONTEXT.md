@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.1 ✅ → Bloco 1.2**
+> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.2 — Onda 1 ✅ (Cargo/Lotação) → Onda 2 (Servidor/Vínculo)**
 
 ---
 
