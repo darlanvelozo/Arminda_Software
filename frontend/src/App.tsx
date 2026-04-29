@@ -6,7 +6,9 @@
  *   /selecionar-municipio             autenticado, sem AppShell
  *   /                                  autenticado + AppShell + Dashboard
  *   /servidores, /cargos, /lotacoes,
- *   /rubricas, /relatorios            autenticado + AppShell + placeholder
+ *   /folha, /rubricas, /relatorios,
+ *   /configuracoes                    autenticado + AppShell + placeholder
+ *                                     (telas reais entram na Onda 1.3b/Bloco 2)
  *   /health, /status                  públicos (legado do Bloco 0)
  *   *                                  404
  */
@@ -53,8 +55,10 @@ function App() {
         <Route path="servidores" element={<EmConstrucaoPage area="Servidores" />} />
         <Route path="cargos" element={<EmConstrucaoPage area="Cargos" />} />
         <Route path="lotacoes" element={<EmConstrucaoPage area="Lotações" />} />
+        <Route path="folha" element={<EmConstrucaoPage area="Folha de Pagamento" />} />
         <Route path="rubricas" element={<EmConstrucaoPage area="Rubricas" />} />
         <Route path="relatorios" element={<EmConstrucaoPage area="Relatórios" />} />
+        <Route path="configuracoes" element={<EmConstrucaoPage area="Configurações" />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
