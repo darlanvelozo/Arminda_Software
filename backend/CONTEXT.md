@@ -11,10 +11,10 @@
 - **Django 5.1.4**
 - **Django REST Framework 3.15.2**
 - **PostgreSQL 16** (driver `psycopg[binary] 3.2.3`)
-- **django-tenants 3.7** (multi-tenant por schema — ativar no Bloco 1)
+- **django-tenants 3.7** ✅ ativo desde Bloco 1.1 (multi-tenant por schema)
 - **Celery 5.4 + Redis 5.2** (cálculo assíncrono — uso real no Bloco 2)
-- **djangorestframework-simplejwt 5.3** (JWT — ativar no Bloco 1)
-- **django-simple-history 3.7** (auditoria — ativar no Bloco 1)
+- **djangorestframework-simplejwt 5.3** ✅ ativo desde Bloco 1.1 (JWT)
+- **django-simple-history 3.7** ✅ ativo desde Bloco 1.1 (auditoria)
 - **drf-spectacular 0.27** (OpenAPI)
 - **ruff 0.8** (lint + format)
 - **pytest 8.3 + pytest-django 4.9 + pytest-cov 6 + factory-boy 3.3 + faker 33**

@@ -1,8 +1,9 @@
-"""
-Admin do app people.
-"""
+"""Admin do app people (schema do tenant)."""
+
+from __future__ import annotations
 
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Cargo, Dependente, Documento, Lotacao, Servidor, VinculoFuncional
 
@@ -36,86 +37,33 @@ class DocumentoInline(admin.TabularInline):
 
 
 @admin.register(Servidor)
-class ServidorAdmin(admin.ModelAdmin):
-    list_display = ("matricula", "nome", "cpf", "municipio", "ativo")
-    list_filter = ("municipio", "ativo", "sexo")
+class ServidorAdmin(SimpleHistoryAdmin):
+    list_display = ("matricula", "nome", "cpf", "ativo")
+    list_filter = ("ativo", "sexo")
     search_fields = ("matricula", "nome", "cpf")
     list_per_page = 25
     inlines = [VinculoInline, DependenteInline, DocumentoInline]
-
-    fieldsets = (
-        (
-            "Dados pessoais",
-            {
-                "fields": (
-                    "municipio",
-                    "matricula",
-                    "nome",
-                    "cpf",
-                    "data_nascimento",
-                    "sexo",
-                    "estado_civil",
-                    "pis_pasep",
-                )
-            },
-        ),
-        ("Contato", {"fields": ("email", "telefone")}),
-        (
-            "Endereco",
-            {
-                "classes": ("collapse",),
-                "fields": (
-                    "logradouro",
-                    "numero",
-                    "complemento",
-                    "bairro",
-                    "cidade",
-                    "uf",
-                    "cep",
-                ),
-            },
-        ),
-        ("Status", {"fields": ("ativo",)}),
-        (
-            "Auditoria",
-            {
-                "classes": ("collapse",),
-                "fields": (
-                    "criado_em",
-                    "atualizado_em",
-                    "criado_por",
-                    "atualizado_por",
-                ),
-            },
-        ),
-    )
     readonly_fields = ("criado_em", "atualizado_em", "criado_por", "atualizado_por")
-
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.criado_por = request.user
-        obj.atualizado_por = request.user
-        super().save_model(request, obj, form, change)
 
 
 @admin.register(Cargo)
-class CargoAdmin(admin.ModelAdmin):
-    list_display = ("codigo", "nome", "nivel_escolaridade", "municipio", "ativo")
-    list_filter = ("municipio", "nivel_escolaridade", "ativo")
+class CargoAdmin(SimpleHistoryAdmin):
+    list_display = ("codigo", "nome", "nivel_escolaridade", "ativo")
+    list_filter = ("nivel_escolaridade", "ativo")
     search_fields = ("codigo", "nome", "cbo")
     list_editable = ("ativo",)
 
 
 @admin.register(Lotacao)
-class LotacaoAdmin(admin.ModelAdmin):
-    list_display = ("codigo", "nome", "sigla", "municipio", "ativo")
-    list_filter = ("municipio", "ativo")
+class LotacaoAdmin(SimpleHistoryAdmin):
+    list_display = ("codigo", "nome", "sigla", "ativo")
+    list_filter = ("ativo",)
     search_fields = ("codigo", "nome", "sigla")
     list_editable = ("ativo",)
 
 
 @admin.register(VinculoFuncional)
-class VinculoFuncionalAdmin(admin.ModelAdmin):
+class VinculoFuncionalAdmin(SimpleHistoryAdmin):
     list_display = (
         "servidor",
         "cargo",
@@ -125,7 +73,7 @@ class VinculoFuncionalAdmin(admin.ModelAdmin):
         "salario_base",
         "ativo",
     )
-    list_filter = ("regime", "ativo", "cargo__municipio")
+    list_filter = ("regime", "ativo")
     search_fields = ("servidor__nome", "servidor__matricula")
     raw_id_fields = ("servidor", "cargo", "lotacao")
     list_per_page = 25

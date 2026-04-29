@@ -1,6 +1,6 @@
-"""
-Admin do app payroll.
-"""
+"""Admin do app payroll (schema do tenant)."""
+
+from __future__ import annotations
 
 from django.contrib import admin
 
@@ -23,28 +23,12 @@ class RubricaAdmin(admin.ModelAdmin):
         "incide_inss",
         "incide_irrf",
         "incide_fgts",
-        "municipio",
         "ativo",
     )
-    list_filter = ("tipo", "incide_inss", "incide_irrf", "incide_fgts", "municipio", "ativo")
+    list_filter = ("tipo", "incide_inss", "incide_irrf", "incide_fgts", "ativo")
     search_fields = ("codigo", "nome")
     list_editable = ("ativo",)
     list_per_page = 50
-
-    fieldsets = (
-        (None, {"fields": ("municipio", "codigo", "nome", "tipo", "ativo")}),
-        (
-            "Incidencias",
-            {"fields": ("incide_inss", "incide_irrf", "incide_fgts")},
-        ),
-        (
-            "Formula",
-            {
-                "classes": ("collapse",),
-                "fields": ("formula",),
-            },
-        ),
-    )
 
 
 @admin.register(Folha)
@@ -53,36 +37,20 @@ class FolhaAdmin(admin.ModelAdmin):
         "competencia",
         "tipo",
         "status",
-        "municipio",
         "total_proventos",
         "total_descontos",
         "total_liquido",
     )
-    list_filter = ("status", "tipo", "municipio")
+    list_filter = ("status", "tipo")
     date_hierarchy = "competencia"
     inlines = [LancamentoInline]
     readonly_fields = ("total_proventos", "total_descontos", "total_liquido")
-
-    fieldsets = (
-        (None, {"fields": ("municipio", "competencia", "tipo", "status")}),
-        (
-            "Totais",
-            {
-                "fields": (
-                    "total_proventos",
-                    "total_descontos",
-                    "total_liquido",
-                ),
-            },
-        ),
-        ("Observacoes", {"fields": ("observacoes",)}),
-    )
 
 
 @admin.register(Lancamento)
 class LancamentoAdmin(admin.ModelAdmin):
     list_display = ("servidor", "rubrica", "referencia", "valor", "folha")
-    list_filter = ("folha__competencia", "rubrica__tipo")
+    list_filter = ("rubrica__tipo",)
     search_fields = ("servidor__nome", "rubrica__nome")
     raw_id_fields = ("folha", "servidor", "vinculo", "rubrica")
     list_per_page = 50

@@ -1,33 +1,30 @@
 """
-Modelos do app reports.
+Modelos do app reports (TENANT_APPS).
 
-Relatorios consolidados e exportacoes.
+Vivem dentro do schema de cada municipio. Sem FK explicita para Municipio.
 """
+
+from __future__ import annotations
 
 from django.conf import settings
 from django.db import models
 
-from apps.core.models import Municipio
+
+class TipoRelatorio(models.TextChoices):
+    HOLERITE = "holerite", "Holerite"
+    RESUMO_FOLHA = "resumo_folha", "Resumo da folha"
+    FICHA_FINANCEIRA = "ficha_financeira", "Ficha financeira"
+    INFORME_RENDIMENTOS = "informe_rendimentos", "Informe de rendimentos"
+    ESOCIAL = "esocial", "eSocial"
+    SEFIP = "sefip", "SEFIP"
+    IMPORT_FIORILLI = "import_fiorilli", "Importacao Fiorilli"
+    OUTRO = "outro", "Outro"
 
 
 class RelatorioGerado(models.Model):
     """Registro de relatorio gerado pelo sistema."""
 
-    municipio = models.ForeignKey(
-        Municipio, on_delete=models.CASCADE, related_name="relatorios"
-    )
-    tipo = models.CharField(
-        max_length=30,
-        choices=[
-            ("holerite", "Holerite"),
-            ("resumo_folha", "Resumo da folha"),
-            ("ficha_financeira", "Ficha financeira"),
-            ("informe_rendimentos", "Informe de rendimentos"),
-            ("esocial", "eSocial"),
-            ("sefip", "SEFIP"),
-            ("outro", "Outro"),
-        ],
-    )
+    tipo = models.CharField(max_length=30, choices=TipoRelatorio.choices)
     titulo = models.CharField(max_length=200)
     competencia = models.DateField(null=True, blank=True)
     arquivo = models.FileField(upload_to="relatorios/%Y/%m/", null=True, blank=True)
@@ -36,6 +33,7 @@ class RelatorioGerado(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     class Meta:
@@ -43,5 +41,5 @@ class RelatorioGerado(models.Model):
         verbose_name = "relatorio gerado"
         verbose_name_plural = "relatorios gerados"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.get_tipo_display()} - {self.titulo}"

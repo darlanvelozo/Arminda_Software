@@ -1,14 +1,14 @@
 """
-Configurações base do Arminda.
+Configuracoes base do Arminda.
 
-Este arquivo contém configurações compartilhadas entre todos os ambientes.
-Configurações específicas de cada ambiente vivem em:
+Compartilhadas entre todos os ambientes. Cada ambiente estende este arquivo:
 - arminda.settings.dev
 - arminda.settings.prod
 
-A escolha do arquivo é feita pela variável de ambiente DJANGO_SETTINGS_MODULE.
+DJANGO_SETTINGS_MODULE controla a escolha (default em dev: arminda.settings.dev).
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -16,60 +16,74 @@ import environ
 # ============================================================
 # Paths
 # ============================================================
-# BASE_DIR aponta para a pasta backend/
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # backend/
 
 # ============================================================
-# Carregar variáveis de ambiente
+# Variaveis de ambiente
 # ============================================================
-env = environ.Env(
-    DJANGO_DEBUG=(bool, False),
-)
-
-# Lê o .env na raiz do repositório (subindo um nível a partir de backend/)
+env = environ.Env(DJANGO_DEBUG=(bool, False))
 environ.Env.read_env(BASE_DIR.parent / ".env")
 
 # ============================================================
-# Segurança
+# Seguranca
 # ============================================================
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-change-me")
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 # ============================================================
-# Apps
+# Apps — split SHARED / TENANT (ADR-0006)
 # ============================================================
-DJANGO_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
+
+SHARED_APPS = [
+    # django-tenants OBRIGATORIAMENTE primeiro
+    "django_tenants",
+    # Nosso app shared (Municipio, Domain, User, ConfiguracaoGlobal, papeis)
+    "apps.core",
+    # Django built-ins compartilhados (auth/sessions/admin precisam estar no public)
     "django.contrib.contenttypes",
+    "django.contrib.auth",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-]
-
-THIRD_PARTY_APPS = [
+    "django.contrib.admin",
+    # Terceiros que vivem no public
     "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
-    # "django_tenants",      # ativar no Bloco 1
-    # "simple_history",      # ativar no Bloco 1
 ]
 
-LOCAL_APPS = [
-    "apps.core",
+TENANT_APPS = [
+    # contenttypes precisa em ambos (limitacao do django-tenants)
+    "django.contrib.contenttypes",
+    # Auditoria por tenant
+    "simple_history",
+    # Apps de dominio (vivem no schema do municipio)
     "apps.people",
     "apps.payroll",
     "apps.reports",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+# django-tenants config
+TENANT_MODEL = "core.Municipio"
+TENANT_DOMAIN_MODEL = "core.Domain"
+PUBLIC_SCHEMA_NAME = "public"
+
+# Custom User (ADR-0005)
+AUTH_USER_MODEL = "core.User"
 
 # ============================================================
-# Middleware
+# Middleware (ADR-0006)
 # ============================================================
 MIDDLEWARE = [
+    # Resolucao de tenant (header X-Tenant em dev / hostname em prod)
+    "apps.core.middleware.tenant.TenantHeaderOrHostMiddleware",
+    # CORS antes de tudo
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -78,7 +92,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "simple_history.middleware.HistoryRequestMiddleware",  # ativar no Bloco 1
+    # Auditoria de quem fez o request (simple-history)
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 ROOT_URLCONF = "arminda.urls"
@@ -101,12 +116,11 @@ TEMPLATES = [
 WSGI_APPLICATION = "arminda.wsgi.application"
 
 # ============================================================
-# Banco de dados
+# Banco de dados — engine do django-tenants (ADR-0006)
 # ============================================================
-# No Bloco 1 vamos trocar o ENGINE para django_tenants.postgresql_backend
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django_tenants.postgresql_backend",
         "NAME": env("POSTGRES_DB", default="arminda"),
         "USER": env("POSTGRES_USER", default="arminda"),
         "PASSWORD": env("POSTGRES_PASSWORD", default="arminda_dev_password"),
@@ -115,18 +129,23 @@ DATABASES = {
     }
 }
 
+DATABASE_ROUTERS = ("django_tenants.routers.TenantSyncRouter",)
+
 # ============================================================
-# Validação de senha
+# Validacao de senha
 # ============================================================
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # ============================================================
-# Internacionalização
+# Internacionalizacao
 # ============================================================
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Fortaleza"
@@ -134,7 +153,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ============================================================
-# Arquivos estáticos
+# Arquivos estaticos
 # ============================================================
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static_collected"
@@ -142,7 +161,7 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # ============================================================
-# Default primary key field type
+# Default primary key
 # ============================================================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -151,8 +170,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ============================================================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        # "rest_framework_simplejwt.authentication.JWTAuthentication",  # Bloco 1
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -166,12 +185,28 @@ REST_FRAMEWORK = {
 }
 
 # ============================================================
+# JWT (ADR-0007)
+# ============================================================
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": env("JWT_SIGNING_KEY", default=SECRET_KEY),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "TOKEN_OBTAIN_SERIALIZER": "apps.core.auth.serializers.ArmindaTokenObtainPairSerializer",
+}
+
+# ============================================================
 # OpenAPI / drf-spectacular
 # ============================================================
 SPECTACULAR_SETTINGS = {
     "TITLE": "Arminda API",
-    "DESCRIPTION": "API do sistema Arminda — folha de pagamento e gestão de pessoal municipal.",
-    "VERSION": "0.1.0",
+    "DESCRIPTION": "API do sistema Arminda — folha de pagamento e gestao de pessoal municipal.",
+    "VERSION": "0.2.0-dev",
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
@@ -181,6 +216,21 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
     default=["http://localhost:5173", "http://127.0.0.1:5173"],
+)
+# Necessario para o frontend mandar X-Tenant + Authorization
+CORS_ALLOW_HEADERS = list(
+    [
+        "accept",
+        "accept-encoding",
+        "authorization",
+        "content-type",
+        "dnt",
+        "origin",
+        "user-agent",
+        "x-csrftoken",
+        "x-requested-with",
+        "x-tenant",
+    ]
 )
 
 # ============================================================

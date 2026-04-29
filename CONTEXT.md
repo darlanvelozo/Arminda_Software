@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-28 · Bloco corrente: **Bloco 0 → Bloco 1**
+> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.1 ✅ → Bloco 1.2**
 
 ---
 
@@ -182,6 +182,9 @@ Decisões formais ficam em `docs/adr/`. Resumo do já decidido:
 | [0002](docs/adr/0002-django-backend.md) | Django + DRF para backend | Aceito |
 | [0003](docs/adr/0003-vite-react-frontend.md) | Vite + React + TS + Tailwind para frontend | Aceito |
 | [0004](docs/adr/0004-multi-tenant-schema.md) | Multi-tenant por schema PostgreSQL via `django-tenants` | Aceito |
+| [0005](docs/adr/0005-custom-user.md) | User customizado em `apps.core.User` (login por e-mail) | Aceito |
+| [0006](docs/adr/0006-multi-tenant-implementacao.md) | Implementação concreta do multi-tenant (refina ADR-0004) | Aceito |
+| [0007](docs/adr/0007-jwt-rbac.md) | Autenticação JWT + RBAC escopado por município | Aceito |
 
 **Quando criar ADR:** sempre que a decisão **influencia futuras decisões** ou **é difícil de reverter**.
 
@@ -194,7 +197,11 @@ Plano completo em [docs/ROADMAP.md](docs/ROADMAP.md). Snapshot:
 | Bloco | Tema | Status |
 |-------|------|--------|
 | 0 | Estrutura inicial | ✅ Concluído |
-| 1 | Multi-tenant + cadastros + JWT/RBAC + importador Firebird | 🟡 Próximo |
+| 1.1 | Fundação técnica (multi-tenant ativo + User customizado + JWT + RBAC + simple-history) | ✅ Concluído |
+| 1.2 | Cadastros core via API REST (serializers, viewsets, permissions, services) | 🟡 Próximo |
+| 1.3 | Frontend autenticado (login + telas de cadastro) | ⏳ |
+| 1.4 | Importador Firebird v1 (Fiorilli SIP → Postgres) | ⏳ |
+| 1.5 | Hardening + entrega Bloco 1 (cobertura ≥ 80%, validações finais) | ⏳ |
 | 2 | Engine de cálculo + DSL de rubricas | ⏳ |
 | 3 | Folhas especiais (13º, férias, rescisão) | ⏳ |
 | 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF) | ⏳ |

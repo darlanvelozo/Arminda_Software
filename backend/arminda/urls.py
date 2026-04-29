@@ -1,8 +1,25 @@
 """
 URLs principais do Arminda.
 
-Cada app tem seu próprio urls.py incluído aqui sob um prefixo.
+Rotas publicas (rodam no schema `public`, sem tenant):
+    /admin/                      Admin do Django
+    /health/                     Healthcheck simples
+    /status/                     Status detalhado
+    /api/auth/*                  Login, refresh, logout, me
+    /api/schema/                 OpenAPI schema
+    /api/docs/                   Swagger UI
+    /api/redoc/                  Redoc
+
+Rotas tenant (exigem header X-Tenant ou subdominio):
+    /api/core/*                  Operacoes administrativas do tenant
+    /api/people/*                Servidores, cargos, lotacoes, vinculos
+    /api/payroll/*               Rubricas, folhas, lancamentos
+    /api/reports/*               Relatorios
+
+A resolucao do tenant e feita pelo TenantHeaderOrHostMiddleware (ADR-0006).
 """
+
+from __future__ import annotations
 
 import time
 
@@ -20,15 +37,13 @@ _start_time = time.time()
 
 
 def health_check(_request):
-    """Endpoint simples de healthcheck."""
+    """Endpoint simples de healthcheck (rota publica)."""
     return JsonResponse({"status": "ok", "service": "arminda"})
 
 
 def status_page(_request):
-    """Status page com verificação de serviços."""
+    """Status com checks de servicos (rota publica)."""
     checks = {}
-
-    # Check do banco de dados
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
@@ -36,18 +51,16 @@ def status_page(_request):
     except Exception as exc:
         checks["database"] = {"status": "error", "detail": str(exc)}
 
-    # Uptime
     uptime_seconds = int(time.time() - _start_time)
     hours, remainder = divmod(uptime_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-
     all_ok = all(c["status"] == "ok" for c in checks.values())
 
     return JsonResponse(
         {
             "status": "ok" if all_ok else "degraded",
             "service": "arminda",
-            "version": "0.1.0",
+            "version": "0.2.0-dev",
             "uptime": f"{hours}h {minutes}m {seconds}s",
             "uptime_seconds": uptime_seconds,
             "checks": checks,
@@ -56,17 +69,13 @@ def status_page(_request):
 
 
 urlpatterns = [
-    # Admin
+    # Public
     path("admin/", admin.site.urls),
-    # Healthcheck & Status
     path("health/", health_check, name="health"),
     path("status/", status_page, name="status"),
-    # API
-    path("api/core/", include("apps.core.urls")),
-    path("api/people/", include("apps.people.urls")),
-    path("api/payroll/", include("apps.payroll.urls")),
-    path("api/reports/", include("apps.reports.urls")),
-    # OpenAPI / Swagger
+    # Auth (publica — login)
+    path("api/auth/", include("apps.core.auth.urls")),
+    # OpenAPI / Swagger (publica)
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/docs/",
@@ -78,4 +87,9 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+    # Tenant (exigem X-Tenant)
+    path("api/core/", include("apps.core.urls")),
+    path("api/people/", include("apps.people.urls")),
+    path("api/payroll/", include("apps.payroll.urls")),
+    path("api/reports/", include("apps.reports.urls")),
 ]
