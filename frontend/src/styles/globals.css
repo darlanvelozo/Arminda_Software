@@ -1,62 +1,117 @@
+/* ========================================================================
+   Arminda — Design Tokens
+   Adaptado do bundle "Arminda" do Claude Design.
+   Cores em OKLCH (light + dark). Inter + JetBrains Mono.
+   ======================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light theme (default fallback — modo padrão é dark) */
+    --background: 0.99 0.003 250;
+    --foreground: 0.18 0.02 250;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.02 250;
 
-    --primary: 217 91% 35%;
-    --primary-foreground: 210 40% 98%;
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0.02 250;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 0.5 0.16 250;
+    --primary-foreground: 0.99 0.005 250;
+    --primary-soft: 0.95 0.03 250;
+    --primary-soft-foreground: 0.4 0.16 250;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 0.96 0.005 250;
+    --secondary-foreground: 0.25 0.02 250;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 0.96 0.005 250;
+    --muted-foreground: 0.5 0.015 250;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 0.96 0.008 250;
+    --accent-foreground: 0.2 0.02 250;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217 91% 35%;
+    --success: 0.58 0.14 155;
+    --success-foreground: 0.99 0.005 155;
+    --success-soft: 0.94 0.04 155;
+    --success-soft-foreground: 0.38 0.13 155;
+
+    --warning: 0.72 0.16 75;
+    --warning-foreground: 0.2 0.02 75;
+    --warning-soft: 0.95 0.06 85;
+    --warning-soft-foreground: 0.42 0.12 65;
+
+    --destructive: 0.58 0.2 25;
+    --destructive-foreground: 0.99 0.005 25;
+    --destructive-soft: 0.95 0.04 25;
+    --destructive-soft-foreground: 0.42 0.18 25;
+
+    --info: 0.55 0.13 235;
+    --info-foreground: 0.99 0.005 235;
+    --info-soft: 0.94 0.04 235;
+    --info-soft-foreground: 0.38 0.13 235;
+
+    --border: 0.91 0.005 250;
+    --border-strong: 0.85 0.008 250;
+    --input: 0.91 0.005 250;
+    --ring: 0.5 0.16 250;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0.16 0.015 250;
+    --foreground: 0.96 0.005 250;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0.2 0.018 250;
+    --card-foreground: 0.96 0.005 250;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --popover: 0.2 0.018 250;
+    --popover-foreground: 0.96 0.005 250;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --primary: 0.68 0.16 250;
+    --primary-foreground: 0.15 0.02 250;
+    --primary-soft: 0.28 0.1 250;
+    --primary-soft-foreground: 0.85 0.1 250;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --secondary: 0.24 0.015 250;
+    --secondary-foreground: 0.92 0.005 250;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 0.24 0.015 250;
+    --muted-foreground: 0.65 0.012 250;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 0.26 0.018 250;
+    --accent-foreground: 0.95 0.005 250;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 217 91% 60%;
+    --success: 0.68 0.15 155;
+    --success-foreground: 0.15 0.02 155;
+    --success-soft: 0.28 0.08 155;
+    --success-soft-foreground: 0.85 0.13 155;
+
+    --warning: 0.78 0.15 75;
+    --warning-foreground: 0.18 0.02 75;
+    --warning-soft: 0.32 0.08 75;
+    --warning-soft-foreground: 0.88 0.12 80;
+
+    --destructive: 0.65 0.2 25;
+    --destructive-foreground: 0.15 0.02 25;
+    --destructive-soft: 0.3 0.1 25;
+    --destructive-soft-foreground: 0.85 0.16 25;
+
+    --info: 0.68 0.13 235;
+    --info-foreground: 0.15 0.02 235;
+    --info-soft: 0.28 0.08 235;
+    --info-soft-foreground: 0.85 0.12 235;
+
+    --border: 0.28 0.015 250;
+    --border-strong: 0.36 0.015 250;
+    --input: 0.28 0.015 250;
+    --ring: 0.68 0.16 250;
   }
 }
 
@@ -64,17 +119,41 @@
   * {
     @apply border-border;
   }
+  html,
   body {
-    @apply bg-background text-foreground antialiased;
     font-family:
-      ui-sans-serif,
+      "Inter",
       system-ui,
       -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      Arial,
       sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .font-mono,
+  code,
+  kbd {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  /* Scrollbar styling consistente com o design */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(var(--border-strong));
+    border-radius: 999px;
+    border: 2px solid oklch(var(--background));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(var(--muted-foreground));
   }
 }

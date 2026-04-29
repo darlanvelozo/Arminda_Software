@@ -35,6 +35,102 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.3 — Onda 1.3a-bis: Adaptação do design Arminda (Claude Design) · 2026-04-29
+
+> O usuário gerou um design completo no Claude Design (claude.ai/design) e
+> exportou como bundle. Esta entrega adapta o sistema de design para o
+> nosso stack (Vite + Tailwind + shadcn) mantendo o visual original:
+> tokens OKLCH, dark mode default, brand panel no login, sidebar
+> redesenhada, topbar com breadcrumb e theme toggle.
+
+#### Adicionado
+
+- **feat(frontend/design):** Sistema de tokens **OKLCH** (light + dark).
+  - `src/styles/globals.css` reescrito com 14 famílias de tokens
+    (background, foreground, card, popover, primary[+soft], secondary,
+    muted, accent, success, warning, info, destructive[+soft], border[+strong]).
+  - Convenção: variáveis CSS guardam `L C H` (sem `oklch()`); o
+    `tailwind.config.ts` envelopa em `oklch(var(--token))` ao consumir,
+    permitindo `oklch(var(--ring) / 0.4)` para alfa.
+  - **Fontes** Inter + JetBrains Mono importadas do Google Fonts;
+    `font-feature-settings: cv02 cv03 cv04 cv11` para variantes
+    estilísticas do Inter.
+  - **Default dark mode** (escolha do design canvas).
+
+- **feat(frontend/theme):** `src/lib/theme.tsx` — ThemeProvider +
+  `useTheme()` hook. Persiste em localStorage com chave
+  `arminda_theme`. Aplica classe `dark` no `<html>`.
+
+- **feat(frontend/brand):** `src/components/brand/Logo.tsx` — SVG
+  oficial (retângulo arredondado + monograma "M"). Variants
+  `light` (para fundos escuros) e `withText`.
+
+- **feat(frontend/layout):** Sidebar redesenhada.
+  - Logo no topo (collapsa para ícone-só em modo collapsed).
+  - **Município context card** mostrando ativo + atalho de troca.
+  - Grupo "Operação" com 7 itens (Dashboard, Servidores, Cargos,
+    Lotações, Folha, Rubricas, Relatórios) — ícones lucide-react.
+  - Footer com Configurações + botão de colapso (248px → 64px).
+  - Estado ativo usa `bg-primary-soft` + `text-primary-soft-foreground`.
+
+- **feat(frontend/layout):** Topbar redesenhada.
+  - Breadcrumb gerado automaticamente da rota.
+  - Search trigger com tecla `⌘K` (placeholder — CmdK real entra
+    na Onda 1.3b).
+  - Toggle de tema (sol/lua), sino com badge de notificação,
+    avatar dropdown com dados do usuário + papel + logout.
+
+- **feat(frontend/pages):**
+  - `LoginPage` redesenhada em **2 colunas**: brand panel à esquerda
+    com gradient azul + grid decorativo + orb radial + headline
+    "Folha de pagamento moderna para a gestão pública"; formulário à
+    direita com toggle de visibilidade da senha (Eye/EyeOff).
+  - `SelecionarMunicipioPage` em cards radio-style com seleção
+    visual + botão "Acessar Arminda".
+  - `DashboardPage` com header + 3 cards-KPI placeholder
+    (servidores, folha mensal, variação 30d) + grid de 6 atalhos.
+
+#### Modificado
+
+- **chore(frontend/tailwind):** `tailwind.config.ts` reescrito.
+  - Cores em `oklch(var(--token))` em vez de `hsl(var(--token))`.
+  - Tokens novos: `primary-soft`, `success`, `warning`, `info`,
+    `border-strong`, `popover` + variantes `*-foreground` e `*-soft-foreground`.
+  - `fontFamily.sans = Inter`, `fontFamily.mono = JetBrains Mono`.
+  - Animations: `fade-in`, `slide-up`, `slide-from-right` (do design).
+
+- **chore(frontend/main.tsx):** Envolve em `<ThemeProvider>` antes
+  do `<QueryClientProvider>`.
+
+- **fix(test):** `LoginPage.test.tsx` ajustado para selectors mais
+  específicos (botão "Continuar", label "Senha" exato em vez de
+  regex que casava com "Esqueci minha senha" e "Mostrar senha").
+
+#### Validações
+
+- `npx tsc --noEmit` — limpo.
+- `npm run build` — **467 KB / 145 KB gzip** (subiu ~16 KB pelos
+  tokens novos + fontes Inter/Mono linkadas via Google Fonts).
+- `npm test` — **10/10 passando**.
+- `npm run lint` — 4 warnings react-refresh em arquivos shadcn padrão
+  e em providers (auth-context, theme) que exportam hook + provider —
+  aceitáveis.
+- Backend mantido: 193 testes verde, 97% cobertura.
+- Smoke manual: `curl http://localhost:5173/login` HTTP 200.
+
+#### Decisões de adaptação
+
+- **Não adaptamos:** CmdK real, painel de notificações com lista,
+  gráficos SVG do dashboard original, telas de Folha/Holerite
+  (ficam para Onda 1.3b ou Bloco 2).
+- **Sidebar mobile (off-canvas):** parking — no design original
+  ela some abaixo de `lg`. Adicionar Sheet mobile em hardening.
+- **Densidade ajustável:** o design canvas tinha tweaks de
+  densidade (`compact|comfortable|spacious`); pulamos por agora,
+  default `comfortable`.
+
+---
+
 ### Bloco 1.3 — Onda 1.3a: Frontend autenticado · 2026-04-29
 
 > Primeira fatia do frontend autenticado. O esqueleto de login, layout

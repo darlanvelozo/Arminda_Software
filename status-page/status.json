@@ -165,6 +165,12 @@
     {
       "data": "2026-04-29",
       "tipo": "entrega",
+      "titulo": "Identidade visual do Arminda implantada",
+      "descricao": "O frontend ganhou uma identidade visual completa, gerada via Claude Design e adaptada para o nosso stack: paleta moderna em OKLCH, dark mode como padrão, fontes Inter e JetBrains Mono, logo SVG, brand panel no login com gradient e grid decorativo, sidebar com card de município ativo, topbar com breadcrumb e toggle de tema. Os componentes (botões, cards, dropdowns, formulários) seguem o sistema shadcn customizado."
+    },
+    {
+      "data": "2026-04-29",
+      "tipo": "entrega",
       "titulo": "Frontend autenticado disponível",
       "descricao": "A interface web do Arminda agora tem login real, layout completo (sidebar + topbar) e troca de município ativo para usuários que operam em mais de uma prefeitura. Tipos TypeScript dos contratos de API são gerados automaticamente a partir do schema OpenAPI do backend, evitando dessincronização. As telas de cadastro de domínio entram na próxima onda."
     },

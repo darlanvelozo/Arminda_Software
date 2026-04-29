@@ -3,7 +3,6 @@
  *
  * Cobre:
  *   - render dos campos e botão
- *   - validação HTML5 de e-mail/senha required
  *   - submit chama login() do AuthContext (mock via vi.mock)
  *   - mensagem de erro aparece quando login falha
  */
@@ -32,15 +31,24 @@ vi.mock("@/lib/auth-context", () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// Selectors precisam ser específicos: o link "Esqueci minha senha"
+// e o botão "Mostrar senha" também casariam com /senha/i.
+function getEmailInput() {
+  return screen.getByLabelText(/E-mail institucional/i);
+}
+function getSenhaInput() {
+  return screen.getByLabelText("Senha");
+}
+
 describe("LoginPage", () => {
   beforeEach(() => loginMock.mockReset());
   afterEach(() => window.localStorage.clear());
 
   it("renderiza campos de e-mail, senha e botão", () => {
     renderWithProviders(<LoginPage />, { initialEntries: ["/login"] });
-    expect(screen.getByLabelText(/e-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/senha/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /entrar/i })).toBeInTheDocument();
+    expect(getEmailInput()).toBeInTheDocument();
+    expect(getSenhaInput()).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /continuar/i })).toBeInTheDocument();
   });
 
   it("submit chama login com email e senha", async () => {
@@ -52,9 +60,9 @@ describe("LoginPage", () => {
     });
     renderWithProviders(<LoginPage />, { initialEntries: ["/login"] });
 
-    await user.type(screen.getByLabelText(/e-mail/i), "ana@x.test");
-    await user.type(screen.getByLabelText(/senha/i), "senha-segura-123");
-    await user.click(screen.getByRole("button", { name: /entrar/i }));
+    await user.type(getEmailInput(), "ana@x.test");
+    await user.type(getSenhaInput(), "senha-segura-123");
+    await user.click(screen.getByRole("button", { name: /continuar/i }));
 
     expect(loginMock).toHaveBeenCalledOnce();
     expect(loginMock).toHaveBeenCalledWith({
@@ -68,10 +76,11 @@ describe("LoginPage", () => {
     loginMock.mockRejectedValueOnce(new Error("oops"));
     renderWithProviders(<LoginPage />, { initialEntries: ["/login"] });
 
-    await user.type(screen.getByLabelText(/e-mail/i), "x@y.test");
-    await user.type(screen.getByLabelText(/senha/i), "qualquer-senha-12");
-    await user.click(screen.getByRole("button", { name: /entrar/i }));
+    await user.type(getEmailInput(), "x@y.test");
+    await user.type(getSenhaInput(), "qualquer-senha-12");
+    await user.click(screen.getByRole("button", { name: /continuar/i }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/inv[aá]lid/i);
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(/inv[aá]lid/i);
   });
 });

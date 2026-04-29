@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.3 — Onda 1.3a ✅ (frontend autenticado: login + layout) → Onda 1.3b (telas de domínio)**
+> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.3 — Onda 1.3a + adaptação Claude Design ✅ (auth + layout + tokens OKLCH + dark mode) → Onda 1.3b (telas de domínio)**
 
 ---
 

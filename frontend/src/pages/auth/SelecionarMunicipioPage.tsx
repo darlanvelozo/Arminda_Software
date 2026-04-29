@@ -1,16 +1,18 @@
 /**
- * SelecionarMunicipioPage (Bloco 1.3).
+ * SelecionarMunicipioPage — Bloco 1.3 (design Arminda).
  *
- * Mostrada após login quando o usuário tem 2+ municípios. Após escolher,
- * redireciona para /. Também pode ser acessada via dropdown do Topbar.
+ * Mostrada após login quando o usuário tem 2+ municípios.
+ * Cards radio-style: clicar seleciona, botão confirma.
  */
 
-import { Building2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2 } from "lucide-react";
+import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
+import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
+import { cn } from "@/lib/utils";
 
 const PAPEL_LABEL: Record<string, string> = {
   staff_arminda: "Staff Arminda",
@@ -21,61 +23,100 @@ const PAPEL_LABEL: Record<string, string> = {
 };
 
 export default function SelecionarMunicipioPage() {
-  const { user, switchTenant } = useAuth();
+  const { user, activeTenant, switchTenant, logout } = useAuth();
   const navigate = useNavigate();
+  const [selected, setSelected] = useState<string | null>(
+    activeTenant ?? user?.municipios[0]?.schema ?? null,
+  );
 
   if (!user) return <Navigate to="/login" replace />;
-  if (user.municipios.length === 0) {
-    // Caso típico de staff_arminda: vai pro dashboard mesmo
-    return <Navigate to="/" replace />;
+  if (user.municipios.length === 0) return <Navigate to="/" replace />;
+
+  function handleConfirm() {
+    if (!selected) return;
+    switchTenant(selected);
+    navigate("/");
+  }
+
+  async function handleVoltar() {
+    await logout();
+    navigate("/login");
   }
 
   return (
-    <main className="min-h-screen grid place-items-center bg-muted/30 px-4 py-10">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
+      <div className="w-full max-w-md space-y-7">
+        <div className="text-center space-y-3">
+          <Logo />
+          <button
+            type="button"
+            onClick={handleVoltar}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-3 w-3" /> Trocar de conta
+          </button>
+        </div>
+
         <header className="text-center space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Selecionar município</h1>
+          <h1 className="font-semibold" style={{ fontSize: 22, letterSpacing: "-0.015em" }}>
+            Selecione o município
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Você opera em mais de um município. Escolha qual acessar agora.
+            Sua conta tem acesso a {user.municipios.length} prefeituras.
           </p>
         </header>
 
-        <ul className="space-y-3">
-          {user.municipios.map((m) => (
-            <li key={m.schema}>
-              <Card>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">
-                      <Building2 className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <CardTitle className="text-base">
-                        {m.nome} · {m.uf}
-                      </CardTitle>
-                      <p className="text-xs text-muted-foreground">
-                        IBGE {m.codigo_ibge} · {PAPEL_LABEL[m.papel] ?? m.papel}
-                      </p>
-                    </div>
+        <div role="radiogroup" className="space-y-2.5">
+          {user.municipios.map((m) => {
+            const isSelected = selected === m.schema;
+            return (
+              <button
+                key={m.schema}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                onClick={() => setSelected(m.schema)}
+                className={cn(
+                  "w-full flex items-center gap-3 rounded-md border bg-card p-3.5 text-left transition-colors",
+                  isSelected ? "border-primary bg-primary-soft" : "hover:bg-accent",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-md flex-shrink-0",
+                    isSelected
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  <Building2 className="h-4.5 w-4.5" />
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">
+                    Prefeitura de {m.nome} · {m.uf}
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      switchTenant(m.schema);
-                      navigate("/");
-                    }}
-                    className="w-full"
-                  >
-                    Acessar
-                  </Button>
-                </CardContent>
-              </Card>
-            </li>
-          ))}
-        </ul>
+                  <div className="text-xs text-muted-foreground">
+                    IBGE {m.codigo_ibge} · {PAPEL_LABEL[m.papel] ?? m.papel}
+                  </div>
+                </div>
+                <span
+                  className={cn(
+                    "h-4 w-4 rounded-full border-2 inline-flex items-center justify-center flex-shrink-0",
+                    isSelected ? "border-primary" : "border-border-strong",
+                  )}
+                >
+                  {isSelected && <span className="h-2 w-2 rounded-full bg-primary" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <Button type="button" onClick={handleConfirm} disabled={!selected} className="w-full">
+          Acessar Arminda
+          <ArrowRight className="h-4 w-4 ml-1" />
+        </Button>
       </div>
-    </main>
+    </div>
   );
 }
