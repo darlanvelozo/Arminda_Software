@@ -47,6 +47,10 @@ addopts = [
     "--strict-markers",
     "--tb=short",
     "-v",
+    "-m", "not perf",
+]
+markers = [
+    "perf: testes de performance (rodar com `pytest -m perf`)",
 ]
 testpaths = ["tests", "apps"]
 

@@ -35,6 +35,88 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.2 — Onda 2: CRUD Servidor + Vínculo + Dependente + Documento · 2026-04-29
+
+> Cadastros centrais de RH via API REST. Reaproveita o pattern da Onda 1
+> (3 serializers, ViewSet, permissions, filtros, isolamento) e adiciona
+> validação de domínio brasileiro, histórico funcional via simple-history
+> e upload de arquivos (Documento). **Performance baseline atingida**:
+> 100 servidores criados em ~5s (gate ROADMAP era < 30s).
+
+#### Adicionado
+
+- **feat(people):** CRUD de **Servidor**, **VinculoFuncional**,
+  **Dependente** e **Documento**.
+  - Endpoints: `/api/people/{servidores,vinculos,dependentes,documentos}/`.
+  - **3 serializers por modelo** (List/Detail/Write) — pattern.
+  - `ServidorDetailSerializer` embute dependentes + vínculos resumidos
+    (cargo_nome, lotacao_nome, regime_display) — evita N+1 com
+    `prefetch_related`.
+  - `VinculoListSerializer` traz resumo do servidor (matricula, nome) e
+    cargo (nome) — UX de listagem direta.
+  - `DocumentoViewSet` aceita upload via `MultiPartParser` (`arquivo`).
+
+- **feat(people):** Endpoint **GET /api/people/servidores/{id}/historico/**
+  consultando `simple_history`. Retorna registros paginados com
+  `history_id`, `history_date`, `history_type` (+/~/-),
+  `history_user_email` (capturado pelo `HistoryRequestMiddleware`) e
+  snapshot dos campos do modelo no momento da mudança.
+  - Permission: leitura (`IsLeituraMunicipio`) — qualquer papel pode ver.
+
+- **feat(people):** Validações de domínio nos `Write` serializers.
+  - **CPF** (Servidor + Dependente): aceita máscara, normaliza para
+    dígitos, valida via `apps.core.validators.validar_cpf`.
+  - **PIS/PASEP** (Servidor): opcional; se preenchido, valida e
+    normaliza.
+  - **Data de nascimento**: não pode ser futura; idade mínima 14 anos.
+  - **Carga horária** (Vínculo): entre 1 e 60 horas semanais.
+  - **Datas de admissão/demissão** (Vínculo): admissão não futura,
+    demissão >= admissão.
+  - Códigos (Cargo/Lotação): `upper().strip()`.
+  - Erros HTTP 400 com `code` estável (`CPF_INVALIDO`, `PIS_INVALIDO`,
+    `DATA_FUTURA`, `IDADE_MINIMA`, etc.).
+
+- **feat(people/filters):** FilterSets para todos os novos viewsets.
+  - `ServidorFilter`: filtros por `vinculos__cargo`, `vinculos__lotacao`,
+    `vinculos__regime`, `ativo`, `sexo`.
+  - `VinculoFilter`: `admitido_apos`/`admitido_ate` (range de datas) +
+    servidor/cargo/lotacao/regime/ativo.
+  - `DependenteFilter`: servidor, parentesco, ir, salario_familia.
+  - `DocumentoFilter`: servidor, tipo.
+
+- **test(people):** 36 testes novos.
+  - `test_views_servidor.py` (15): CRUD, RBAC, isolamento, validação CPF,
+    PIS, data, idade mínima, matrícula duplicada, histórico via
+    `simple-history` (autor capturado pelo middleware).
+  - `test_views_vinculo.py` (6): CRUD, validação de carga horária,
+    coerência de datas, filtro por servidor.
+  - `test_views_dependente_documento.py` (5): CRUD básico, upload de
+    arquivo via multipart, leitura por papel.
+  - `test_perf.py` (1, marker `@pytest.mark.perf`): **100 servidores
+    criados em ~5s**, bem abaixo do gate de 30s.
+
+#### Modificado
+
+- **chore(pytest):** marker `perf` adicionado em `pyproject.toml`. Suíte
+  default exclui (`-m "not perf"`); rodar com `pytest -m perf`.
+
+#### Validações realizadas
+
+- `pytest` — **126/126 passando** em ~30s (1 deselected: o teste perf).
+- `pytest -m perf` — 1 passando em ~5s (100 servidores via API).
+- `pytest --cov` — **96% de cobertura** geral.
+- `ruff format` + `ruff check` — verdes.
+- `python manage.py check` — sem warnings.
+
+#### Próximos passos
+
+- **Bloco 1.2 — Onda 3** (~4 dias): Services em `apps.people.services/`
+  (admissão, desligamento, transferência) + endpoints `@action` para
+  fluxos. CRUD de Rubrica esqueleto. Management command
+  `criar_usuario` (resolve gap do Bloco 1.1).
+
+---
+
 ### Bloco 1.2 — Onda 1: Validators + CRUD Cargo/Lotação · 2026-04-29
 
 > Primeira onda de cadastros via API REST. Valida o pattern (3 serializers,
