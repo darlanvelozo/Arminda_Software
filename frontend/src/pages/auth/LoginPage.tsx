@@ -127,7 +127,7 @@ export default function LoginPage() {
       </div>
 
       {/* Form panel — direita */}
-      <div className="flex-1 flex items-center justify-center px-6 py-10">
+      <div className="flex-1 flex items-center justify-center px-6 py-10 bg-background text-foreground">
         <div className="w-full max-w-sm space-y-7">
           {/* Logo aparece em mobile (esconde brand panel) */}
           <div className="lg:hidden text-center">
