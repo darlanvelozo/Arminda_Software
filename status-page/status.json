@@ -164,6 +164,12 @@
   "changelog": [
     {
       "data": "2026-04-29",
+      "tipo": "validacao",
+      "titulo": "Frontend autenticado validado em produção",
+      "descricao": "Varredura completa das rotas e telas implementadas até aqui (login, seleção de município, dashboard, sidebar com troca de município, topbar com breadcrumb e tema). Identificado e corrigido um bug de roteamento (links 'Folha' e 'Configurações' iam para 404) e reforçada a renderização do formulário de login para evitar problemas de tema. Build de produção verificado com a identidade visual nova. Backend mantém 193 testes verde com 97% de cobertura."
+    },
+    {
+      "data": "2026-04-29",
       "tipo": "entrega",
       "titulo": "Identidade visual do Arminda implantada",
       "descricao": "O frontend ganhou uma identidade visual completa, gerada via Claude Design e adaptada para o nosso stack: paleta moderna em OKLCH, dark mode como padrão, fontes Inter e JetBrains Mono, logo SVG, brand panel no login com gradient e grid decorativo, sidebar com card de município ativo, topbar com breadcrumb e toggle de tema. Os componentes (botões, cards, dropdowns, formulários) seguem o sistema shadcn customizado."
