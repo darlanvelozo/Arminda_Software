@@ -1,11 +1,15 @@
-"""
-URLs do app payroll.
+"""URLs do app payroll (rotas tenant — exigem header X-Tenant)."""
 
-Roteamento da API será definido nos próximos blocos.
-"""
+from __future__ import annotations
+
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from apps.payroll.views import RubricaViewSet
 
 app_name = "payroll"
 
-urlpatterns: list = [
-    # path("", views.IndexView.as_view(), name="index"),
-]
+router = DefaultRouter()
+router.register("rubricas", RubricaViewSet, basename="rubrica")
+
+urlpatterns = [path("", include(router.urls))]

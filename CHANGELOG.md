@@ -35,6 +35,71 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.2 — Onda 3: Services + Rubrica + criar_usuario · 2026-04-29
+
+> Camada de services (regras de negócio) finalmente entra em ação:
+> admissão, desligamento e transferência saem do `serializer.save()`
+> ingênuo e passam a executar invariantes de domínio em transação atômica.
+> Bloco 1.2 está agora 75% completo (Ondas 1+2+3 de 4).
+
+#### Adicionado
+
+- **feat(people/services):** Camada de regras de negócio em
+  `apps/people/services/`.
+  - `exceptions.py` com `DomainError`, `AdmissaoInvalidaError`,
+    `DesligamentoInvalidoError`, `TransferenciaInvalidaError`. Cada uma
+    carrega `code` estável.
+  - `admissao.admitir_servidor(DadosAdmissao)` — cria Servidor +
+    VinculoFuncional em uma transação atômica, com 13 invariantes
+    validadas.
+  - `desligamento.desligar_servidor(DadosDesligamento)` — encerra todos
+    os vínculos ativos + marca servidor inativo. 5 codes de erro.
+  - `transferencia.transferir_lotacao(DadosTransferencia)` — encerra
+    vínculo atual e cria novo na nova lotação preservando atributos.
+    5 codes de erro.
+  - Todos com `@transaction.atomic` + `select_for_update()` onde
+    necessário.
+
+- **feat(people/views):** Endpoints `@action` orquestrando services.
+  - `POST /api/people/servidores/admitir/`
+  - `POST /api/people/servidores/<id>/desligar/`
+  - `POST /api/people/vinculos/<id>/transferir/`
+  - `_domain_error_to_validation_error()` traduz `DomainError` em
+    HTTP 400 com `code` estável.
+
+- **feat(payroll):** CRUD de **Rubrica** (esqueleto — DSL no Bloco 2).
+  - Pattern triplo de serializers, `/api/payroll/rubricas/` com filtros
+    e busca, RBAC dedicado: leitura aberta, escrita exige
+    `IsFinanceiroMunicipio` (RH não cria rubrica).
+
+- **feat(core):** Management command **`criar_usuario`** (resolve gap
+  do Bloco 1.1: hoje não tínhamos como atribuir papel via CLI).
+  - Cria User + UsuarioMunicipioPapel opcional. Suporta
+    `--staff-arminda`, `--superuser`, `--precisa-trocar-senha`.
+  - Senha via `--password` ou `--senha-stdin` (evita histórico shell).
+
+- **test:** 53 testes novos.
+  - 16 admissão (caminho feliz + cada um dos 13 codes + atomicidade)
+  - 6 desligamento, 6 transferência
+  - 8 endpoints @action (HTTP + RBAC + propagação de code)
+  - 5 Rubrica CRUD + RBAC + isolamento
+  - 12 criar_usuario (cobre todos os flags)
+
+#### Validações
+
+- `pytest` — **179/179 passando** em ~36s.
+- `pytest --cov` — **97% de cobertura** geral.
+- `ruff format` + `ruff check` — verdes.
+- `python manage.py check` — sem warnings.
+
+#### Próximos passos
+
+- **Bloco 1.2 — Onda 4** (~2 dias): hardening final, OpenAPI revisado,
+  `docs/BLOCO_1.2_RESUMO.md`, validação manual end-to-end.
+- **Bloco 1.3** (~2 sem): frontend autenticado consumindo a API.
+
+---
+
 ### Bloco 1.2 — Onda 2: CRUD Servidor + Vínculo + Dependente + Documento · 2026-04-29
 
 > Cadastros centrais de RH via API REST. Reaproveita o pattern da Onda 1

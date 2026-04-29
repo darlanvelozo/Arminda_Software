@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.2 — Onda 2 ✅ (Servidor/Vínculo/Dependente/Documento) → Onda 3 (Services + Rubrica + criar_usuario)**
+> Última atualização: 2026-04-29 · Bloco corrente: **Bloco 1.2 — Onda 3 ✅ (Services + Rubrica + criar_usuario) → Onda 4 (Hardening)**
 
 ---
 

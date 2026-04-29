@@ -567,3 +567,46 @@ class HistoricoServidorSerializer(serializers.Serializer):
     def get_history_user_email(self, obj) -> str | None:
         user = getattr(obj, "history_user", None)
         return user.email if user else None
+
+
+# ============================================================
+# Serializers de input para os endpoints de acao (Bloco 1.2 — Onda 3)
+# ============================================================
+
+
+class AdmissaoInputSerializer(serializers.Serializer):
+    """Input para POST /api/people/servidores/admitir/.
+
+    Espelha apps.people.services.admissao.DadosAdmissao.
+    """
+
+    matricula = serializers.CharField(max_length=30)
+    nome = serializers.CharField(max_length=200)
+    cpf = serializers.CharField(max_length=14)
+    data_nascimento = serializers.DateField()
+    sexo = serializers.CharField(max_length=1)
+    estado_civil = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    pis_pasep = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    telefone = serializers.CharField(max_length=20, required=False, allow_blank=True)
+
+    cargo_id = serializers.IntegerField()
+    lotacao_id = serializers.IntegerField()
+    regime = serializers.CharField(max_length=30)
+    data_admissao = serializers.DateField()
+    salario_base = serializers.DecimalField(max_digits=12, decimal_places=2)
+    carga_horaria = serializers.IntegerField(default=40, min_value=1, max_value=60)
+
+
+class DesligamentoInputSerializer(serializers.Serializer):
+    """Input para POST /api/people/servidores/<id>/desligar/."""
+
+    data_desligamento = serializers.DateField()
+    motivo = serializers.CharField(required=False, allow_blank=True, max_length=500)
+
+
+class TransferenciaInputSerializer(serializers.Serializer):
+    """Input para POST /api/people/vinculos/<id>/transferir/."""
+
+    nova_lotacao_id = serializers.IntegerField()
+    data_transferencia = serializers.DateField()

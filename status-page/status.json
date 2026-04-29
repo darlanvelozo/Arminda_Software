@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-04-29",
   "bloco_atual": 1,
-  "progresso_geral_pct": 22,
+  "progresso_geral_pct": 28,
   "blocos": [
     {
       "numero": 0,
@@ -36,7 +36,7 @@
       "data_fim_prevista": "2026-06-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 45,
+      "progresso_pct": 60,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
         "✅ Autenticação JWT e controle de acesso (RBAC por município)",
@@ -44,7 +44,9 @@
         "✅ Cadastro de servidor, cargo, vínculo, lotação, dependente e documento via API REST",
         "✅ Validação de CPF, PIS/PASEP e datas brasileiras",
         "✅ Endpoint de histórico de servidor + upload de documentos digitalizados",
-        "Serviços de admissão, desligamento e transferência (em andamento)",
+        "✅ Serviços de admissão, desligamento e transferência com regras de negócio em transação atômica",
+        "✅ Cadastro de rubricas (esqueleto, sem cálculo ainda)",
+        "✅ Comando para criar usuário e atribuir papel via linha de comando",
         "Importador inicial do sistema atual (Fiorilli SIP → Postgres)",
         "Telas básicas de cadastro (frontend autenticado)"
       ]
@@ -159,6 +161,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-04-29",
+      "tipo": "entrega",
+      "titulo": "Regras de negócio de RH em transação atômica",
+      "descricao": "Os fluxos de admissão, desligamento e transferência de servidor passaram a ser executados como serviços com invariantes de domínio explícitas e em transação única — não dá mais para deixar um servidor sem vínculo, ou desligar duas vezes. Cadastro de rubricas (sem cálculo, ainda) também foi disponibilizado. Total: 179 testes automatizados, 97% de cobertura."
+    },
     {
       "data": "2026-04-29",
       "tipo": "entrega",

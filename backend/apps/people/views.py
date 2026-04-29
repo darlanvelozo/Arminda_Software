@@ -11,8 +11,9 @@ Servidor expoe @action /historico/ consultando simple-history.
 
 from __future__ import annotations
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
@@ -34,12 +35,14 @@ from apps.people.models import (
     VinculoFuncional,
 )
 from apps.people.serializers import (
+    AdmissaoInputSerializer,
     CargoDetailSerializer,
     CargoListSerializer,
     CargoWriteSerializer,
     DependenteDetailSerializer,
     DependenteListSerializer,
     DependenteWriteSerializer,
+    DesligamentoInputSerializer,
     DocumentoDetailSerializer,
     DocumentoListSerializer,
     DocumentoWriteSerializer,
@@ -50,10 +53,27 @@ from apps.people.serializers import (
     ServidorDetailSerializer,
     ServidorListSerializer,
     ServidorWriteSerializer,
+    TransferenciaInputSerializer,
     VinculoDetailSerializer,
     VinculoListSerializer,
     VinculoWriteSerializer,
 )
+from apps.people.services.admissao import DadosAdmissao, admitir_servidor
+from apps.people.services.desligamento import (
+    DadosDesligamento,
+    desligar_servidor,
+)
+from apps.people.services.exceptions import DomainError
+from apps.people.services.transferencia import (
+    DadosTransferencia,
+    transferir_lotacao,
+)
+
+
+def _domain_error_to_validation_error(exc: DomainError) -> ValidationError:
+    """Traduz erro de dominio para resposta HTTP 400 com `code` estavel."""
+    return ValidationError({"detail": str(exc), "code": exc.code})
+
 
 # ============================================================
 # Mixin: leitura vs escrita (RBAC)
@@ -143,6 +163,10 @@ class ServidorViewSet(_PapelPorAcaoMixin, viewsets.ModelViewSet):
             return ServidorListSerializer
         if self.action in ("create", "update", "partial_update"):
             return ServidorWriteSerializer
+        if self.action == "admitir":
+            return AdmissaoInputSerializer
+        if self.action == "desligar":
+            return DesligamentoInputSerializer
         return ServidorDetailSerializer
 
     @action(detail=True, methods=["get"], url_path="historico")
@@ -156,6 +180,33 @@ class ServidorViewSet(_PapelPorAcaoMixin, viewsets.ModelViewSet):
             return self.get_paginated_response(ser.data)
         ser = HistoricoServidorSerializer(history, many=True)
         return Response(ser.data)
+
+    @action(detail=False, methods=["post"], url_path="admitir")
+    def admitir(self, request):
+        """POST /api/people/servidores/admitir/ — cria Servidor + Vinculo (atomico)."""
+        ser = AdmissaoInputSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            servidor = admitir_servidor(DadosAdmissao(**ser.validated_data))
+        except DomainError as exc:
+            raise _domain_error_to_validation_error(exc) from exc
+        return Response(
+            ServidorDetailSerializer(servidor).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    @action(detail=True, methods=["post"], url_path="desligar")
+    def desligar(self, request, pk=None):
+        """POST /api/people/servidores/<id>/desligar/ — encerra vinculos + inativa."""
+        ser = DesligamentoInputSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            servidor = desligar_servidor(
+                DadosDesligamento(servidor_id=int(pk), **ser.validated_data)
+            )
+        except DomainError as exc:
+            raise _domain_error_to_validation_error(exc) from exc
+        return Response(ServidorDetailSerializer(servidor).data)
 
 
 # ============================================================
@@ -176,7 +227,20 @@ class VinculoFuncionalViewSet(_PapelPorAcaoMixin, viewsets.ModelViewSet):
             return VinculoListSerializer
         if self.action in ("create", "update", "partial_update"):
             return VinculoWriteSerializer
+        if self.action == "transferir":
+            return TransferenciaInputSerializer
         return VinculoDetailSerializer
+
+    @action(detail=True, methods=["post"], url_path="transferir")
+    def transferir(self, request, pk=None):
+        """POST /api/people/vinculos/<id>/transferir/ — encerra atual + cria novo."""
+        ser = TransferenciaInputSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        try:
+            novo = transferir_lotacao(DadosTransferencia(vinculo_id=int(pk), **ser.validated_data))
+        except DomainError as exc:
+            raise _domain_error_to_validation_error(exc) from exc
+        return Response(VinculoDetailSerializer(novo).data, status=status.HTTP_201_CREATED)
 
 
 # ============================================================
