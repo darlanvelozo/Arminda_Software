@@ -107,6 +107,20 @@ Interface em `http://localhost:5173`.
 
 ## Documentação
 
+### Sistema de contexto (leitura obrigatória antes de implementar)
+
+- **[CONTEXT.md](CONTEXT.md)** — contexto global do projeto (mestre)
+- **[CHANGELOG.md](CHANGELOG.md)** — memória de todas as alterações
+- **[backend/CONTEXT.md](backend/CONTEXT.md)** — regras do backend Django
+  - [backend/CONTEXT_MODELS.md](backend/CONTEXT_MODELS.md) — camada de models
+  - [backend/CONTEXT_SERVICES.md](backend/CONTEXT_SERVICES.md) — camada de services
+  - [backend/apps/CONTEXT.md](backend/apps/CONTEXT.md) — estrutura interna de cada app
+- **[frontend/CONTEXT.md](frontend/CONTEXT.md)** — regras do frontend React
+  - [frontend/src/pages/CONTEXT.md](frontend/src/pages/CONTEXT.md) — páginas
+  - [frontend/src/components/CONTEXT.md](frontend/src/components/CONTEXT.md) — componentes
+
+### Documentação técnica
+
 - **[ROADMAP.md](docs/ROADMAP.md)** — os 7 blocos de construção e o que cada um entrega
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** — visão arquitetural e decisões de stack
 - **[CONTRIBUTING.md](docs/CONTRIBUTING.md)** — padrões de commit, branch e PR

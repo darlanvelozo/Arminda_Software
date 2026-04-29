@@ -3,8 +3,9 @@ Configuracoes para rodar localmente sem Docker/PostgreSQL/Redis.
 Usa SQLite e desativa Celery.
 """
 
-from .dev import *  # noqa: F401, F403
 from pathlib import Path
+
+from .dev import *  # noqa: F401, F403
 
 # SQLite em vez de PostgreSQL
 DATABASES = {

@@ -4,6 +4,31 @@
 
 ---
 
+## Antes de qualquer contribuição: sistema de contexto
+
+Toda implementação deve passar pelo sistema de contexto distribuído do Arminda. **Antes** de codar:
+
+1. Ler [`CONTEXT.md`](../CONTEXT.md) (raiz) — sempre.
+2. Ler o `CONTEXT.md` do escopo onde você vai mexer:
+   - Backend → [`backend/CONTEXT.md`](../backend/CONTEXT.md)
+   - Frontend → [`frontend/CONTEXT.md`](../frontend/CONTEXT.md)
+3. Ler o `CONTEXT.md` específico se for arquivo crítico:
+   - `models.py` → [`backend/CONTEXT_MODELS.md`](../backend/CONTEXT_MODELS.md)
+   - regra de negócio (`services/`) → [`backend/CONTEXT_SERVICES.md`](../backend/CONTEXT_SERVICES.md)
+   - app inteiro Django → [`backend/apps/CONTEXT.md`](../backend/apps/CONTEXT.md)
+   - componente → [`frontend/src/components/CONTEXT.md`](../frontend/src/components/CONTEXT.md)
+   - página → [`frontend/src/pages/CONTEXT.md`](../frontend/src/pages/CONTEXT.md)
+
+**Depois** de codar:
+
+1. Atualizar [`CHANGELOG.md`](../CHANGELOG.md) com a entrada estruturada.
+2. Atualizar o `CONTEXT.md` pertinente se a alteração mudou padrão, regra ou estrutura.
+3. Criar/atualizar ADR em `docs/adr/` se a decisão for difícil de reverter.
+
+> **PR sem entrada no `CHANGELOG.md` ou que viole regra de algum `CONTEXT.md` é bloqueado.**
+
+---
+
 ## Branches
 
 - `main` — produção. Sempre verde no CI. Nunca commitar direto.
