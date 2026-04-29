@@ -35,6 +35,61 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.2 — Onda 3 (hotfix): admin do Django + cobertura HTML · 2026-04-29
+
+> ⚠ Bug identificado por **navegação manual do usuário** que minha
+> bateria automatizada anterior não pegou. Documentando aqui com
+> transparência sobre o gap.
+
+#### Fix
+
+- **fix(core/middleware):** `TenantHeaderOrHostMiddleware` parou de
+  setar `request.tenant = None` em rotas públicas. Agora o atributo
+  simplesmente **não é definido** quando estamos no schema `public`.
+  - **Sintoma:** `GET /admin/` retornava HTTP 500 com
+    `AttributeError: 'NoneType' object has no attribute 'schema_name'`
+    em `django_tenants/templatetags/tenant.py:61` (template tag
+    `is_public_schema`, usada pelo template do admin via
+    `{% load tenant %}`).
+  - **Causa:** a template tag faz `hasattr(request, 'tenant')` antes
+    de acessar `.schema_name`. Atributo presente porém None passa pelo
+    `hasattr` e quebra na linha seguinte.
+  - **Fix:** não setar o atributo. `hasattr(...)` retorna False; a
+    template tag interpreta como "schema public" — o que está correto.
+  - **Arquivo:** `apps/core/middleware/tenant.py`.
+  - **Impacto:** `/admin/` e demais rotas públicas voltam a renderizar
+    normalmente. Endpoints API (`/api/people/...`) seguem inalterados:
+    o middleware continua setando `request.tenant` quando o header
+    `X-Tenant` é resolvido.
+
+#### Adicionado (cobertura)
+
+- **test(core):** `apps/core/tests/test_admin_smoke.py` — 12 testes
+  novos cobrindo:
+  - 8 páginas do admin do Django (`/admin/`, `/admin/login/`,
+    `/admin/auth/group/`, `/admin/core/{user,municipio,domain,
+    usuariomunicipiopapel,configuracaoglobal}/`).
+  - 3 páginas do drf-spectacular (`/api/schema/`, `/api/docs/`,
+    `/api/redoc/`).
+  - 1 teste explicito do invariante "request.tenant não existe em
+    rota pública" para evitar regressão.
+  - **Por que faltava:** minha bateria anterior usava `APIClient` do
+    DRF para testar JSON. Templates HTML do admin (que carregam
+    `{% load tenant %}` do `django-tenants`) **nunca eram renderizados
+    durante os testes**. Bug histórico ficou invisível até o usuário
+    abrir o `/admin/` no browser.
+
+#### Validações
+
+- `pytest` — **193/193 passando** em ~39s (12 novos sobre 181 anteriores).
+- `pytest --cov` — **97% de cobertura** mantida.
+- `ruff format` + `ruff check` — verdes.
+- `python manage.py check` — sem warnings.
+- Smoke manual via curl: 11 páginas (admin + swagger + redoc + schema)
+  todas retornam 200/302 sem mensagem de erro no body.
+
+---
+
 ### Bloco 1.2 — Onda 3: Services + Rubrica + criar_usuario · 2026-04-29
 
 > Camada de services (regras de negócio) finalmente entra em ação:

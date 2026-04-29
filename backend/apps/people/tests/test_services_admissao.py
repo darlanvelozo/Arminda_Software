@@ -182,16 +182,12 @@ class TestAdmitirServidorExcecoes:
 
     def test_cpf_invalido(self, tenant_a, in_tenant, cargo, lotacao):
         with in_tenant(tenant_a), pytest.raises(AdmissaoInvalidaError) as exc:
-            admitir_servidor(
-                _dados_validos(cargo.id, lotacao.id, cpf="111.111.111-11")
-            )
+            admitir_servidor(_dados_validos(cargo.id, lotacao.id, cpf="111.111.111-11"))
         assert exc.value.code == "CPF_INVALIDO"
 
     def test_pis_invalido(self, tenant_a, in_tenant, cargo, lotacao):
         with in_tenant(tenant_a), pytest.raises(AdmissaoInvalidaError) as exc:
-            admitir_servidor(
-                _dados_validos(cargo.id, lotacao.id, pis_pasep="11111111111")
-            )
+            admitir_servidor(_dados_validos(cargo.id, lotacao.id, pis_pasep="11111111111"))
         assert exc.value.code == "PIS_INVALIDO"
 
     def test_matricula_duplicada(self, tenant_a, in_tenant, cargo, lotacao):

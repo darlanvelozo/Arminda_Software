@@ -32,10 +32,14 @@ class TenantHeaderOrHostMiddleware(TenantMainMiddleware):
     )
 
     def process_request(self, request: HttpRequest):
-        # Rotas publicas: forca schema public e segue o pipeline normal
+        # Rotas publicas: forca schema public e segue o pipeline normal.
+        # IMPORTANTE: nao setar request.tenant = None — a template tag
+        # `is_public_schema` do django-tenants faz `hasattr(request, 'tenant')`
+        # antes de acessar `.schema_name`. Atributo presente porem None quebra.
+        # Solucao: deixar o atributo nao existir; a template tag entao retorna
+        # True corretamente (nao tem tenant -> e public).
         if any(request.path.startswith(p) for p in self.PUBLIC_PATH_PREFIXES):
             connection.set_schema_to_public()
-            request.tenant = None  # type: ignore[attr-defined]
             return None
 
         # Tentativa 1: header X-Tenant
