@@ -21,6 +21,11 @@ import DashboardPage from "@/pages/DashboardPage";
 import HealthPage from "@/pages/HealthPage";
 import LoginPage from "@/pages/auth/LoginPage";
 import SelecionarMunicipioPage from "@/pages/auth/SelecionarMunicipioPage";
+import CargosListPage from "@/pages/cargos/CargosListPage";
+import LotacoesListPage from "@/pages/lotacoes/LotacoesListPage";
+import RubricasListPage from "@/pages/rubricas/RubricasListPage";
+import ServidorDetailPage from "@/pages/servidores/ServidorDetailPage";
+import ServidoresListPage from "@/pages/servidores/ServidoresListPage";
 import EmConstrucaoPage from "@/pages/EmConstrucaoPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
@@ -52,11 +57,12 @@ function App() {
         }
       >
         <Route index element={<DashboardPage />} />
-        <Route path="servidores" element={<EmConstrucaoPage area="Servidores" />} />
-        <Route path="cargos" element={<EmConstrucaoPage area="Cargos" />} />
-        <Route path="lotacoes" element={<EmConstrucaoPage area="Lotações" />} />
+        <Route path="servidores" element={<ServidoresListPage />} />
+        <Route path="servidores/:id" element={<ServidorDetailPage />} />
+        <Route path="cargos" element={<CargosListPage />} />
+        <Route path="lotacoes" element={<LotacoesListPage />} />
         <Route path="folha" element={<EmConstrucaoPage area="Folha de Pagamento" />} />
-        <Route path="rubricas" element={<EmConstrucaoPage area="Rubricas" />} />
+        <Route path="rubricas" element={<RubricasListPage />} />
         <Route path="relatorios" element={<EmConstrucaoPage area="Relatórios" />} />
         <Route path="configuracoes" element={<EmConstrucaoPage area="Configurações" />} />
       </Route>

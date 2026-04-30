@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-04-29",
+  "ultima_atualizacao": "2026-04-30",
   "bloco_atual": 1,
-  "progresso_geral_pct": 32,
+  "progresso_geral_pct": 35,
   "blocos": [
     {
       "numero": 0,
@@ -36,7 +36,7 @@
       "data_fim_prevista": "2026-06-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 70,
+      "progresso_pct": 85,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
         "✅ Autenticação JWT e controle de acesso (RBAC por município)",
@@ -48,7 +48,8 @@
         "✅ Cadastro de rubricas (esqueleto, sem cálculo ainda)",
         "✅ Comando para criar usuário e atribuir papel via linha de comando",
         "✅ Frontend autenticado: tela de login, layout, troca de município, dashboard",
-        "Telas de domínio (servidor/cargo/lotação/rubrica) — em andamento",
+        "✅ Telas de domínio: Cargos, Lotações, Rubricas (CRUD completo) e Servidores (lista + admissão + detalhe read-only com 4 abas)",
+        "Edição inline do servidor + ações de desligar/transferir/dependentes (Onda 1.3c)",
         "Importador inicial do sistema atual (Fiorilli SIP → Postgres)"
       ]
     },
@@ -162,6 +163,18 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-04-30",
+      "tipo": "entrega",
+      "titulo": "Telas de domínio do Bloco 1 entregues (Cargos, Lotações, Rubricas, Servidores)",
+      "descricao": "As 4 áreas que estavam como placeholder ('em construção') ganharam tela real e funcional, ligadas à API. Cargos, Lotações e Rubricas têm CRUD completo (criar, editar, ativar/desativar, excluir) com busca, filtros, ordenação e paginação. Servidores tem listagem paginada, fluxo de admissão (cria servidor + vínculo em transação atômica) e página de detalhe com 4 abas: Pessoais, Vínculos, Dependentes e Histórico (timeline com simple-history). O padrão visual segue a identidade Arminda — toolbar com busca e filtros, tabela com badges de status, formulário em sheet slide-from-right. Edição inline do servidor, desligamento, transferência e cadastro de dependentes ficam para a sub-onda 1.3c."
+    },
+    {
+      "data": "2026-04-30",
+      "tipo": "processo",
+      "titulo": "Análise do banco Fiorilli SIP concluída",
+      "descricao": "O arquivo SIP.FDB (banco Firebird 2.5 do município-piloto) foi extraído e analisado em ambiente isolado. Mapeamos as 1029 tabelas e identificamos as ~15 críticas para o importador: 517 pessoas, 2.762 trabalhadores, 91 cargos, 66 locais de trabalho, 201 rubricas, 1.387 lançamentos fixos, 249 mil lançamentos de movimentação histórica. Foram identificados gaps no nosso modelo (campos eSocial faltantes em Servidor, separação Lotação x Unidade Orçamentária, falta de modelo para Conta Bancária e Eventos Fixos) que serão fechados na onda do importador. A importação de cadastros (MVP) é viável após 3-5 dias de trabalho; importação de histórico de folha aguarda o engine de cálculo (Bloco 2)."
+    },
     {
       "data": "2026-04-29",
       "tipo": "validacao",

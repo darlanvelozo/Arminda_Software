@@ -35,6 +35,109 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.3 — Onda 1.3b: Telas de domínio (Cargos, Lotações, Rubricas, Servidores) · 2026-04-30
+
+> Onda dedicada às telas autenticadas de domínio. As 4 áreas que estavam
+> em `EmConstrucaoPage` ganharam CRUD funcional ligado à API, com busca,
+> filtros, ordenação, paginação e ações por linha. Tudo reaproveitando
+> os tokens OKLCH e os primitivos shadcn já estabelecidos. Mantém o
+> mesmo padrão de tratamento de erro de domínio do backend (ValidationError
+> com `code` e mensagem por campo) — erros são mapeados nos próprios
+> campos do formulário; falha genérica cai num `toast`.
+
+#### Adicionado
+
+- **feat(frontend/ui):** Primitivos shadcn faltantes
+  - `components/ui/table.tsx` (Table/Header/Body/Row/Head/Cell)
+  - `components/ui/badge.tsx` (variants: default/secondary/destructive/outline/success/warning/info/muted)
+  - `components/ui/select.tsx` (Radix Select wrapper)
+  - `components/ui/alert-dialog.tsx` (confirmação de delete)
+  - `components/ui/tabs.tsx` (Radix Tabs wrapper, usado em ServidorDetailPage)
+  - Deps novas: `@radix-ui/react-select`, `@radix-ui/react-tabs`,
+    `@radix-ui/react-alert-dialog`, `@radix-ui/react-tooltip`.
+
+- **feat(frontend/queries):** Hooks TanStack Query por recurso, em
+  `src/lib/queries/`:
+  - `cargos.ts` — list/get/create/update/delete + tipos `CargosListParams`
+  - `lotacoes.ts` — idem, com filtro `raiz` e `lotacaoPaiId`
+  - `rubricas.ts` — idem, com filtro por `tipo`
+  - `servidores.ts` — list/get + ações (`admitir`, `update`, `desligar`,
+    `historico`).
+  - Padrão: `queryKey` escopado por tenant (`["cargos", activeTenant, ...]`)
+    para evitar mistura de cache entre municípios; `placeholderData:
+    keepPreviousData` para paginação suave.
+  - Tipo `*Input = Omit<*Write, "id">` corrige limitação do
+    drf-spectacular (campos `read_only_fields` saem como `readonly`
+    obrigatórios na schema gerada).
+
+- **feat(frontend/cargos):** `pages/cargos/CargosListPage.tsx` +
+  `CargoFormSheet.tsx`. Tabela com busca debounced (300ms), filtro
+  por status, ordenação clicável (nome/código), paginação DRF, ações
+  por linha (editar, ativar/desativar, excluir). Form de create/edit
+  via Sheet slide-from-right com Zod + react-hook-form.
+
+- **feat(frontend/lotacoes):** `pages/lotacoes/LotacoesListPage.tsx` +
+  `LotacaoFormSheet.tsx`. Mesmo padrão de Cargos; form inclui dropdown
+  de **Lotação pai** (popula com lotações ativas para hierarquia
+  organograma).
+
+- **feat(frontend/rubricas):** `pages/rubricas/RubricasListPage.tsx` +
+  `RubricaFormSheet.tsx`. Filtro adicional por **tipo**
+  (provento/desconto/informativa), checkboxes de incidências
+  (INSS/IRRF/FGTS), campo `formula` como TextArea (DSL apenas
+  armazenada — interpretação no Bloco 2).
+
+- **feat(frontend/servidores):** `pages/servidores/ServidoresListPage.tsx`
+  + `ServidorAdmissaoSheet.tsx` + `ServidorDetailPage.tsx`. Lista
+  paginada com busca por matrícula/nome/CPF; clique na linha vai para
+  rota `/servidores/:id`. Sheet de **admissão** chama
+  `POST /api/people/servidores/admitir/` (cria Servidor + Vínculo em
+  transação atômica). Detalhe com 4 abas:
+  - **Pessoais** — view read-only (identificação + contato + endereço)
+  - **Vínculos** — cards com cargo/lotação/regime/datas/salário
+  - **Dependentes** — cards com flags IR / sal. família
+  - **Histórico** — timeline com snapshots simple-history (tipo,
+    data/hora, autor, snapshot ativo, motivo)
+
+- **feat(frontend/routes):** `App.tsx` substitui `EmConstrucaoPage`
+  pelas 4 páginas reais e adiciona rota nested `/servidores/:id`.
+
+#### Por quê
+
+- **Operação real depende de cadastros.** Sem CRUDs, não dá para o
+  usuário-piloto poder testar o sistema. As telas reais habilitam o
+  fluxo de admissão ponta-a-ponta — único caminho para validar a
+  paridade contra o sistema legado antes do importador entrar.
+- **Estabelecer padrão antes de Servidores.** Cargo/Lotação/Rubrica
+  são CRUDs simples (3–6 campos). Implementá-los primeiro estabelece
+  o padrão de UI (toolbar + tabela + sheet de form + alert dialog
+  de delete) que Servidores reaproveita — reduzindo divergências
+  estilísticas entre as telas.
+- **Read-only no detalhe do servidor.** Edição inline e ações
+  (desligar, transferir, novo dependente, upload documento) ficam
+  para Onda 1.3c. Manter este escopo enxuto entrega valor sem
+  comprometer a previsibilidade da onda.
+
+#### Impacto
+
+- Frontend cresceu para **5.6k linhas TS**; bundle de produção foi de
+  622 KB para **680 KB** (gzip 197 KB) — segue dentro do alvo, mas o
+  warning do Vite sobre code-splitting ficou mais alto. Não bloqueia,
+  resolveremos com lazy routes na próxima sub-onda.
+- Sem mudança de backend, sem migrations, sem mudança de contrato.
+- 10/10 tests verde, build verde, lint verde (5 warnings preexistentes
+  de fast-refresh).
+
+#### Próximos passos
+
+- **Onda 1.3c** — Edição do servidor (sheet), ação de desligamento,
+  transferência de vínculo (sheet por vínculo), CRUD de dependentes
+  e upload de documentos. Lazy-load das rotas para reduzir bundle.
+- **Onda 1.4** — Importador Fiorilli SIP (FDB → Postgres), conforme
+  diagnóstico em [docs/adr/0009-importador-fiorilli.md](#) (a escrever).
+
+---
+
 ### Bloco 1.3 — Onda 1.3a-bis: Adaptação do design Arminda (Claude Design) · 2026-04-29
 
 > O usuário gerou um design completo no Claude Design (claude.ai/design) e
