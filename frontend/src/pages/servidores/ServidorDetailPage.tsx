@@ -1,14 +1,16 @@
 /**
- * ServidorDetailPage — Bloco 1.3b.
+ * ServidorDetailPage — Bloco 1.3c.
  *
- * View read-only do servidor com 4 abas (Pessoais, Vínculos, Dependentes,
- * Histórico). Edição inline, desligamento e transferência ficam para a
- * próxima sub-onda (1.3c).
+ * Detalhe do servidor com 4 abas (Pessoais, Vínculos, Dependentes, Histórico)
+ * e ações: editar dados pessoais, desligar, transferir vínculo, CRUD de
+ * dependentes. Documentos ficam para uma onda futura (precisa upload com
+ * FormData).
  */
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
+  ArrowLeftRight,
   Briefcase,
   Building2,
   Calendar,
@@ -16,23 +18,48 @@ import {
   History,
   Mail,
   MapPin,
+  MoreHorizontal,
+  PencilLine,
   Phone,
+  Plus,
+  PowerOff,
+  Trash2,
   Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { extractDomainErrorMessage } from "@/lib/api";
+import { useDeleteDependente } from "@/lib/queries/dependentes";
 import { useServidor, useServidorHistorico } from "@/lib/queries/servidores";
 import type { ServidorDetail } from "@/types";
+
+import { DependenteFormSheet } from "./DependenteFormSheet";
+import { DesligamentoDialog } from "./DesligamentoDialog";
+import { ServidorEditSheet } from "./ServidorEditSheet";
+import { TransferenciaDialog } from "./TransferenciaDialog";
 
 function formatCpf(cpf: string): string {
   const onlyDigits = cpf.replace(/\D/g, "").padStart(11, "0").slice(-11);
@@ -56,6 +83,22 @@ export default function ServidorDetailPage() {
   const servidorId = id ? Number(id) : null;
 
   const { data: servidor, isLoading, isError, error } = useServidor(servidorId);
+
+  // Dialogs / Sheets state
+  const [editOpen, setEditOpen] = useState(false);
+  const [desligarOpen, setDesligarOpen] = useState(false);
+  const [transferirVinculoId, setTransferirVinculoId] = useState<{
+    id: number;
+    lotacaoId: number;
+    lotacaoNome: string;
+  } | null>(null);
+  const [dependenteFormOpen, setDependenteFormOpen] = useState(false);
+  const [editingDependente, setEditingDependente] = useState<
+    ServidorDetail["dependentes"][number] | null
+  >(null);
+  const [confirmDeleteDependente, setConfirmDeleteDependente] = useState<number | null>(
+    null,
+  );
 
   if (isLoading) return <DetailSkeleton />;
   if (isError) {
@@ -96,6 +139,21 @@ export default function ServidorDetailPage() {
             )}
           </div>
         </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setEditOpen(true)}>
+            <PencilLine className="h-4 w-4 mr-1" /> Editar dados
+          </Button>
+          {servidor.ativo && (
+            <Button
+              variant="outline"
+              onClick={() => setDesligarOpen(true)}
+              className="text-destructive hover:text-destructive"
+            >
+              <PowerOff className="h-4 w-4 mr-1" /> Desligar
+            </Button>
+          )}
+        </div>
       </header>
 
       <Tabs defaultValue="pessoais">
@@ -118,15 +176,64 @@ export default function ServidorDetailPage() {
           <PessoaisTab servidor={servidor} />
         </TabsContent>
         <TabsContent value="vinculos">
-          <VinculosTab servidor={servidor} />
+          <VinculosTab
+            servidor={servidor}
+            onTransferir={(v) =>
+              setTransferirVinculoId({
+                id: v.id,
+                lotacaoId: v.lotacao,
+                lotacaoNome: v.lotacao_nome ?? "",
+              })
+            }
+          />
         </TabsContent>
         <TabsContent value="dependentes">
-          <DependentesTab servidor={servidor} />
+          <DependentesTab
+            servidor={servidor}
+            onNovo={() => {
+              setEditingDependente(null);
+              setDependenteFormOpen(true);
+            }}
+            onEditar={(d) => {
+              setEditingDependente(d);
+              setDependenteFormOpen(true);
+            }}
+            onExcluir={(id) => setConfirmDeleteDependente(id)}
+          />
         </TabsContent>
         <TabsContent value="historico">
           {servidorId !== null && <HistoricoTab servidorId={servidorId} />}
         </TabsContent>
       </Tabs>
+
+      {/* Dialogs / Sheets */}
+      <ServidorEditSheet open={editOpen} onOpenChange={setEditOpen} servidor={servidor} />
+      <DesligamentoDialog
+        open={desligarOpen}
+        onOpenChange={setDesligarOpen}
+        servidorId={servidor.id}
+        servidorNome={servidor.nome}
+      />
+      {transferirVinculoId && (
+        <TransferenciaDialog
+          open={transferirVinculoId !== null}
+          onOpenChange={(o) => !o && setTransferirVinculoId(null)}
+          vinculoId={transferirVinculoId.id}
+          lotacaoAtualId={transferirVinculoId.lotacaoId}
+          lotacaoAtualNome={transferirVinculoId.lotacaoNome}
+        />
+      )}
+      <DependenteFormSheet
+        open={dependenteFormOpen}
+        onOpenChange={setDependenteFormOpen}
+        servidorId={servidor.id}
+        dependente={editingDependente}
+      />
+      <DeleteDependenteDialog
+        open={confirmDeleteDependente !== null}
+        onOpenChange={(o) => !o && setConfirmDeleteDependente(null)}
+        dependenteId={confirmDeleteDependente}
+      />
     </div>
   );
 }
@@ -216,18 +323,17 @@ function PessoaisTab({ servidor }: { servidor: ServidorDetail }) {
           </Field>
         </CardContent>
       </Card>
-
-      <Card className="md:col-span-2">
-        <CardContent className="py-4 text-xs text-muted-foreground">
-          Edição inline e ações (desligar / transferir) entram na próxima onda
-          (1.3c). Por enquanto, este painel é apenas leitura.
-        </CardContent>
-      </Card>
     </div>
   );
 }
 
-function VinculosTab({ servidor }: { servidor: ServidorDetail }) {
+function VinculosTab({
+  servidor,
+  onTransferir,
+}: {
+  servidor: ServidorDetail;
+  onTransferir: (v: ServidorDetail["vinculos"][number]) => void;
+}) {
   if (servidor.vinculos.length === 0) {
     return (
       <Card>
@@ -263,14 +369,33 @@ function VinculosTab({ servidor }: { servidor: ServidorDetail }) {
                 {v.data_demissao && ` · Demissão: ${formatDate(v.data_demissao)}`}
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-xs text-muted-foreground">Salário-base</div>
-              <div className="font-mono tabular-nums font-medium">
-                R$ {Number(v.salario_base).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-xs text-muted-foreground">Salário-base</div>
+                <div className="font-mono tabular-nums font-medium">
+                  R${" "}
+                  {Number(v.salario_base).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {v.carga_horaria}h semanais
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {v.carga_horaria}h semanais
-              </div>
+              {v.ativo && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="Ações do vínculo">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onTransferir(v)}>
+                      <ArrowLeftRight className="h-4 w-4 mr-2" /> Transferir lotação
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -279,35 +404,67 @@ function VinculosTab({ servidor }: { servidor: ServidorDetail }) {
   );
 }
 
-function DependentesTab({ servidor }: { servidor: ServidorDetail }) {
-  if (servidor.dependentes.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          Nenhum dependente cadastrado. Cadastro de dependentes entra na próxima onda.
-        </CardContent>
-      </Card>
-    );
-  }
-
+function DependentesTab({
+  servidor,
+  onNovo,
+  onEditar,
+  onExcluir,
+}: {
+  servidor: ServidorDetail;
+  onNovo: () => void;
+  onEditar: (d: ServidorDetail["dependentes"][number]) => void;
+  onExcluir: (id: number) => void;
+}) {
   return (
-    <div className="space-y-2">
-      {servidor.dependentes.map((d) => (
-        <Card key={d.id}>
-          <CardContent className="py-3 flex items-center justify-between gap-3">
-            <div>
-              <div className="font-medium">{d.nome}</div>
-              <div className="text-xs text-muted-foreground">
-                {d.parentesco} · Nascimento: {formatDate(d.data_nascimento)}
-              </div>
-            </div>
-            <div className="flex gap-2">
-              {d.ir && <Badge variant="info">IR</Badge>}
-              {d.salario_familia && <Badge variant="success">Sal. família</Badge>}
-            </div>
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button onClick={onNovo} size="sm">
+          <Plus className="h-4 w-4 mr-1" /> Novo dependente
+        </Button>
+      </div>
+      {servidor.dependentes.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center text-sm text-muted-foreground">
+            Nenhum dependente cadastrado.
           </CardContent>
         </Card>
-      ))}
+      ) : (
+        servidor.dependentes.map((d) => (
+          <Card key={d.id}>
+            <CardContent className="py-3 flex items-center justify-between gap-3">
+              <div>
+                <div className="font-medium">{d.nome}</div>
+                <div className="text-xs text-muted-foreground">
+                  {d.parentesco} · Nascimento: {formatDate(d.data_nascimento)}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {d.ir && <Badge variant="info">IR</Badge>}
+                {d.salario_familia && <Badge variant="success">Sal. família</Badge>}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="Ações do dependente">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onEditar(d)}>
+                      <PencilLine className="h-4 w-4 mr-2" /> Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onExcluir(d.id)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
     </div>
   );
 }
@@ -363,9 +520,7 @@ function HistoricoTab({ servidorId }: { servidorId: number }) {
                 <Badge variant={tipoVariant(entry.history_type)}>
                   {tipoLabel(entry.history_type)}
                 </Badge>
-                <span className="font-medium">
-                  {formatDateTime(entry.history_date)}
-                </span>
+                <span className="font-medium">{formatDateTime(entry.history_date)}</span>
                 {entry.history_user_email && (
                   <span className="text-xs text-muted-foreground">
                     por {entry.history_user_email}
@@ -384,6 +539,55 @@ function HistoricoTab({ servidorId }: { servidorId: number }) {
         </ol>
       </CardContent>
     </Card>
+  );
+}
+
+function DeleteDependenteDialog({
+  open,
+  onOpenChange,
+  dependenteId,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  dependenteId: number | null;
+}) {
+  const deleteMutation = useDeleteDependente();
+
+  async function confirmar() {
+    if (dependenteId === null) return;
+    try {
+      await deleteMutation.mutateAsync(dependenteId);
+      toast.success("Dependente excluído.");
+      onOpenChange(false);
+    } catch (e) {
+      toast.error(extractDomainErrorMessage(e) ?? "Falha ao excluir.");
+    }
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir dependente?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta ação não pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleteMutation.isPending}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              confirmar();
+            }}
+            disabled={deleteMutation.isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -420,4 +624,3 @@ function DetailSkeleton() {
     </div>
   );
 }
-

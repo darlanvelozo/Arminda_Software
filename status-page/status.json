@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-04-30",
   "bloco_atual": 1,
-  "progresso_geral_pct": 35,
+  "progresso_geral_pct": 38,
   "blocos": [
     {
       "numero": 0,
@@ -36,7 +36,7 @@
       "data_fim_prevista": "2026-06-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 85,
+      "progresso_pct": 92,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
         "✅ Autenticação JWT e controle de acesso (RBAC por município)",
@@ -48,9 +48,10 @@
         "✅ Cadastro de rubricas (esqueleto, sem cálculo ainda)",
         "✅ Comando para criar usuário e atribuir papel via linha de comando",
         "✅ Frontend autenticado: tela de login, layout, troca de município, dashboard",
-        "✅ Telas de domínio: Cargos, Lotações, Rubricas (CRUD completo) e Servidores (lista + admissão + detalhe read-only com 4 abas)",
-        "Edição inline do servidor + ações de desligar/transferir/dependentes (Onda 1.3c)",
-        "Importador inicial do sistema atual (Fiorilli SIP → Postgres)"
+        "✅ Telas de domínio: Cargos, Lotações, Rubricas (CRUD completo) e Servidores (lista + admissão + detalhe com 4 abas)",
+        "✅ Edição inline do servidor + desligamento + transferência de vínculo + CRUD de dependentes (Onda 1.3c)",
+        "✅ Code-splitting por rota: bundle inicial reduzido em 31%",
+        "Importador inicial do sistema atual (Fiorilli SIP → Postgres) — Onda 1.4"
       ]
     },
     {
@@ -163,6 +164,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-04-30",
+      "tipo": "entrega",
+      "titulo": "Ciclo de vida do servidor completo + bundle 31% menor (Onda 1.3c)",
+      "descricao": "O detalhe do servidor agora tem todas as ações que faltavam: edição inline dos dados pessoais, botão de desligamento (encerra todos os vínculos e marca o servidor como inativo em transação atômica), transferência de vínculo entre lotações, cadastro/edição/exclusão de dependentes (com flags de IR e salário-família). Com isso, o ciclo de vida do servidor está completo end-to-end no frontend — admitir, manter, transferir e desligar — usando os endpoints atômicos que já existiam no backend desde o Bloco 1.2. Como bônus técnico, todas as rotas autenticadas viraram chunks separados via React.lazy: o bundle inicial caiu de 680 KB para 468 KB (gzip de 197 KB para 146 KB), o que melhora a primeira renderização em conexões lentas — importante porque o público-alvo são prefeituras de pequeno porte com internet limitada."
+    },
     {
       "data": "2026-04-30",
       "tipo": "entrega",

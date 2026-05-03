@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-30 · Bloco corrente: **Bloco 1.3 — Onda 1.3b ✅ (telas de domínio: Cargos, Lotações, Rubricas, Servidores) → Onda 1.3c (edição inline + ações de desligar/transferir/dependentes); Onda 1.4 (Importador Fiorilli) com diagnóstico do FDB concluído**
+> Última atualização: 2026-04-30 · Bloco corrente: **Bloco 1.3 — Ondas 1.3a + 1.3b + 1.3c concluídas ✅ (frontend autenticado completo: telas de domínio + ciclo de vida do servidor + lazy routes). Próximo: Onda 1.4 (Importador Fiorilli) com diagnóstico do FDB já feito**
 
 ---
 

@@ -35,6 +35,90 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.3 — Onda 1.3c: Edição inline + ações + lazy routes · 2026-04-30
+
+> Fecha as lacunas que estavam read-only na onda anterior. Servidor pode
+> agora ser editado, desligado, transferir vínculo, e ter dependentes
+> cadastrados/editados/excluídos diretamente no detalhe — todas as ações
+> chamam endpoints atômicos que já existiam no backend (Bloco 1.2).
+> Bundle do frontend foi splitado por rota: o chunk inicial caiu de
+> 680 KB para 468 KB.
+
+#### Adicionado
+
+- **feat(frontend/queries):** Hooks novos
+  - `lib/queries/vinculos.ts` — `useUpdateVinculo`, `useTransferirVinculo`
+    (POST `/api/people/vinculos/{id}/transferir/`)
+  - `lib/queries/dependentes.ts` — `useCreateDependente`, `useUpdateDependente`,
+    `useDeleteDependente`. Ambos invalidam o cache de `["servidores", tenant]`
+    porque o detalhe do servidor traz os vínculos e dependentes embutidos.
+
+- **feat(frontend/servidores):** 4 componentes novos no fluxo do servidor
+  - `ServidorEditSheet.tsx` — Sheet com formulário de edição dos dados
+    pessoais (identificação, contato, endereço); zod + react-hook-form;
+    erros do backend mapeados por campo.
+  - `DesligamentoDialog.tsx` — AlertDialog com formulário de desligamento
+    (data + motivo opcional). Avisa que encerra TODOS os vínculos ativos.
+  - `TransferenciaDialog.tsx` — AlertDialog para transferir um vínculo;
+    dropdown popula com lotações ativas (excluindo a atual) e exige
+    `data_transferencia`.
+  - `DependenteFormSheet.tsx` — Sheet de criação/edição de dependente
+    com checkboxes para flags `ir` e `salario_familia`. Aceita um shape
+    mínimo (compatível com o serializer embedded e o full).
+
+- **feat(frontend/servidores/detalhe):** `ServidorDetailPage.tsx` ganhou
+  - Botões "Editar dados" e "Desligar" no header (Desligar só aparece
+    se o servidor estiver ativo).
+  - DropdownMenu por vínculo na aba "Vínculos" com opção "Transferir
+    lotação" (só para vínculos ativos).
+  - Botão "Novo dependente" + DropdownMenu por dependente (Editar/Excluir)
+    na aba "Dependentes".
+  - AlertDialog de confirmação para excluir dependente.
+
+- **perf(frontend):** Code-splitting por rota com `React.lazy` +
+  `Suspense` em `App.tsx`. Cada página de domínio virou um chunk:
+  - CargosListPage 11 KB · LotacoesListPage 11 KB · RubricasListPage 14 KB
+  - ServidoresListPage 13 KB · ServidorDetailPage 37 KB
+  - DashboardPage 4 KB · sheet (chunk shared) 132 KB
+  - **Bundle inicial:** 680 KB → **468 KB** (gzip 197 KB → 146 KB,
+    redução de 31%). Vite parou de avisar do warning de chunk grande.
+
+#### Por quê
+
+- **Operação real exige edição.** Sem editar dados pessoais, desligar,
+  transferir e cadastrar dependentes, o usuário-piloto não consegue
+  rodar nenhum fluxo realista — só consegue admitir e olhar. Esses 4
+  fluxos completam o ciclo de vida CRUD do servidor.
+- **Reaproveitamento total do backend.** Todos os endpoints já existem
+  desde o Bloco 1.2 (services atômicos `admitir_servidor`,
+  `desligar_servidor`, `transferir_lotacao` + CRUD de Dependente).
+  A onda foi exclusivamente frontend, sem migration nem mudança de
+  contrato.
+- **Code-splitting agora, não depois.** Adicionar lazy routes ficou
+  mais simples enquanto o roteamento ainda é pequeno (10 rotas);
+  fazer isso depois exigiria refatorar mais arquivos.
+
+#### Impacto
+
+- Sem mudança de backend, sem migration, sem mudança de contrato.
+- Bundle inicial 31% menor — primeira renderização mais rápida em
+  conexões lentas (target: prefeituras com internet ruim).
+- Frontend cresceu para ~10.5k LOC TS em ~64 arquivos.
+- 10/10 testes verde, build verde, lint verde (5 warnings preexistentes).
+
+#### Próximos passos
+
+- **Onda 1.4** — Importador Fiorilli SIP. ADR-0009 + `apps.imports`
+  (Django app novo) + adapter Firebird (firebirdsql) + migrations
+  para campos faltantes em Cargo/Servidor/Vínculo + management command
+  `import_fiorilli_sip --dsn ... --dry-run` + import MVP de
+  Cargo/Lotação/Servidor/Vínculo/Dependente.
+- **Onda 1.3d (opcional)** — Upload de documentos digitalizados no
+  detalhe do servidor (precisa multipart/form-data, valida tamanho
+  e tipo).
+
+---
+
 ### Bloco 1.3 — Onda 1.3b: Telas de domínio (Cargos, Lotações, Rubricas, Servidores) · 2026-04-30
 
 > Onda dedicada às telas autenticadas de domínio. As 4 áreas que estavam
