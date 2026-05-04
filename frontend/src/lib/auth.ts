@@ -35,3 +35,18 @@ export async function fetchMe(): Promise<UserMe> {
   const { data } = await api.get<UserMe>("/auth/me/");
   return data;
 }
+
+export async function updateMe(payload: { nome_completo: string }): Promise<UserMe> {
+  const { data } = await api.patch<UserMe>("/auth/me/", payload);
+  return data;
+}
+
+export interface ChangePasswordPayload {
+  current_password: string;
+  new_password: string;
+  new_password_confirm: string;
+}
+
+export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
+  await api.post("/auth/change-password/", payload);
+}

@@ -1,10 +1,9 @@
 /**
- * ServidorDetailPage — Bloco 1.3c.
+ * ServidorDetailPage — Bloco 1.5.
  *
- * Detalhe do servidor com 4 abas (Pessoais, Vínculos, Dependentes, Histórico)
- * e ações: editar dados pessoais, desligar, transferir vínculo, CRUD de
- * dependentes. Documentos ficam para uma onda futura (precisa upload com
- * FormData).
+ * Detalhe do servidor com 5 abas (Pessoais, Vínculos, Dependentes, Documentos,
+ * Histórico) e ações: editar dados pessoais, desligar, transferir vínculo,
+ * CRUD de dependentes, upload/download/delete de documentos.
  */
 
 import { useState, type ReactNode } from "react";
@@ -15,6 +14,8 @@ import {
   Building2,
   Calendar,
   CircleUser,
+  Download,
+  FileText,
   History,
   Mail,
   MapPin,
@@ -24,6 +25,7 @@ import {
   Plus,
   PowerOff,
   Trash2,
+  Upload,
   Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
@@ -53,11 +55,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { extractDomainErrorMessage } from "@/lib/api";
 import { useDeleteDependente } from "@/lib/queries/dependentes";
+import {
+  useDeleteDocumento,
+  useDocumentosDoServidor,
+} from "@/lib/queries/documentos";
 import { useServidor, useServidorHistorico } from "@/lib/queries/servidores";
 import type { ServidorDetail } from "@/types";
 
 import { DependenteFormSheet } from "./DependenteFormSheet";
 import { DesligamentoDialog } from "./DesligamentoDialog";
+import { DocumentoUploadSheet } from "./DocumentoUploadSheet";
 import { ServidorEditSheet } from "./ServidorEditSheet";
 import { TransferenciaDialog } from "./TransferenciaDialog";
 
@@ -97,6 +104,10 @@ export default function ServidorDetailPage() {
     ServidorDetail["dependentes"][number] | null
   >(null);
   const [confirmDeleteDependente, setConfirmDeleteDependente] = useState<number | null>(
+    null,
+  );
+  const [documentoUploadOpen, setDocumentoUploadOpen] = useState(false);
+  const [confirmDeleteDocumento, setConfirmDeleteDocumento] = useState<number | null>(
     null,
   );
 
@@ -167,6 +178,9 @@ export default function ServidorDetailPage() {
           <TabsTrigger value="dependentes">
             <Users className="h-4 w-4 mr-1.5" /> Dependentes ({servidor.dependentes.length})
           </TabsTrigger>
+          <TabsTrigger value="documentos">
+            <FileText className="h-4 w-4 mr-1.5" /> Documentos
+          </TabsTrigger>
           <TabsTrigger value="historico">
             <History className="h-4 w-4 mr-1.5" /> Histórico
           </TabsTrigger>
@@ -201,6 +215,15 @@ export default function ServidorDetailPage() {
             onExcluir={(id) => setConfirmDeleteDependente(id)}
           />
         </TabsContent>
+        <TabsContent value="documentos">
+          {servidorId !== null && (
+            <DocumentosTab
+              servidorId={servidorId}
+              onUpload={() => setDocumentoUploadOpen(true)}
+              onDelete={(id) => setConfirmDeleteDocumento(id)}
+            />
+          )}
+        </TabsContent>
         <TabsContent value="historico">
           {servidorId !== null && <HistoricoTab servidorId={servidorId} />}
         </TabsContent>
@@ -233,6 +256,18 @@ export default function ServidorDetailPage() {
         open={confirmDeleteDependente !== null}
         onOpenChange={(o) => !o && setConfirmDeleteDependente(null)}
         dependenteId={confirmDeleteDependente}
+      />
+
+      <DocumentoUploadSheet
+        open={documentoUploadOpen}
+        onOpenChange={setDocumentoUploadOpen}
+        servidorId={servidor.id}
+      />
+
+      <DeleteDocumentoDialog
+        open={confirmDeleteDocumento !== null}
+        onOpenChange={(o) => !o && setConfirmDeleteDocumento(null)}
+        documentoId={confirmDeleteDocumento}
       />
     </div>
   );
@@ -571,6 +606,152 @@ function DeleteDependenteDialog({
           <AlertDialogTitle>Excluir dependente?</AlertDialogTitle>
           <AlertDialogDescription>
             Esta ação não pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={deleteMutation.isPending}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              confirmar();
+            }}
+            disabled={deleteMutation.isPending}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+function DocumentosTab({
+  servidorId,
+  onUpload,
+  onDelete,
+}: {
+  servidorId: number;
+  onUpload: () => void;
+  onDelete: (id: number) => void;
+}) {
+  const { data, isLoading, isError, error } = useDocumentosDoServidor(servidorId);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button onClick={onUpload} size="sm">
+          <Upload className="h-4 w-4 mr-1" /> Enviar documento
+        </Button>
+      </div>
+
+      {isLoading && (
+        <Card>
+          <CardContent className="py-6 space-y-3">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-3/4" />
+          </CardContent>
+        </Card>
+      )}
+
+      {isError && (
+        <Card>
+          <CardContent className="py-8 text-center text-sm text-destructive">
+            {extractDomainErrorMessage(error) ?? "Falha ao carregar documentos."}
+          </CardContent>
+        </Card>
+      )}
+
+      {!isLoading && !isError && data?.results.length === 0 && (
+        <Card>
+          <CardContent className="py-12 text-center text-sm text-muted-foreground">
+            Nenhum documento enviado.
+          </CardContent>
+        </Card>
+      )}
+
+      {data?.results.map((doc) => (
+        <Card key={doc.id}>
+          <CardContent className="py-3 flex items-center justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0 flex-1">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-muted text-muted-foreground flex-shrink-0">
+                <FileText className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium text-sm flex items-center gap-2">
+                  {doc.tipo_display}
+                  {doc.descricao && (
+                    <span className="text-muted-foreground font-normal">
+                      · {doc.descricao}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Enviado em {formatDateTime(doc.data_upload)}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              {doc.arquivo && (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Baixar"
+                  title="Baixar"
+                >
+                  <a href={doc.arquivo} target="_blank" rel="noreferrer">
+                    <Download className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(doc.id)}
+                aria-label="Excluir"
+                title="Excluir"
+                className="text-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function DeleteDocumentoDialog({
+  open,
+  onOpenChange,
+  documentoId,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  documentoId: number | null;
+}) {
+  const deleteMutation = useDeleteDocumento();
+
+  async function confirmar() {
+    if (documentoId === null) return;
+    try {
+      await deleteMutation.mutateAsync(documentoId);
+      toast.success("Documento excluído.");
+      onOpenChange(false);
+    } catch (e) {
+      toast.error(extractDomainErrorMessage(e) ?? "Falha ao excluir.");
+    }
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir documento?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta ação não pode ser desfeita. O arquivo será removido.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

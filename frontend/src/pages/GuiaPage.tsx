@@ -23,6 +23,7 @@ import {
   ExternalLink,
   FileText,
   Info,
+  Keyboard,
   Library,
   Lightbulb,
   ListChecks,
@@ -42,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-03";
+const LAST_UPDATED = "2026-05-05";
 
 interface TocItem {
   id: string;
@@ -57,6 +58,8 @@ const TOC: TocItem[] = [
   { id: "papeis", label: "Papéis e permissões", icon: Shield },
   { id: "cadastros", label: "Cadastros centrais", icon: Briefcase },
   { id: "servidores", label: "Servidores", icon: Users },
+  { id: "configuracoes", label: "Configurações", icon: SettingsIcon },
+  { id: "atalhos", label: "Pesquisa e atalhos", icon: Keyboard },
   { id: "importador", label: "Importador Fiorilli SIP", icon: Upload },
   { id: "em-construcao", label: "Em construção", icon: Construction },
   { id: "suporte", label: "Suporte", icon: Lightbulb },
@@ -111,6 +114,8 @@ export default function GuiaPage() {
           <SectionPapeis />
           <SectionCadastros />
           <SectionServidores />
+          <SectionConfiguracoes />
+          <SectionAtalhos />
           <SectionImportador />
           <SectionEmConstrucao />
           <SectionSuporte />
@@ -166,9 +171,9 @@ function SectionComoComecar() {
         </li>
       </ol>
       <Callout variant="tip">
-        Se você criou uma senha temporária via importação, o sistema vai pedir para
-        trocá-la no primeiro login. (
-        <span className="opacity-70">— a tela de troca de senha entra na Onda 1.5.</span>)
+        Se você foi cadastrado por um administrador com senha temporária, troque-a em{" "}
+        <Link to="/configuracoes" className="underline">Configurações → Segurança</Link>{" "}
+        no primeiro acesso.
       </Callout>
     </Section>
   );
@@ -364,9 +369,9 @@ function SectionServidores() {
           desc="Aba 'Histórico'. Timeline com todas as mudanças do registro (criação, alterações, desligamento), com data, autor e snapshot dos campos."
         />
         <FlowItem
-          status="em-construcao"
+          status="ok"
           title="Documentos digitalizados"
-          desc="Upload de documentos por servidor. O backend já tem o endpoint; a aba do frontend entra na Onda 1.5."
+          desc="Aba 'Documentos' no detalhe do servidor. Upload (PDF/JPG/PNG até 10 MB) com tipo (RG, CPF, certificado, etc.) e descrição. Lista, download e exclusão."
         />
       </ul>
 
@@ -375,6 +380,74 @@ function SectionServidores() {
         intencional. O Fiorilli guarda o salário em outras tabelas (eventos fixos +
         movimento histórico) que dependem do engine de cálculo (Bloco 2). Por enquanto,
         edite cada vínculo e preencha manualmente se quiser testar fluxos.
+      </Callout>
+    </Section>
+  );
+}
+
+function SectionConfiguracoes() {
+  return (
+    <Section id="configuracoes" icon={SettingsIcon} title="Configurações">
+      <p>
+        Acesse via <Link to="/configuracoes" className="underline">Configurações</Link>{" "}
+        no rodapé da sidebar. A página tem 3 abas:
+      </p>
+      <ul className="space-y-3">
+        <FlowItem
+          status="ok"
+          title="Perfil"
+          desc="Edite seu nome completo. O e-mail é imutável — para alterar, fale com o suporte."
+        />
+        <FlowItem
+          status="ok"
+          title="Segurança"
+          desc="Troque sua senha (precisa da senha atual + nova com mínimo 8 caracteres)."
+        />
+        <FlowItem
+          status="ok"
+          title="Usuários do município (admin)"
+          desc="Lista todos os usuários com acesso ao município ativo. Cria novos com papel + senha temporária. Troca o papel direto na linha. Remove o acesso (sem deletar o usuário, que pode ter papel em outros municípios)."
+        />
+      </ul>
+      <Callout variant="info">
+        Apenas <code className="text-xs bg-muted px-1 rounded">admin_municipio</code> e{" "}
+        <code className="text-xs bg-muted px-1 rounded">staff_arminda</code> veem a aba
+        Usuários. Outros papéis veem só Perfil e Segurança.
+      </Callout>
+    </Section>
+  );
+}
+
+function SectionAtalhos() {
+  return (
+    <Section id="atalhos" icon={Keyboard} title="Pesquisa e atalhos">
+      <p>
+        A barra de pesquisa global está sempre visível no topo. Aperte{" "}
+        <kbd className="font-mono text-[11px] px-1.5 py-0.5 bg-muted border rounded-sm">⌘K</kbd>{" "}
+        (Mac) ou{" "}
+        <kbd className="font-mono text-[11px] px-1.5 py-0.5 bg-muted border rounded-sm">
+          Ctrl+K
+        </kbd>{" "}
+        (Windows/Linux) em qualquer tela autenticada para abrir.
+      </p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>
+          A pesquisa busca em paralelo por <strong>servidores</strong> (matrícula, nome,
+          CPF), <strong>cargos</strong> (código, nome, CBO),{" "}
+          <strong>lotações</strong> (código, nome, sigla) e{" "}
+          <strong>rubricas</strong> (código, nome).
+        </li>
+        <li>
+          Vazio ou com menos de 2 caracteres: o palette mostra <strong>atalhos</strong>{" "}
+          para todas as áreas do sistema (Dashboard, Servidores, Configurações, etc.).
+        </li>
+        <li>
+          Use ↑/↓ para navegar entre resultados; Enter abre a página relevante; Esc fecha.
+        </li>
+      </ul>
+      <Callout variant="tip">
+        A pesquisa só vê dados do município ativo. Para buscar em outro município,
+        troque-o primeiro pelo card da sidebar.
       </Callout>
     </Section>
   );

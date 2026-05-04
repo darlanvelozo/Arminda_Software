@@ -35,6 +35,131 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.5 — Onda 1.5: Documentos, Configurações, Pesquisa global, Notificações honestas · 2026-05-05
+
+> Fecha as lacunas reais do Bloco 1: aba Documentos no detalhe do servidor,
+> página Configurações com 3 abas (Perfil, Segurança, Usuários), pesquisa
+> global com ⌘K, e dropdown de notificações honesto (sem badge fake). O
+> Bloco 1 agora não tem mais buracos de UX em produção.
+
+#### Adicionado — Backend (5 endpoints novos)
+
+- **feat(core/auth):** `POST /api/auth/change-password/` — troca de senha
+  do próprio usuário com `current_password`, `new_password`,
+  `new_password_confirm`. Valida senha atual, exige confirmação igual,
+  nova diferente da atual, e roda `validate_password` do Django
+  (mínimo, similaridade, lista de senhas comuns). Limpa
+  `precisa_trocar_senha`.
+- **feat(core/auth):** `PATCH /api/auth/me/` — edita campos do próprio
+  User (apenas `nome_completo` por enquanto). E-mail é imutável.
+- **feat(core/users):** `GET/POST/PATCH/DELETE /api/core/usuarios/` —
+  gestão de `UsuarioMunicipioPapel` no tenant ativo. Apenas
+  `admin_municipio` + `staff_arminda` operam. Cria User + papel
+  atomicamente; se o e-mail já existir em outro município, reaproveita.
+  DELETE remove só a associação (não deleta o User).
+- **test:** 19 testes novos (244 verde no total).
+
+#### Adicionado — Frontend
+
+- **feat(servidores):** Aba **Documentos** no `ServidorDetailPage`.
+  - `lib/queries/documentos.ts` — `useDocumentosDoServidor`,
+    `useUploadDocumento`, `useDeleteDocumento` (multipart/form-data via
+    FormData; axios deixa o navegador preencher o boundary).
+  - `pages/servidores/DocumentoUploadSheet.tsx` — Sheet com input de
+    arquivo (PDF/JPG/PNG até 10 MB), tipo (RG, CPF, certificado, etc.)
+    e descrição opcional.
+  - Aba na DetailPage: lista cards de documentos com download e delete;
+    botão "Enviar documento" no topo; AlertDialog de confirmação
+    para excluir.
+
+- **feat(configuracoes):** Página `/configuracoes` real (não mais
+  `EmConstrucaoPage`). 3 abas em `Tabs` shadcn:
+  - **Perfil** — `PerfilTab.tsx` edita nome via `PATCH /auth/me/`,
+    refresca o `AuthContext` no sucesso, exibe e-mail como read-only.
+  - **Segurança** — `SegurancaTab.tsx` formulário de troca de senha
+    com toggle de visibilidade, validação Zod
+    (mínimo 8 chars + confirmação igual + diferente da atual), erros
+    do backend mapeados por campo via `code` do `ValidationError`.
+  - **Usuários** (admin only) — `UsuariosTab.tsx` lista paginada com
+    troca inline de papel via Select; Sheet "Novo usuário" com
+    e-mail/nome/papel/senha-temporária; botão "Remover acesso" com
+    AlertDialog. Não-admins veem mensagem "apenas administradores
+    podem gerir usuários".
+  - `lib/queries/usuarios.ts` — hooks correspondentes.
+  - `lib/auth.ts` — `updateMe()` e `changePassword()` adicionados.
+
+- **feat(search):** Pesquisa global com **⌘K / Ctrl+K**.
+  - Lib `cmdk` instalada.
+  - Primitivos `command.tsx` e `dialog.tsx` adicionados a
+    `components/ui/`.
+  - `components/search/CommandPalette.tsx` — Dialog que abre via atalho
+    ou clique no SearchTrigger. Busca paralela debounced (250ms) em 4
+    APIs (`/people/cargos/`, `/people/lotacoes/`, `/people/servidores/`,
+    `/payroll/rubricas/`) com `?search=` e `page_size=5`. Resultados
+    agrupados por tipo, navegam para a página relevante. Quando
+    vazio, mostra atalhos para todas as áreas (Dashboard, Servidores,
+    Configurações, Guia de uso, etc.).
+  - `useCommandPaletteShortcut` registra ⌘K / Ctrl+K globalmente.
+  - `AppShell` mantém o estado do palette e passa `onSearchOpen` para
+    o Topbar.
+
+- **feat(layout):** `Topbar.tsx`
+  - SearchTrigger agora é interativo (abre o palette).
+  - **Notificações honestas:** o sino sem badge fake; ao clicar abre
+    DropdownMenu com mensagem "Nada por enquanto" e nota explicando
+    que alertas reais entram nos Blocos 5 (TCE) e 7 (alertas
+    inteligentes).
+  - Itens "Meu perfil" e "Trocar senha" do PerfilDropdown deixaram
+    de ser `disabled` — agora navegam para `/configuracoes`. Adicionado
+    item "Guia de uso".
+
+- **docs(GuiaPage):**
+  - `LAST_UPDATED` para 2026-05-05.
+  - 2 seções novas: **Configurações** (com FlowItems para Perfil,
+    Segurança, Usuários) e **Pesquisa e atalhos** (explica ⌘K,
+    como navegar, escopo por município).
+  - Status da feature "Documentos" subiu de "em-construcao" para "ok"
+    com descrição atualizada.
+  - Callout do "Como começar" agora aponta para
+    `/configuracoes#seguranca` em vez de "entra na Onda 1.5".
+
+#### Por quê
+
+- **O Bloco 1 estava entregue mas com fricção visível** — botão de
+  pesquisa fake, sino com badge falsa, 4 placeholders disabled no
+  perfil dropdown, aba Documentos prometida pelo backend mas sem UI.
+  Em produção esses detalhes corroem confiança rápido.
+- **Configurações de usuário não dão pra ser CLI-only** — qualquer
+  prefeitura precisa que o admin cadastre/remova RH/financeiro pela
+  UI, sem precisar SSH no servidor.
+- **Pesquisa global é UX foundational** — sem ela, encontrar 1
+  servidor numa lista de 517 vira fricção repetitiva. ⌘K resolve em
+  ~250ms.
+- **Notificações fake violam confiança** — badge vermelho permanente
+  sem clique acionável é teatro. Estrutura honesta agora; alertas
+  reais quando o domínio existir.
+
+#### Impacto
+
+- **Backend:** 244 testes verde (era 225, +19), 4 endpoints novos,
+  nenhuma migration, nenhum breaking.
+- **Frontend:** 10/10 testes verde, build verde, lint verde (1 warning
+  preexistente). Bundle inicial subiu para 499 KB (era 468) por causa
+  das novas pages — ainda dentro do alvo. ConfiguracoesPage 15 KB e
+  GuiaPage 24 KB são lazy-chunks separados.
+- **Sem regressão.** Todas as telas anteriores continuam funcionando.
+
+#### Próximos passos
+
+- Bloco 1 está 100% completo agora — incluindo todas as funcionalidades
+  marcadas como "deve fazer parte do Bloco 1" no roadmap original.
+- Próximo passo: **Bloco 2 — Engine de cálculo de folha** (DSL de
+  fórmulas, INSS, IRRF, FGTS, holerite). Habilita Folha + KPIs
+  do Dashboard + as primeiras importações de histórico financeiro
+  (EVENTOSFIXOS, MOVIMENTO).
+
+---
+
 ### docs(frontend): Guia de uso do sistema acessível em /guia · 2026-05-03
 
 > Página viva de documentação dentro do próprio sistema. Substitui a

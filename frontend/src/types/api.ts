@@ -4,1675 +4,1090 @@
  */
 
 export interface paths {
-  "/api/auth/login/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/change-password/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/auth/change-password/ — troca a senha do próprio usuário. */
+        post: operations["auth_change_password_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** @description POST /api/auth/login/ — autentica e retorna tokens. */
-    post: operations["auth_login_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/logout/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/login/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/auth/login/ — autentica e retorna tokens. */
+        post: operations["auth_login_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** @description POST /api/auth/logout/ — blacklist o refresh token informado. */
-    post: operations["auth_logout_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/me/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/logout/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/auth/logout/ — blacklist o refresh token informado. */
+        post: operations["auth_logout_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description GET /api/auth/me/ — retorna o usuario autenticado + papeis. */
-    get: operations["auth_me_retrieve"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/refresh/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/me/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description GET/PATCH /api/auth/me/ — retorna ou edita o usuário autenticado. */
+        get: operations["auth_me_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description GET/PATCH /api/auth/me/ — retorna ou edita o usuário autenticado. */
+        patch: operations["auth_me_partial_update"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** @description POST /api/auth/refresh/ — gera novo access a partir do refresh. */
-    post: operations["auth_refresh_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/payroll/rubricas/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/refresh/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/auth/refresh/ — gera novo access a partir do refresh. */
+        post: operations["auth_refresh_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
-     *
-     *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-     *     aqui aceitamos como TextField sem interpretacao.
-     */
-    get: operations["payroll_rubricas_list"];
-    put?: never;
-    /**
-     * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
-     *
-     *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-     *     aqui aceitamos como TextField sem interpretacao.
-     */
-    post: operations["payroll_rubricas_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/payroll/rubricas/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/core/usuarios/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de usuários do município ativo (associação User × Município × Group).
+         *
+         *     GET    /api/core/usuarios/         lista papéis do tenant
+         *     POST   /api/core/usuarios/         cria User + papel (atômico)
+         *     PATCH  /api/core/usuarios/{id}/    troca papel
+         *     DELETE /api/core/usuarios/{id}/    remove papel (não deleta o User)
+         */
+        get: operations["core_usuarios_list"];
+        put?: never;
+        /**
+         * @description CRUD de usuários do município ativo (associação User × Município × Group).
+         *
+         *     GET    /api/core/usuarios/         lista papéis do tenant
+         *     POST   /api/core/usuarios/         cria User + papel (atômico)
+         *     PATCH  /api/core/usuarios/{id}/    troca papel
+         *     DELETE /api/core/usuarios/{id}/    remove papel (não deleta o User)
+         */
+        post: operations["core_usuarios_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
-     *
-     *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-     *     aqui aceitamos como TextField sem interpretacao.
-     */
-    get: operations["payroll_rubricas_retrieve"];
-    /**
-     * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
-     *
-     *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-     *     aqui aceitamos como TextField sem interpretacao.
-     */
-    put: operations["payroll_rubricas_update"];
-    post?: never;
-    /**
-     * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
-     *
-     *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-     *     aqui aceitamos como TextField sem interpretacao.
-     */
-    delete: operations["payroll_rubricas_destroy"];
-    options?: never;
-    head?: never;
-    /**
-     * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
-     *
-     *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-     *     aqui aceitamos como TextField sem interpretacao.
-     */
-    patch: operations["payroll_rubricas_partial_update"];
-    trace?: never;
-  };
-  "/api/people/cargos/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/core/usuarios/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de usuários do município ativo (associação User × Município × Group).
+         *
+         *     GET    /api/core/usuarios/         lista papéis do tenant
+         *     POST   /api/core/usuarios/         cria User + papel (atômico)
+         *     PATCH  /api/core/usuarios/{id}/    troca papel
+         *     DELETE /api/core/usuarios/{id}/    remove papel (não deleta o User)
+         */
+        get: operations["core_usuarios_retrieve"];
+        put?: never;
+        post?: never;
+        /**
+         * @description CRUD de usuários do município ativo (associação User × Município × Group).
+         *
+         *     GET    /api/core/usuarios/         lista papéis do tenant
+         *     POST   /api/core/usuarios/         cria User + papel (atômico)
+         *     PATCH  /api/core/usuarios/{id}/    troca papel
+         *     DELETE /api/core/usuarios/{id}/    remove papel (não deleta o User)
+         */
+        delete: operations["core_usuarios_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * @description CRUD de usuários do município ativo (associação User × Município × Group).
+         *
+         *     GET    /api/core/usuarios/         lista papéis do tenant
+         *     POST   /api/core/usuarios/         cria User + papel (atômico)
+         *     PATCH  /api/core/usuarios/{id}/    troca papel
+         *     DELETE /api/core/usuarios/{id}/    remove papel (não deleta o User)
+         */
+        patch: operations["core_usuarios_partial_update"];
+        trace?: never;
     };
-    /** @description CRUD de cargos do municipio (tenant atual). */
-    get: operations["people_cargos_list"];
-    put?: never;
-    /** @description CRUD de cargos do municipio (tenant atual). */
-    post: operations["people_cargos_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/cargos/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/payroll/rubricas/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         *
+         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
+         *     aqui aceitamos como TextField sem interpretacao.
+         */
+        get: operations["payroll_rubricas_list"];
+        put?: never;
+        /**
+         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         *
+         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
+         *     aqui aceitamos como TextField sem interpretacao.
+         */
+        post: operations["payroll_rubricas_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de cargos do municipio (tenant atual). */
-    get: operations["people_cargos_retrieve"];
-    /** @description CRUD de cargos do municipio (tenant atual). */
-    put: operations["people_cargos_update"];
-    post?: never;
-    /** @description CRUD de cargos do municipio (tenant atual). */
-    delete: operations["people_cargos_destroy"];
-    options?: never;
-    head?: never;
-    /** @description CRUD de cargos do municipio (tenant atual). */
-    patch: operations["people_cargos_partial_update"];
-    trace?: never;
-  };
-  "/api/people/dependentes/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/payroll/rubricas/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         *
+         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
+         *     aqui aceitamos como TextField sem interpretacao.
+         */
+        get: operations["payroll_rubricas_retrieve"];
+        /**
+         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         *
+         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
+         *     aqui aceitamos como TextField sem interpretacao.
+         */
+        put: operations["payroll_rubricas_update"];
+        post?: never;
+        /**
+         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         *
+         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
+         *     aqui aceitamos como TextField sem interpretacao.
+         */
+        delete: operations["payroll_rubricas_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         *
+         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
+         *     aqui aceitamos como TextField sem interpretacao.
+         */
+        patch: operations["payroll_rubricas_partial_update"];
+        trace?: never;
     };
-    /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
-    get: operations["people_dependentes_list"];
-    put?: never;
-    /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
-    post: operations["people_dependentes_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/dependentes/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/cargos/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de cargos do municipio (tenant atual). */
+        get: operations["people_cargos_list"];
+        put?: never;
+        /** @description CRUD de cargos do municipio (tenant atual). */
+        post: operations["people_cargos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
-    get: operations["people_dependentes_retrieve"];
-    /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
-    put: operations["people_dependentes_update"];
-    post?: never;
-    /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
-    delete: operations["people_dependentes_destroy"];
-    options?: never;
-    head?: never;
-    /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
-    patch: operations["people_dependentes_partial_update"];
-    trace?: never;
-  };
-  "/api/people/documentos/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/cargos/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de cargos do municipio (tenant atual). */
+        get: operations["people_cargos_retrieve"];
+        /** @description CRUD de cargos do municipio (tenant atual). */
+        put: operations["people_cargos_update"];
+        post?: never;
+        /** @description CRUD de cargos do municipio (tenant atual). */
+        delete: operations["people_cargos_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de cargos do municipio (tenant atual). */
+        patch: operations["people_cargos_partial_update"];
+        trace?: never;
     };
-    /** @description CRUD de documentos digitalizados (upload via multipart). */
-    get: operations["people_documentos_list"];
-    put?: never;
-    /** @description CRUD de documentos digitalizados (upload via multipart). */
-    post: operations["people_documentos_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/documentos/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/dependentes/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
+        get: operations["people_dependentes_list"];
+        put?: never;
+        /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
+        post: operations["people_dependentes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de documentos digitalizados (upload via multipart). */
-    get: operations["people_documentos_retrieve"];
-    /** @description CRUD de documentos digitalizados (upload via multipart). */
-    put: operations["people_documentos_update"];
-    post?: never;
-    /** @description CRUD de documentos digitalizados (upload via multipart). */
-    delete: operations["people_documentos_destroy"];
-    options?: never;
-    head?: never;
-    /** @description CRUD de documentos digitalizados (upload via multipart). */
-    patch: operations["people_documentos_partial_update"];
-    trace?: never;
-  };
-  "/api/people/lotacoes/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/dependentes/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
+        get: operations["people_dependentes_retrieve"];
+        /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
+        put: operations["people_dependentes_update"];
+        post?: never;
+        /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
+        delete: operations["people_dependentes_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de dependentes (filtrar por ?servidor=<id>). */
+        patch: operations["people_dependentes_partial_update"];
+        trace?: never;
     };
-    /** @description CRUD de lotacoes (secretarias) do municipio. */
-    get: operations["people_lotacoes_list"];
-    put?: never;
-    /** @description CRUD de lotacoes (secretarias) do municipio. */
-    post: operations["people_lotacoes_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/lotacoes/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/documentos/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de documentos digitalizados (upload via multipart). */
+        get: operations["people_documentos_list"];
+        put?: never;
+        /** @description CRUD de documentos digitalizados (upload via multipart). */
+        post: operations["people_documentos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de lotacoes (secretarias) do municipio. */
-    get: operations["people_lotacoes_retrieve"];
-    /** @description CRUD de lotacoes (secretarias) do municipio. */
-    put: operations["people_lotacoes_update"];
-    post?: never;
-    /** @description CRUD de lotacoes (secretarias) do municipio. */
-    delete: operations["people_lotacoes_destroy"];
-    options?: never;
-    head?: never;
-    /** @description CRUD de lotacoes (secretarias) do municipio. */
-    patch: operations["people_lotacoes_partial_update"];
-    trace?: never;
-  };
-  "/api/people/servidores/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/documentos/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de documentos digitalizados (upload via multipart). */
+        get: operations["people_documentos_retrieve"];
+        /** @description CRUD de documentos digitalizados (upload via multipart). */
+        put: operations["people_documentos_update"];
+        post?: never;
+        /** @description CRUD de documentos digitalizados (upload via multipart). */
+        delete: operations["people_documentos_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de documentos digitalizados (upload via multipart). */
+        patch: operations["people_documentos_partial_update"];
+        trace?: never;
     };
-    /** @description CRUD de servidores do municipio + endpoint de historico. */
-    get: operations["people_servidores_list"];
-    put?: never;
-    /** @description CRUD de servidores do municipio + endpoint de historico. */
-    post: operations["people_servidores_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/servidores/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/lotacoes/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de lotacoes (secretarias) do municipio. */
+        get: operations["people_lotacoes_list"];
+        put?: never;
+        /** @description CRUD de lotacoes (secretarias) do municipio. */
+        post: operations["people_lotacoes_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de servidores do municipio + endpoint de historico. */
-    get: operations["people_servidores_retrieve"];
-    /** @description CRUD de servidores do municipio + endpoint de historico. */
-    put: operations["people_servidores_update"];
-    post?: never;
-    /** @description CRUD de servidores do municipio + endpoint de historico. */
-    delete: operations["people_servidores_destroy"];
-    options?: never;
-    head?: never;
-    /** @description CRUD de servidores do municipio + endpoint de historico. */
-    patch: operations["people_servidores_partial_update"];
-    trace?: never;
-  };
-  "/api/people/servidores/{id}/desligar/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/lotacoes/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de lotacoes (secretarias) do municipio. */
+        get: operations["people_lotacoes_retrieve"];
+        /** @description CRUD de lotacoes (secretarias) do municipio. */
+        put: operations["people_lotacoes_update"];
+        post?: never;
+        /** @description CRUD de lotacoes (secretarias) do municipio. */
+        delete: operations["people_lotacoes_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de lotacoes (secretarias) do municipio. */
+        patch: operations["people_lotacoes_partial_update"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** @description POST /api/people/servidores/<id>/desligar/ — encerra vinculos + inativa. */
-    post: operations["people_servidores_desligar_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/servidores/{id}/historico/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/servidores/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de servidores do municipio + endpoint de historico. */
+        get: operations["people_servidores_list"];
+        put?: never;
+        /** @description CRUD de servidores do municipio + endpoint de historico. */
+        post: operations["people_servidores_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description GET /api/people/servidores/{id}/historico/ — versoes simple-history. */
-    get: operations["people_servidores_historico_retrieve"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/servidores/admitir/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/servidores/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de servidores do municipio + endpoint de historico. */
+        get: operations["people_servidores_retrieve"];
+        /** @description CRUD de servidores do municipio + endpoint de historico. */
+        put: operations["people_servidores_update"];
+        post?: never;
+        /** @description CRUD de servidores do municipio + endpoint de historico. */
+        delete: operations["people_servidores_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de servidores do municipio + endpoint de historico. */
+        patch: operations["people_servidores_partial_update"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** @description POST /api/people/servidores/admitir/ — cria Servidor + Vinculo (atomico). */
-    post: operations["people_servidores_admitir_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/vinculos/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/servidores/{id}/desligar/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/people/servidores/<id>/desligar/ — encerra vinculos + inativa. */
+        post: operations["people_servidores_desligar_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
-    get: operations["people_vinculos_list"];
-    put?: never;
-    /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
-    post: operations["people_vinculos_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/people/vinculos/{id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/servidores/{id}/historico/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description GET /api/people/servidores/{id}/historico/ — versoes simple-history. */
+        get: operations["people_servidores_historico_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
-    get: operations["people_vinculos_retrieve"];
-    /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
-    put: operations["people_vinculos_update"];
-    post?: never;
-    /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
-    delete: operations["people_vinculos_destroy"];
-    options?: never;
-    head?: never;
-    /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
-    patch: operations["people_vinculos_partial_update"];
-    trace?: never;
-  };
-  "/api/people/vinculos/{id}/transferir/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/people/servidores/admitir/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/people/servidores/admitir/ — cria Servidor + Vinculo (atomico). */
+        post: operations["people_servidores_admitir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** @description POST /api/people/vinculos/<id>/transferir/ — encerra atual + cria novo. */
-    post: operations["people_vinculos_transferir_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/people/vinculos/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
+        get: operations["people_vinculos_list"];
+        put?: never;
+        /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
+        post: operations["people_vinculos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/vinculos/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
+        get: operations["people_vinculos_retrieve"];
+        /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
+        put: operations["people_vinculos_update"];
+        post?: never;
+        /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
+        delete: operations["people_vinculos_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de vinculos funcionais (servidor x cargo x lotacao). */
+        patch: operations["people_vinculos_partial_update"];
+        trace?: never;
+    };
+    "/api/people/vinculos/{id}/transferir/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description POST /api/people/vinculos/<id>/transferir/ — encerra atual + cria novo. */
+        post: operations["people_vinculos_transferir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /**
-     * @description Input para POST /api/people/servidores/admitir/.
-     *
-     *     Espelha apps.people.services.admissao.DadosAdmissao.
-     */
-    AdmissaoInput: {
-      matricula: string;
-      nome: string;
-      cpf: string;
-      /** Format: date */
-      data_nascimento: string;
-      sexo: string;
-      estado_civil?: string;
-      pis_pasep?: string;
-      /** Format: email */
-      email?: string;
-      telefone?: string;
-      cargo_id: number;
-      lotacao_id: number;
-      regime: string;
-      /** Format: date */
-      data_admissao: string;
-      /** Format: decimal */
-      salario_base: string;
-      /** @default 40 */
-      carga_horaria: number;
-    };
-    /** @description Login: gera tokens com claims customizadas e retorna dados do usuario. */
-    ArmindaTokenObtainPair: {
-      email: string;
-      password: string;
-    };
-    /** @enum {unknown} */
-    BlankEnum: "";
-    /** @description Versao completa para retrieve. */
-    CargoDetail: {
-      readonly id: number;
-      codigo: string;
-      nome: string;
-      cbo?: string;
-      nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
-      readonly nivel_escolaridade_display: string;
-      ativo?: boolean;
-      /** Format: date-time */
-      readonly criado_em: string;
-      /** Format: date-time */
-      readonly atualizado_em: string;
-    };
-    /** @description Versao enxuta para listagem. */
-    CargoList: {
-      readonly id: number;
-      readonly codigo: string;
-      readonly nome: string;
-      readonly nivel_escolaridade: components["schemas"]["NivelEscolaridadeEnum"];
-      readonly nivel_escolaridade_display: string;
-      readonly ativo: boolean;
-    };
-    /** @description Versao para create/update. */
-    CargoWrite: {
-      readonly id: number;
-      codigo: string;
-      nome: string;
-      cbo?: string;
-      nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
-      ativo?: boolean;
-    };
-    DependenteDetail: {
-      readonly id: number;
-      servidor: number;
-      nome: string;
-      cpf?: string;
-      /** Format: date */
-      data_nascimento: string;
-      parentesco: components["schemas"]["ParentescoEnum"];
-      readonly parentesco_display: string;
-      /** Dependente para IR */
-      ir?: boolean;
-      salario_familia?: boolean;
-      /** Format: date-time */
-      readonly criado_em: string;
-      /** Format: date-time */
-      readonly atualizado_em: string;
-    };
-    DependenteList: {
-      readonly id: number;
-      readonly servidor: number;
-      readonly nome: string;
-      readonly parentesco: components["schemas"]["ParentescoEnum"];
-      readonly parentesco_display: string;
-      /** Format: date */
-      readonly data_nascimento: string;
-      /** Dependente para IR */
-      readonly ir: boolean;
-      readonly salario_familia: boolean;
-    };
-    DependenteWrite: {
-      readonly id: number;
-      servidor: number;
-      nome: string;
-      cpf?: string;
-      /** Format: date */
-      data_nascimento: string;
-      parentesco: components["schemas"]["ParentescoEnum"];
-      /** Dependente para IR */
-      ir?: boolean;
-      salario_familia?: boolean;
-    };
-    /** @description Input para POST /api/people/servidores/<id>/desligar/. */
-    DesligamentoInput: {
-      /** Format: date */
-      data_desligamento: string;
-      motivo?: string;
-    };
-    /** @description Mesmo que List por ora — todos os campos sao basicos. */
-    DocumentoDetail: {
-      readonly id: number;
-      readonly servidor: number;
-      readonly tipo: components["schemas"]["TipoC3eEnum"];
-      readonly tipo_display: string;
-      readonly descricao: string;
-      /** Format: uri */
-      readonly arquivo: string;
-      /** Format: date-time */
-      readonly data_upload: string;
-    };
-    DocumentoList: {
-      readonly id: number;
-      readonly servidor: number;
-      readonly tipo: components["schemas"]["TipoC3eEnum"];
-      readonly tipo_display: string;
-      readonly descricao: string;
-      /** Format: uri */
-      readonly arquivo: string;
-      /** Format: date-time */
-      readonly data_upload: string;
-    };
-    DocumentoWrite: {
-      readonly id: number;
-      servidor: number;
-      tipo: components["schemas"]["TipoC3eEnum"];
-      descricao?: string;
-      /** Format: uri */
-      arquivo: string;
-    };
-    /**
-     * @description * `solteiro` - Solteiro(a)
-     *     * `casado` - Casado(a)
-     *     * `divorciado` - Divorciado(a)
-     *     * `viuvo` - Viuvo(a)
-     *     * `uniao_estavel` - Uniao estavel
-     * @enum {string}
-     */
-    EstadoCivilEnum: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel";
-    /** @description Versao completa com resumo do pai. */
-    LotacaoDetail: {
-      readonly id: number;
-      codigo: string;
-      nome: string;
-      sigla?: string;
-      lotacao_pai?: number | null;
-      readonly lotacao_pai_nome: string;
-      ativo?: boolean;
-      /** Format: date-time */
-      readonly criado_em: string;
-      /** Format: date-time */
-      readonly atualizado_em: string;
-    };
-    /** @description Versao enxuta para listagem. */
-    LotacaoList: {
-      readonly id: number;
-      readonly codigo: string;
-      readonly nome: string;
-      readonly sigla: string;
-      readonly ativo: boolean;
-    };
-    /** @description Versao para create/update. */
-    LotacaoWrite: {
-      readonly id: number;
-      codigo: string;
-      nome: string;
-      sigla?: string;
-      lotacao_pai?: number | null;
-      ativo?: boolean;
-    };
-    /**
-     * @description * `fundamental` - Fundamental
-     *     * `medio` - Medio
-     *     * `tecnico` - Tecnico
-     *     * `superior` - Superior
-     *     * `pos_graduacao` - Pos-graduacao
-     * @enum {string}
-     */
-    NivelEscolaridadeEnum: "fundamental" | "medio" | "tecnico" | "superior" | "pos_graduacao";
-    PaginatedCargoListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["CargoList"][];
-    };
-    PaginatedDependenteListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["DependenteList"][];
-    };
-    PaginatedDocumentoListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["DocumentoList"][];
-    };
-    PaginatedLotacaoListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["LotacaoList"][];
-    };
-    PaginatedRubricaListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["RubricaList"][];
-    };
-    PaginatedServidorListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["ServidorList"][];
-    };
-    PaginatedVinculoListList: {
-      /** @example 123 */
-      count: number;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=4
-       */
-      next?: string | null;
-      /**
-       * Format: uri
-       * @example http://api.example.org/accounts/?page=2
-       */
-      previous?: string | null;
-      results: components["schemas"]["VinculoList"][];
-    };
-    /**
-     * @description * `conjuge` - Conjuge
-     *     * `filho` - Filho(a)
-     *     * `enteado` - Enteado(a)
-     *     * `pai_mae` - Pai/Mae
-     *     * `outro` - Outro
-     * @enum {string}
-     */
-    ParentescoEnum: "conjuge" | "filho" | "enteado" | "pai_mae" | "outro";
-    /** @description Versao para create/update. */
-    PatchedCargoWrite: {
-      readonly id?: number;
-      codigo?: string;
-      nome?: string;
-      cbo?: string;
-      nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
-      ativo?: boolean;
-    };
-    PatchedDependenteWrite: {
-      readonly id?: number;
-      servidor?: number;
-      nome?: string;
-      cpf?: string;
-      /** Format: date */
-      data_nascimento?: string;
-      parentesco?: components["schemas"]["ParentescoEnum"];
-      /** Dependente para IR */
-      ir?: boolean;
-      salario_familia?: boolean;
-    };
-    PatchedDocumentoWrite: {
-      readonly id?: number;
-      servidor?: number;
-      tipo?: components["schemas"]["TipoC3eEnum"];
-      descricao?: string;
-      /** Format: uri */
-      arquivo?: string;
-    };
-    /** @description Versao para create/update. */
-    PatchedLotacaoWrite: {
-      readonly id?: number;
-      codigo?: string;
-      nome?: string;
-      sigla?: string;
-      lotacao_pai?: number | null;
-      ativo?: boolean;
-    };
-    PatchedRubricaWrite: {
-      readonly id?: number;
-      codigo?: string;
-      nome?: string;
-      tipo?: components["schemas"]["Tipo721Enum"];
-      incide_inss?: boolean;
-      incide_irrf?: boolean;
-      incide_fgts?: boolean;
-      /**
-       * Formula de calculo
-       * @description DSL de calculo (sera implementada no Bloco 2)
-       */
-      formula?: string;
-      ativo?: boolean;
-    };
-    /** @description Validacao + normalizacao de CPF/PIS/datas. */
-    PatchedServidorWrite: {
-      readonly id?: number;
-      matricula?: string;
-      nome?: string;
-      cpf?: string;
-      /** Format: date */
-      data_nascimento?: string;
-      sexo?: components["schemas"]["SexoEnum"];
-      estado_civil?: components["schemas"]["EstadoCivilEnum"] | components["schemas"]["BlankEnum"];
-      /** PIS/PASEP */
-      pis_pasep?: string;
-      /** Format: email */
-      email?: string;
-      telefone?: string;
-      logradouro?: string;
-      numero?: string;
-      complemento?: string;
-      bairro?: string;
-      cidade?: string;
-      uf?: string;
-      cep?: string;
-      ativo?: boolean;
-    };
-    PatchedVinculoWrite: {
-      readonly id?: number;
-      servidor?: number;
-      cargo?: number;
-      lotacao?: number;
-      regime?: components["schemas"]["RegimeEnum"];
-      /** Format: date */
-      data_admissao?: string;
-      /** Format: date */
-      data_demissao?: string | null;
-      /** @description Horas semanais */
-      carga_horaria?: number;
-      /** Format: decimal */
-      salario_base?: string;
-      ativo?: boolean;
-    };
-    /**
-     * @description * `estatutario` - Estatutario
-     *     * `celetista` - Celetista
-     *     * `comissionado` - Comissionado
-     *     * `temporario` - Temporario
-     *     * `estagiario` - Estagiario
-     * @enum {string}
-     */
-    RegimeEnum: "estatutario" | "celetista" | "comissionado" | "temporario" | "estagiario";
-    RubricaDetail: {
-      readonly id: number;
-      codigo: string;
-      nome: string;
-      tipo: components["schemas"]["Tipo721Enum"];
-      readonly tipo_display: string;
-      incide_inss?: boolean;
-      incide_irrf?: boolean;
-      incide_fgts?: boolean;
-      /**
-       * Formula de calculo
-       * @description DSL de calculo (sera implementada no Bloco 2)
-       */
-      formula?: string;
-      ativo?: boolean;
-      /** Format: date-time */
-      readonly criado_em: string;
-      /** Format: date-time */
-      readonly atualizado_em: string;
-    };
-    RubricaList: {
-      readonly id: number;
-      readonly codigo: string;
-      readonly nome: string;
-      readonly tipo: components["schemas"]["Tipo721Enum"];
-      readonly tipo_display: string;
-      readonly ativo: boolean;
-    };
-    RubricaWrite: {
-      readonly id: number;
-      codigo: string;
-      nome: string;
-      tipo: components["schemas"]["Tipo721Enum"];
-      incide_inss?: boolean;
-      incide_irrf?: boolean;
-      incide_fgts?: boolean;
-      /**
-       * Formula de calculo
-       * @description DSL de calculo (sera implementada no Bloco 2)
-       */
-      formula?: string;
-      ativo?: boolean;
-    };
-    /** @description Versao completa — inclui dependentes e vinculos. */
-    ServidorDetail: {
-      readonly id: number;
-      matricula: string;
-      nome: string;
-      cpf: string;
-      /** Format: date */
-      data_nascimento: string;
-      sexo: components["schemas"]["SexoEnum"];
-      readonly sexo_display: string;
-      estado_civil?: components["schemas"]["EstadoCivilEnum"] | components["schemas"]["BlankEnum"];
-      /** @default  */
-      readonly estado_civil_display: string;
-      /** PIS/PASEP */
-      pis_pasep?: string;
-      /** Format: email */
-      email?: string;
-      telefone?: string;
-      logradouro?: string;
-      numero?: string;
-      complemento?: string;
-      bairro?: string;
-      cidade?: string;
-      uf?: string;
-      cep?: string;
-      ativo?: boolean;
-      /** Format: date-time */
-      readonly criado_em: string;
-      /** Format: date-time */
-      readonly atualizado_em: string;
-      readonly dependentes: components["schemas"]["_DependenteEmbutido"][];
-      readonly vinculos: components["schemas"]["_VinculoEmbutido"][];
-    };
-    /** @description Versao enxuta — uso em listagem (paginada). */
-    ServidorList: {
-      readonly id: number;
-      readonly matricula: string;
-      readonly nome: string;
-      readonly cpf: string;
-      readonly ativo: boolean;
-    };
-    /** @description Validacao + normalizacao de CPF/PIS/datas. */
-    ServidorWrite: {
-      readonly id: number;
-      matricula: string;
-      nome: string;
-      cpf: string;
-      /** Format: date */
-      data_nascimento: string;
-      sexo: components["schemas"]["SexoEnum"];
-      estado_civil?: components["schemas"]["EstadoCivilEnum"] | components["schemas"]["BlankEnum"];
-      /** PIS/PASEP */
-      pis_pasep?: string;
-      /** Format: email */
-      email?: string;
-      telefone?: string;
-      logradouro?: string;
-      numero?: string;
-      complemento?: string;
-      bairro?: string;
-      cidade?: string;
-      uf?: string;
-      cep?: string;
-      ativo?: boolean;
-    };
-    /**
-     * @description * `M` - Masculino
-     *     * `F` - Feminino
-     * @enum {string}
-     */
-    SexoEnum: "M" | "F";
-    /**
-     * @description * `provento` - Provento
-     *     * `desconto` - Desconto
-     *     * `informativa` - Informativa
-     * @enum {string}
-     */
-    Tipo721Enum: "provento" | "desconto" | "informativa";
-    /**
-     * @description * `rg` - RG
-     *     * `cpf` - CPF
-     *     * `titulo_eleitor` - Titulo de eleitor
-     *     * `carteira_trabalho` - Carteira de trabalho
-     *     * `certificado` - Certificado/Diploma
-     *     * `comprovante_residencia` - Comprovante de residencia
-     *     * `outro` - Outro
-     * @enum {string}
-     */
-    TipoC3eEnum:
-      | "rg"
-      | "cpf"
-      | "titulo_eleitor"
-      | "carteira_trabalho"
-      | "certificado"
-      | "comprovante_residencia"
-      | "outro";
-    TokenRefresh: {
-      readonly access: string;
-      refresh: string;
-    };
-    /** @description Input para POST /api/people/vinculos/<id>/transferir/. */
-    TransferenciaInput: {
-      nova_lotacao_id: number;
-      /** Format: date */
-      data_transferencia: string;
-    };
-    VinculoDetail: {
-      readonly id: number;
-      servidor: number;
-      cargo: number;
-      readonly cargo_nome: string;
-      lotacao: number;
-      readonly lotacao_nome: string;
-      regime: components["schemas"]["RegimeEnum"];
-      readonly regime_display: string;
-      /** Format: date */
-      data_admissao: string;
-      /** Format: date */
-      data_demissao?: string | null;
-      /** @description Horas semanais */
-      carga_horaria?: number;
-      /** Format: decimal */
-      salario_base: string;
-      ativo?: boolean;
-      /** Format: date-time */
-      readonly criado_em: string;
-      /** Format: date-time */
-      readonly atualizado_em: string;
-    };
-    VinculoList: {
-      readonly id: number;
-      readonly servidor: number;
-      readonly servidor_matricula: string;
-      readonly servidor_nome: string;
-      readonly cargo: number;
-      readonly cargo_nome: string;
-      readonly lotacao: number;
-      readonly lotacao_sigla: string;
-      readonly regime: components["schemas"]["RegimeEnum"];
-      /** Format: date */
-      readonly data_admissao: string;
-      /** Format: date */
-      readonly data_demissao: string | null;
-      readonly ativo: boolean;
-    };
-    VinculoWrite: {
-      readonly id: number;
-      servidor: number;
-      cargo: number;
-      lotacao: number;
-      regime: components["schemas"]["RegimeEnum"];
-      /** Format: date */
-      data_admissao: string;
-      /** Format: date */
-      data_demissao?: string | null;
-      /** @description Horas semanais */
-      carga_horaria?: number;
-      /** Format: decimal */
-      salario_base: string;
-      ativo?: boolean;
-    };
-    /** @description Embutido em ServidorDetailSerializer. */
-    _DependenteEmbutido: {
-      readonly id: number;
-      nome: string;
-      parentesco: components["schemas"]["ParentescoEnum"];
-      /** Format: date */
-      data_nascimento: string;
-      /** Dependente para IR */
-      ir?: boolean;
-      salario_familia?: boolean;
-    };
-    /** @description Embutido em ServidorDetailSerializer (apenas vinculos ativos). */
-    _VinculoEmbutido: {
-      readonly id: number;
-      cargo: number;
-      readonly cargo_nome: string;
-      lotacao: number;
-      readonly lotacao_nome: string;
-      regime: components["schemas"]["RegimeEnum"];
-      readonly regime_display: string;
-      /** Format: date */
-      data_admissao: string;
-      /** Format: date */
-      data_demissao?: string | null;
-      /** @description Horas semanais */
-      carga_horaria?: number;
-      /** Format: decimal */
-      salario_base: string;
-      ativo?: boolean;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
-}
-export type $defs = Record<string, never>;
-export interface operations {
-  auth_login_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ArmindaTokenObtainPair"];
-        "application/x-www-form-urlencoded": components["schemas"]["ArmindaTokenObtainPair"];
-        "multipart/form-data": components["schemas"]["ArmindaTokenObtainPair"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ArmindaTokenObtainPair"];
-        };
-      };
-    };
-  };
-  auth_logout_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  auth_me_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  auth_refresh_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TokenRefresh"];
-        "application/x-www-form-urlencoded": components["schemas"]["TokenRefresh"];
-        "multipart/form-data": components["schemas"]["TokenRefresh"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TokenRefresh"];
-        };
-      };
-    };
-  };
-  payroll_rubricas_list: {
-    parameters: {
-      query?: {
-        ativo?: boolean;
-        codigo?: string;
-        incide_fgts?: boolean;
-        incide_inss?: boolean;
-        incide_irrf?: boolean;
-        nome?: string;
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
-        /** @description A search term. */
-        search?: string;
+    schemas: {
         /**
-         * @description * `provento` - Provento
-         *     * `desconto` - Desconto
-         *     * `informativa` - Informativa
+         * @description Input para POST /api/people/servidores/admitir/.
+         *
+         *     Espelha apps.people.services.admissao.DadosAdmissao.
          */
-        tipo?: "desconto" | "informativa" | "provento";
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        AdmissaoInput: {
+            matricula: string;
+            nome: string;
+            cpf: string;
+            /** Format: date */
+            data_nascimento: string;
+            sexo: string;
+            estado_civil?: string;
+            pis_pasep?: string;
+            /** Format: email */
+            email?: string;
+            telefone?: string;
+            cargo_id: number;
+            lotacao_id: number;
+            regime: string;
+            /** Format: date */
+            data_admissao: string;
+            /** Format: decimal */
+            salario_base: string;
+            /** @default 40 */
+            carga_horaria: number;
         };
-        content: {
-          "application/json": components["schemas"]["PaginatedRubricaListList"];
+        /** @description Login: gera tokens com claims customizadas e retorna dados do usuario. */
+        ArmindaTokenObtainPair: {
+            email: string;
+            password: string;
         };
-      };
-    };
-  };
-  payroll_rubricas_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RubricaWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["RubricaWrite"];
-        "multipart/form-data": components["schemas"]["RubricaWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        /** @enum {unknown} */
+        BlankEnum: "";
+        /** @description Versao completa para retrieve. */
+        CargoDetail: {
+            readonly id: number;
+            codigo: string;
+            nome: string;
+            cbo?: string;
+            nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
+            readonly nivel_escolaridade_display: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
         };
-        content: {
-          "application/json": components["schemas"]["RubricaWrite"];
+        /** @description Versao enxuta para listagem. */
+        CargoList: {
+            readonly id: number;
+            readonly codigo: string;
+            readonly nome: string;
+            readonly nivel_escolaridade: components["schemas"]["NivelEscolaridadeEnum"];
+            readonly nivel_escolaridade_display: string;
+            readonly ativo: boolean;
         };
-      };
-    };
-  };
-  payroll_rubricas_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this rubrica. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        /** @description Versao para create/update. */
+        CargoWrite: {
+            readonly id: number;
+            codigo: string;
+            nome: string;
+            cbo?: string;
+            nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
+            ativo?: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["RubricaDetail"];
+        DependenteDetail: {
+            readonly id: number;
+            servidor: number;
+            nome: string;
+            cpf?: string;
+            /** Format: date */
+            data_nascimento: string;
+            parentesco: components["schemas"]["ParentescoEnum"];
+            readonly parentesco_display: string;
+            /** Dependente para IR */
+            ir?: boolean;
+            salario_familia?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
         };
-      };
-    };
-  };
-  payroll_rubricas_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this rubrica. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RubricaWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["RubricaWrite"];
-        "multipart/form-data": components["schemas"]["RubricaWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        DependenteList: {
+            readonly id: number;
+            readonly servidor: number;
+            readonly nome: string;
+            readonly parentesco: components["schemas"]["ParentescoEnum"];
+            readonly parentesco_display: string;
+            /** Format: date */
+            readonly data_nascimento: string;
+            /** Dependente para IR */
+            readonly ir: boolean;
+            readonly salario_familia: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["RubricaWrite"];
+        DependenteWrite: {
+            readonly id: number;
+            servidor: number;
+            nome: string;
+            cpf?: string;
+            /** Format: date */
+            data_nascimento: string;
+            parentesco: components["schemas"]["ParentescoEnum"];
+            /** Dependente para IR */
+            ir?: boolean;
+            salario_familia?: boolean;
         };
-      };
-    };
-  };
-  payroll_rubricas_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this rubrica. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
+        /** @description Input para POST /api/people/servidores/<id>/desligar/. */
+        DesligamentoInput: {
+            /** Format: date */
+            data_desligamento: string;
+            motivo?: string;
         };
-        content?: never;
-      };
-    };
-  };
-  payroll_rubricas_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this rubrica. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedRubricaWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedRubricaWrite"];
-        "multipart/form-data": components["schemas"]["PatchedRubricaWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        /** @description Mesmo que List por ora — todos os campos sao basicos. */
+        DocumentoDetail: {
+            readonly id: number;
+            readonly servidor: number;
+            readonly tipo: components["schemas"]["TipoC3eEnum"];
+            readonly tipo_display: string;
+            readonly descricao: string;
+            /** Format: uri */
+            readonly arquivo: string;
+            /** Format: date-time */
+            readonly data_upload: string;
         };
-        content: {
-          "application/json": components["schemas"]["RubricaWrite"];
+        DocumentoList: {
+            readonly id: number;
+            readonly servidor: number;
+            readonly tipo: components["schemas"]["TipoC3eEnum"];
+            readonly tipo_display: string;
+            readonly descricao: string;
+            /** Format: uri */
+            readonly arquivo: string;
+            /** Format: date-time */
+            readonly data_upload: string;
         };
-      };
-    };
-  };
-  people_cargos_list: {
-    parameters: {
-      query?: {
-        ativo?: boolean;
-        codigo?: string;
+        DocumentoWrite: {
+            readonly id: number;
+            servidor: number;
+            tipo: components["schemas"]["TipoC3eEnum"];
+            descricao?: string;
+            /** Format: uri */
+            arquivo: string;
+        };
+        /**
+         * @description * `solteiro` - Solteiro(a)
+         *     * `casado` - Casado(a)
+         *     * `divorciado` - Divorciado(a)
+         *     * `viuvo` - Viuvo(a)
+         *     * `uniao_estavel` - Uniao estavel
+         * @enum {string}
+         */
+        EstadoCivilEnum: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel";
+        /** @description Versao completa com resumo do pai. */
+        LotacaoDetail: {
+            readonly id: number;
+            codigo: string;
+            nome: string;
+            sigla?: string;
+            lotacao_pai?: number | null;
+            readonly lotacao_pai_nome: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+        };
+        /** @description Versao enxuta para listagem. */
+        LotacaoList: {
+            readonly id: number;
+            readonly codigo: string;
+            readonly nome: string;
+            readonly sigla: string;
+            readonly ativo: boolean;
+        };
+        /** @description Versao para create/update. */
+        LotacaoWrite: {
+            readonly id: number;
+            codigo: string;
+            nome: string;
+            sigla?: string;
+            lotacao_pai?: number | null;
+            ativo?: boolean;
+        };
         /**
          * @description * `fundamental` - Fundamental
          *     * `medio` - Medio
          *     * `tecnico` - Tecnico
          *     * `superior` - Superior
          *     * `pos_graduacao` - Pos-graduacao
+         * @enum {string}
          */
-        nivel_escolaridade?: "fundamental" | "medio" | "pos_graduacao" | "superior" | "tecnico";
-        nome?: string;
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
-        /** @description A search term. */
-        search?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        NivelEscolaridadeEnum: "fundamental" | "medio" | "tecnico" | "superior" | "pos_graduacao";
+        PaginatedCargoListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["CargoList"][];
         };
-        content: {
-          "application/json": components["schemas"]["PaginatedCargoListList"];
+        PaginatedDependenteListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["DependenteList"][];
         };
-      };
-    };
-  };
-  people_cargos_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CargoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["CargoWrite"];
-        "multipart/form-data": components["schemas"]["CargoWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        PaginatedDocumentoListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["DocumentoList"][];
         };
-        content: {
-          "application/json": components["schemas"]["CargoWrite"];
+        PaginatedLotacaoListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["LotacaoList"][];
         };
-      };
-    };
-  };
-  people_cargos_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this cargo. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        PaginatedRubricaListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["RubricaList"][];
         };
-        content: {
-          "application/json": components["schemas"]["CargoDetail"];
+        PaginatedServidorListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["ServidorList"][];
         };
-      };
-    };
-  };
-  people_cargos_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this cargo. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CargoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["CargoWrite"];
-        "multipart/form-data": components["schemas"]["CargoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        PaginatedUsuarioMunicipioPapelListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["UsuarioMunicipioPapelList"][];
         };
-        content: {
-          "application/json": components["schemas"]["CargoWrite"];
+        PaginatedVinculoListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["VinculoList"][];
         };
-      };
-    };
-  };
-  people_cargos_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this cargo. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  people_cargos_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this cargo. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedCargoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedCargoWrite"];
-        "multipart/form-data": components["schemas"]["PatchedCargoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CargoWrite"];
-        };
-      };
-    };
-  };
-  people_dependentes_list: {
-    parameters: {
-      query?: {
-        ir?: boolean;
-        nome?: string;
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
+        /**
+         * @description * `staff_arminda` - staff_arminda
+         *     * `admin_municipio` - admin_municipio
+         *     * `rh_municipio` - rh_municipio
+         *     * `financeiro_municipio` - financeiro_municipio
+         *     * `leitura_municipio` - leitura_municipio
+         * @enum {string}
+         */
+        PapelEnum: "staff_arminda" | "admin_municipio" | "rh_municipio" | "financeiro_municipio" | "leitura_municipio";
         /**
          * @description * `conjuge` - Conjuge
          *     * `filho` - Filho(a)
          *     * `enteado` - Enteado(a)
          *     * `pai_mae` - Pai/Mae
          *     * `outro` - Outro
+         * @enum {string}
          */
-        parentesco?: "conjuge" | "enteado" | "filho" | "outro" | "pai_mae";
-        salario_familia?: boolean;
-        /** @description A search term. */
-        search?: string;
-        servidor?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        ParentescoEnum: "conjuge" | "filho" | "enteado" | "pai_mae" | "outro";
+        /** @description Versao para create/update. */
+        PatchedCargoWrite: {
+            readonly id?: number;
+            codigo?: string;
+            nome?: string;
+            cbo?: string;
+            nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
+            ativo?: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["PaginatedDependenteListList"];
+        PatchedDependenteWrite: {
+            readonly id?: number;
+            servidor?: number;
+            nome?: string;
+            cpf?: string;
+            /** Format: date */
+            data_nascimento?: string;
+            parentesco?: components["schemas"]["ParentescoEnum"];
+            /** Dependente para IR */
+            ir?: boolean;
+            salario_familia?: boolean;
         };
-      };
-    };
-  };
-  people_dependentes_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DependenteWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["DependenteWrite"];
-        "multipart/form-data": components["schemas"]["DependenteWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        PatchedDocumentoWrite: {
+            readonly id?: number;
+            servidor?: number;
+            tipo?: components["schemas"]["TipoC3eEnum"];
+            descricao?: string;
+            /** Format: uri */
+            arquivo?: string;
         };
-        content: {
-          "application/json": components["schemas"]["DependenteWrite"];
+        /** @description Versao para create/update. */
+        PatchedLotacaoWrite: {
+            readonly id?: number;
+            codigo?: string;
+            nome?: string;
+            sigla?: string;
+            lotacao_pai?: number | null;
+            ativo?: boolean;
         };
-      };
-    };
-  };
-  people_dependentes_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this dependente. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        PatchedRubricaWrite: {
+            readonly id?: number;
+            codigo?: string;
+            nome?: string;
+            tipo?: components["schemas"]["Tipo721Enum"];
+            incide_inss?: boolean;
+            incide_irrf?: boolean;
+            incide_fgts?: boolean;
+            /**
+             * Formula de calculo
+             * @description DSL de calculo (sera implementada no Bloco 2)
+             */
+            formula?: string;
+            ativo?: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["DependenteDetail"];
+        /** @description Validacao + normalizacao de CPF/PIS/datas. */
+        PatchedServidorWrite: {
+            readonly id?: number;
+            matricula?: string;
+            nome?: string;
+            cpf?: string;
+            /** Format: date */
+            data_nascimento?: string;
+            sexo?: components["schemas"]["SexoEnum"];
+            estado_civil?: components["schemas"]["EstadoCivilEnum"] | components["schemas"]["BlankEnum"];
+            /** PIS/PASEP */
+            pis_pasep?: string;
+            /** Format: email */
+            email?: string;
+            telefone?: string;
+            logradouro?: string;
+            numero?: string;
+            complemento?: string;
+            bairro?: string;
+            cidade?: string;
+            uf?: string;
+            cep?: string;
+            ativo?: boolean;
         };
-      };
-    };
-  };
-  people_dependentes_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this dependente. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DependenteWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["DependenteWrite"];
-        "multipart/form-data": components["schemas"]["DependenteWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        /** @description PATCH /api/core/usuarios/{id}/ — troca o papel do usuário no tenant. */
+        PatchedUsuarioMunicipioPapelUpdate: {
+            papel?: components["schemas"]["PapelEnum"];
         };
-        content: {
-          "application/json": components["schemas"]["DependenteWrite"];
+        PatchedVinculoWrite: {
+            readonly id?: number;
+            servidor?: number;
+            cargo?: number;
+            lotacao?: number;
+            regime?: components["schemas"]["RegimeEnum"];
+            /** Format: date */
+            data_admissao?: string;
+            /** Format: date */
+            data_demissao?: string | null;
+            /** @description Horas semanais */
+            carga_horaria?: number;
+            /** Format: decimal */
+            salario_base?: string;
+            ativo?: boolean;
         };
-      };
-    };
-  };
-  people_dependentes_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this dependente. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
+        /**
+         * @description * `estatutario` - Estatutario
+         *     * `celetista` - Celetista
+         *     * `comissionado` - Comissionado
+         *     * `temporario` - Temporario
+         *     * `estagiario` - Estagiario
+         * @enum {string}
+         */
+        RegimeEnum: "estatutario" | "celetista" | "comissionado" | "temporario" | "estagiario";
+        RubricaDetail: {
+            readonly id: number;
+            codigo: string;
+            nome: string;
+            tipo: components["schemas"]["Tipo721Enum"];
+            readonly tipo_display: string;
+            incide_inss?: boolean;
+            incide_irrf?: boolean;
+            incide_fgts?: boolean;
+            /**
+             * Formula de calculo
+             * @description DSL de calculo (sera implementada no Bloco 2)
+             */
+            formula?: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
         };
-        content?: never;
-      };
-    };
-  };
-  people_dependentes_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this dependente. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedDependenteWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedDependenteWrite"];
-        "multipart/form-data": components["schemas"]["PatchedDependenteWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        RubricaList: {
+            readonly id: number;
+            readonly codigo: string;
+            readonly nome: string;
+            readonly tipo: components["schemas"]["Tipo721Enum"];
+            readonly tipo_display: string;
+            readonly ativo: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["DependenteWrite"];
+        RubricaWrite: {
+            readonly id: number;
+            codigo: string;
+            nome: string;
+            tipo: components["schemas"]["Tipo721Enum"];
+            incide_inss?: boolean;
+            incide_irrf?: boolean;
+            incide_fgts?: boolean;
+            /**
+             * Formula de calculo
+             * @description DSL de calculo (sera implementada no Bloco 2)
+             */
+            formula?: string;
+            ativo?: boolean;
         };
-      };
-    };
-  };
-  people_documentos_list: {
-    parameters: {
-      query?: {
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
-        /** @description A search term. */
-        search?: string;
-        servidor?: number;
+        /** @description Versao completa — inclui dependentes e vinculos. */
+        ServidorDetail: {
+            readonly id: number;
+            matricula: string;
+            nome: string;
+            cpf: string;
+            /** Format: date */
+            data_nascimento: string;
+            sexo: components["schemas"]["SexoEnum"];
+            readonly sexo_display: string;
+            estado_civil?: components["schemas"]["EstadoCivilEnum"] | components["schemas"]["BlankEnum"];
+            /** @default  */
+            readonly estado_civil_display: string;
+            /** PIS/PASEP */
+            pis_pasep?: string;
+            /** Format: email */
+            email?: string;
+            telefone?: string;
+            logradouro?: string;
+            numero?: string;
+            complemento?: string;
+            bairro?: string;
+            cidade?: string;
+            uf?: string;
+            cep?: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+            readonly dependentes: components["schemas"]["_DependenteEmbutido"][];
+            readonly vinculos: components["schemas"]["_VinculoEmbutido"][];
+        };
+        /** @description Versao enxuta — uso em listagem (paginada). */
+        ServidorList: {
+            readonly id: number;
+            readonly matricula: string;
+            readonly nome: string;
+            readonly cpf: string;
+            readonly ativo: boolean;
+        };
+        /** @description Validacao + normalizacao de CPF/PIS/datas. */
+        ServidorWrite: {
+            readonly id: number;
+            matricula: string;
+            nome: string;
+            cpf: string;
+            /** Format: date */
+            data_nascimento: string;
+            sexo: components["schemas"]["SexoEnum"];
+            estado_civil?: components["schemas"]["EstadoCivilEnum"] | components["schemas"]["BlankEnum"];
+            /** PIS/PASEP */
+            pis_pasep?: string;
+            /** Format: email */
+            email?: string;
+            telefone?: string;
+            logradouro?: string;
+            numero?: string;
+            complemento?: string;
+            bairro?: string;
+            cidade?: string;
+            uf?: string;
+            cep?: string;
+            ativo?: boolean;
+        };
+        /**
+         * @description * `M` - Masculino
+         *     * `F` - Feminino
+         * @enum {string}
+         */
+        SexoEnum: "M" | "F";
+        /**
+         * @description * `provento` - Provento
+         *     * `desconto` - Desconto
+         *     * `informativa` - Informativa
+         * @enum {string}
+         */
+        Tipo721Enum: "provento" | "desconto" | "informativa";
         /**
          * @description * `rg` - RG
          *     * `cpf` - CPF
@@ -1681,737 +1096,1630 @@ export interface operations {
          *     * `certificado` - Certificado/Diploma
          *     * `comprovante_residencia` - Comprovante de residencia
          *     * `outro` - Outro
+         * @enum {string}
          */
-        tipo?:
-          | "carteira_trabalho"
-          | "certificado"
-          | "comprovante_residencia"
-          | "cpf"
-          | "outro"
-          | "rg"
-          | "titulo_eleitor";
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        TipoC3eEnum: "rg" | "cpf" | "titulo_eleitor" | "carteira_trabalho" | "certificado" | "comprovante_residencia" | "outro";
+        TokenRefresh: {
+            readonly access: string;
+            refresh: string;
         };
-        content: {
-          "application/json": components["schemas"]["PaginatedDocumentoListList"];
+        /** @description Input para POST /api/people/vinculos/<id>/transferir/. */
+        TransferenciaInput: {
+            nova_lotacao_id: number;
+            /** Format: date */
+            data_transferencia: string;
         };
-      };
-    };
-  };
-  people_documentos_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["DocumentoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["DocumentoWrite"];
-        "application/json": components["schemas"]["DocumentoWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DocumentoWrite"];
-        };
-      };
-    };
-  };
-  people_documentos_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this documento. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DocumentoDetail"];
-        };
-      };
-    };
-  };
-  people_documentos_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this documento. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["DocumentoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["DocumentoWrite"];
-        "application/json": components["schemas"]["DocumentoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DocumentoWrite"];
-        };
-      };
-    };
-  };
-  people_documentos_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this documento. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  people_documentos_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this documento. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "multipart/form-data": components["schemas"]["PatchedDocumentoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedDocumentoWrite"];
-        "application/json": components["schemas"]["PatchedDocumentoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DocumentoWrite"];
-        };
-      };
-    };
-  };
-  people_lotacoes_list: {
-    parameters: {
-      query?: {
-        ativo?: boolean;
-        codigo?: string;
-        lotacao_pai?: number;
-        nome?: string;
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
-        raiz?: boolean;
-        /** @description A search term. */
-        search?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PaginatedLotacaoListList"];
-        };
-      };
-    };
-  };
-  people_lotacoes_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LotacaoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["LotacaoWrite"];
-        "multipart/form-data": components["schemas"]["LotacaoWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["LotacaoWrite"];
-        };
-      };
-    };
-  };
-  people_lotacoes_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this lotacao. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["LotacaoDetail"];
-        };
-      };
-    };
-  };
-  people_lotacoes_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this lotacao. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LotacaoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["LotacaoWrite"];
-        "multipart/form-data": components["schemas"]["LotacaoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["LotacaoWrite"];
-        };
-      };
-    };
-  };
-  people_lotacoes_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this lotacao. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  people_lotacoes_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this lotacao. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedLotacaoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedLotacaoWrite"];
-        "multipart/form-data": components["schemas"]["PatchedLotacaoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["LotacaoWrite"];
-        };
-      };
-    };
-  };
-  people_servidores_list: {
-    parameters: {
-      query?: {
-        ativo?: boolean;
-        cargo?: number;
-        lotacao?: number;
-        matricula?: string;
-        nome?: string;
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
-        regime?: string;
-        /** @description A search term. */
-        search?: string;
         /**
-         * @description * `M` - Masculino
-         *     * `F` - Feminino
+         * @description POST /api/core/usuarios/ — cria User + atribui papel no tenant ativo.
+         *
+         *     Idempotência: se o e-mail já existe como User no public, reaproveita e
+         *     apenas cria/atualiza o papel no tenant. Senha temporária só é setada
+         *     quando o User é novo.
          */
-        sexo?: "F" | "M";
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        UsuarioMunicipioPapelCreate: {
+            /** Format: email */
+            email: string;
+            nome_completo: string;
+            papel: components["schemas"]["PapelEnum"];
+            senha_temporaria?: string;
         };
-        content: {
-          "application/json": components["schemas"]["PaginatedServidorListList"];
+        /** @description GET /api/core/usuarios/ — lista de papéis no tenant ativo. */
+        UsuarioMunicipioPapelList: {
+            readonly id: number;
+            readonly usuario: components["schemas"]["_UsuarioEmbutido"];
+            readonly papel: string;
+            /** Format: date-time */
+            readonly criado_em: string;
         };
-      };
-    };
-  };
-  people_servidores_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ServidorWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["ServidorWrite"];
-        "multipart/form-data": components["schemas"]["ServidorWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        /** @description PATCH /api/core/usuarios/{id}/ — troca o papel do usuário no tenant. */
+        UsuarioMunicipioPapelUpdate: {
+            papel: components["schemas"]["PapelEnum"];
         };
-        content: {
-          "application/json": components["schemas"]["ServidorWrite"];
+        VinculoDetail: {
+            readonly id: number;
+            servidor: number;
+            cargo: number;
+            readonly cargo_nome: string;
+            lotacao: number;
+            readonly lotacao_nome: string;
+            regime: components["schemas"]["RegimeEnum"];
+            readonly regime_display: string;
+            /** Format: date */
+            data_admissao: string;
+            /** Format: date */
+            data_demissao?: string | null;
+            /** @description Horas semanais */
+            carga_horaria?: number;
+            /** Format: decimal */
+            salario_base: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
         };
-      };
-    };
-  };
-  people_servidores_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this servidor. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        VinculoList: {
+            readonly id: number;
+            readonly servidor: number;
+            readonly servidor_matricula: string;
+            readonly servidor_nome: string;
+            readonly cargo: number;
+            readonly cargo_nome: string;
+            readonly lotacao: number;
+            readonly lotacao_sigla: string;
+            readonly regime: components["schemas"]["RegimeEnum"];
+            /** Format: date */
+            readonly data_admissao: string;
+            /** Format: date */
+            readonly data_demissao: string | null;
+            readonly ativo: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["ServidorDetail"];
+        VinculoWrite: {
+            readonly id: number;
+            servidor: number;
+            cargo: number;
+            lotacao: number;
+            regime: components["schemas"]["RegimeEnum"];
+            /** Format: date */
+            data_admissao: string;
+            /** Format: date */
+            data_demissao?: string | null;
+            /** @description Horas semanais */
+            carga_horaria?: number;
+            /** Format: decimal */
+            salario_base: string;
+            ativo?: boolean;
         };
-      };
-    };
-  };
-  people_servidores_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this servidor. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ServidorWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["ServidorWrite"];
-        "multipart/form-data": components["schemas"]["ServidorWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        /** @description Embutido em ServidorDetailSerializer. */
+        _DependenteEmbutido: {
+            readonly id: number;
+            nome: string;
+            parentesco: components["schemas"]["ParentescoEnum"];
+            /** Format: date */
+            data_nascimento: string;
+            /** Dependente para IR */
+            ir?: boolean;
+            salario_familia?: boolean;
         };
-        content: {
-          "application/json": components["schemas"]["ServidorWrite"];
+        /** @description Read-only — exibe dados públicos do User dentro de cada papel. */
+        _UsuarioEmbutido: {
+            readonly id: number;
+            /**
+             * E-mail
+             * Format: email
+             */
+            readonly email: string;
+            readonly nome_completo: string;
+            /**
+             * Ativo
+             * @description Indica que o usuário será tratado como ativo. Ao invés de excluir contas de usuário, desmarque isso.
+             */
+            readonly is_active: boolean;
+            /**
+             * Precisa trocar senha no proximo login
+             * @description Setado para usuarios criados via importacao
+             */
+            readonly precisa_trocar_senha: boolean;
         };
-      };
-    };
-  };
-  people_servidores_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this servidor. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
+        /** @description Embutido em ServidorDetailSerializer (apenas vinculos ativos). */
+        _VinculoEmbutido: {
+            readonly id: number;
+            cargo: number;
+            readonly cargo_nome: string;
+            lotacao: number;
+            readonly lotacao_nome: string;
+            regime: components["schemas"]["RegimeEnum"];
+            readonly regime_display: string;
+            /** Format: date */
+            data_admissao: string;
+            /** Format: date */
+            data_demissao?: string | null;
+            /** @description Horas semanais */
+            carga_horaria?: number;
+            /** Format: decimal */
+            salario_base: string;
+            ativo?: boolean;
         };
-        content?: never;
-      };
     };
-  };
-  people_servidores_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this servidor. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedServidorWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedServidorWrite"];
-        "multipart/form-data": components["schemas"]["PatchedServidorWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+    auth_change_password_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["ServidorWrite"];
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-      };
     };
-  };
-  people_servidores_desligar_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this servidor. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DesligamentoInput"];
-        "application/x-www-form-urlencoded": components["schemas"]["DesligamentoInput"];
-        "multipart/form-data": components["schemas"]["DesligamentoInput"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    auth_login_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["DesligamentoInput"];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArmindaTokenObtainPair"];
+                "application/x-www-form-urlencoded": components["schemas"]["ArmindaTokenObtainPair"];
+                "multipart/form-data": components["schemas"]["ArmindaTokenObtainPair"];
+            };
         };
-      };
-    };
-  };
-  people_servidores_historico_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this servidor. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArmindaTokenObtainPair"];
+                };
+            };
         };
-        content: {
-          "application/json": components["schemas"]["ServidorDetail"];
+    };
+    auth_logout_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  people_servidores_admitir_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AdmissaoInput"];
-        "application/x-www-form-urlencoded": components["schemas"]["AdmissaoInput"];
-        "multipart/form-data": components["schemas"]["AdmissaoInput"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          "application/json": components["schemas"]["AdmissaoInput"];
+    };
+    auth_me_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  people_vinculos_list: {
-    parameters: {
-      query?: {
-        admitido_apos?: string;
-        admitido_ate?: string;
-        ativo?: boolean;
-        cargo?: number;
-        lotacao?: number;
-        /** @description Which field to use when ordering the results. */
-        ordering?: string;
-        /** @description A page number within the paginated result set. */
-        page?: number;
-        /**
-         * @description * `estatutario` - Estatutario
-         *     * `celetista` - Celetista
-         *     * `comissionado` - Comissionado
-         *     * `temporario` - Temporario
-         *     * `estagiario` - Estagiario
-         */
-        regime?: "celetista" | "comissionado" | "estagiario" | "estatutario" | "temporario";
-        /** @description A search term. */
-        search?: string;
-        servidor?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          "application/json": components["schemas"]["PaginatedVinculoListList"];
+    };
+    auth_me_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  people_vinculos_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VinculoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["VinculoWrite"];
-        "multipart/form-data": components["schemas"]["VinculoWrite"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          "application/json": components["schemas"]["VinculoWrite"];
+    };
+    auth_refresh_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  people_vinculos_retrieve: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this vinculo funcional. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenRefresh"];
+                "application/x-www-form-urlencoded": components["schemas"]["TokenRefresh"];
+                "multipart/form-data": components["schemas"]["TokenRefresh"];
+            };
         };
-        content: {
-          "application/json": components["schemas"]["VinculoDetail"];
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenRefresh"];
+                };
+            };
         };
-      };
     };
-  };
-  people_vinculos_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this vinculo funcional. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VinculoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["VinculoWrite"];
-        "multipart/form-data": components["schemas"]["VinculoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    core_usuarios_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["VinculoWrite"];
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedUsuarioMunicipioPapelListList"];
+                };
+            };
         };
-      };
     };
-  };
-  people_vinculos_destroy: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this vinculo funcional. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No response body */
-      204: {
-        headers: {
-          [name: string]: unknown;
+    core_usuarios_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  people_vinculos_partial_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this vinculo funcional. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PatchedVinculoWrite"];
-        "application/x-www-form-urlencoded": components["schemas"]["PatchedVinculoWrite"];
-        "multipart/form-data": components["schemas"]["PatchedVinculoWrite"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsuarioMunicipioPapelCreate"];
+                "application/x-www-form-urlencoded": components["schemas"]["UsuarioMunicipioPapelCreate"];
+                "multipart/form-data": components["schemas"]["UsuarioMunicipioPapelCreate"];
+            };
         };
-        content: {
-          "application/json": components["schemas"]["VinculoWrite"];
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsuarioMunicipioPapelCreate"];
+                };
+            };
         };
-      };
     };
-  };
-  people_vinculos_transferir_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description A unique integer value identifying this vinculo funcional. */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TransferenciaInput"];
-        "application/x-www-form-urlencoded": components["schemas"]["TransferenciaInput"];
-        "multipart/form-data": components["schemas"]["TransferenciaInput"];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    core_usuarios_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this papel de usuario em municipio. */
+                id: number;
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["TransferenciaInput"];
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsuarioMunicipioPapelList"];
+                };
+            };
         };
-      };
     };
-  };
+    core_usuarios_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this papel de usuario em municipio. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    core_usuarios_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this papel de usuario em municipio. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedUsuarioMunicipioPapelUpdate"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedUsuarioMunicipioPapelUpdate"];
+                "multipart/form-data": components["schemas"]["PatchedUsuarioMunicipioPapelUpdate"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsuarioMunicipioPapelUpdate"];
+                };
+            };
+        };
+    };
+    payroll_rubricas_list: {
+        parameters: {
+            query?: {
+                ativo?: boolean;
+                codigo?: string;
+                incide_fgts?: boolean;
+                incide_inss?: boolean;
+                incide_irrf?: boolean;
+                nome?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `provento` - Provento
+                 *     * `desconto` - Desconto
+                 *     * `informativa` - Informativa
+                 */
+                tipo?: "desconto" | "informativa" | "provento";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRubricaListList"];
+                };
+            };
+        };
+    };
+    payroll_rubricas_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RubricaWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["RubricaWrite"];
+                "multipart/form-data": components["schemas"]["RubricaWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RubricaWrite"];
+                };
+            };
+        };
+    };
+    payroll_rubricas_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this rubrica. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RubricaDetail"];
+                };
+            };
+        };
+    };
+    payroll_rubricas_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this rubrica. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RubricaWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["RubricaWrite"];
+                "multipart/form-data": components["schemas"]["RubricaWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RubricaWrite"];
+                };
+            };
+        };
+    };
+    payroll_rubricas_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this rubrica. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    payroll_rubricas_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this rubrica. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedRubricaWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedRubricaWrite"];
+                "multipart/form-data": components["schemas"]["PatchedRubricaWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RubricaWrite"];
+                };
+            };
+        };
+    };
+    people_cargos_list: {
+        parameters: {
+            query?: {
+                ativo?: boolean;
+                codigo?: string;
+                /**
+                 * @description * `fundamental` - Fundamental
+                 *     * `medio` - Medio
+                 *     * `tecnico` - Tecnico
+                 *     * `superior` - Superior
+                 *     * `pos_graduacao` - Pos-graduacao
+                 */
+                nivel_escolaridade?: "fundamental" | "medio" | "pos_graduacao" | "superior" | "tecnico";
+                nome?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCargoListList"];
+                };
+            };
+        };
+    };
+    people_cargos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CargoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["CargoWrite"];
+                "multipart/form-data": components["schemas"]["CargoWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CargoWrite"];
+                };
+            };
+        };
+    };
+    people_cargos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this cargo. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CargoDetail"];
+                };
+            };
+        };
+    };
+    people_cargos_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this cargo. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CargoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["CargoWrite"];
+                "multipart/form-data": components["schemas"]["CargoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CargoWrite"];
+                };
+            };
+        };
+    };
+    people_cargos_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this cargo. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_cargos_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this cargo. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedCargoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedCargoWrite"];
+                "multipart/form-data": components["schemas"]["PatchedCargoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CargoWrite"];
+                };
+            };
+        };
+    };
+    people_dependentes_list: {
+        parameters: {
+            query?: {
+                ir?: boolean;
+                nome?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /**
+                 * @description * `conjuge` - Conjuge
+                 *     * `filho` - Filho(a)
+                 *     * `enteado` - Enteado(a)
+                 *     * `pai_mae` - Pai/Mae
+                 *     * `outro` - Outro
+                 */
+                parentesco?: "conjuge" | "enteado" | "filho" | "outro" | "pai_mae";
+                salario_familia?: boolean;
+                /** @description A search term. */
+                search?: string;
+                servidor?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedDependenteListList"];
+                };
+            };
+        };
+    };
+    people_dependentes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependenteWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["DependenteWrite"];
+                "multipart/form-data": components["schemas"]["DependenteWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependenteWrite"];
+                };
+            };
+        };
+    };
+    people_dependentes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this dependente. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependenteDetail"];
+                };
+            };
+        };
+    };
+    people_dependentes_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this dependente. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependenteWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["DependenteWrite"];
+                "multipart/form-data": components["schemas"]["DependenteWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependenteWrite"];
+                };
+            };
+        };
+    };
+    people_dependentes_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this dependente. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_dependentes_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this dependente. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedDependenteWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedDependenteWrite"];
+                "multipart/form-data": components["schemas"]["PatchedDependenteWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependenteWrite"];
+                };
+            };
+        };
+    };
+    people_documentos_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+                servidor?: number;
+                /**
+                 * @description * `rg` - RG
+                 *     * `cpf` - CPF
+                 *     * `titulo_eleitor` - Titulo de eleitor
+                 *     * `carteira_trabalho` - Carteira de trabalho
+                 *     * `certificado` - Certificado/Diploma
+                 *     * `comprovante_residencia` - Comprovante de residencia
+                 *     * `outro` - Outro
+                 */
+                tipo?: "carteira_trabalho" | "certificado" | "comprovante_residencia" | "cpf" | "outro" | "rg" | "titulo_eleitor";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedDocumentoListList"];
+                };
+            };
+        };
+    };
+    people_documentos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DocumentoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["DocumentoWrite"];
+                "application/json": components["schemas"]["DocumentoWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoWrite"];
+                };
+            };
+        };
+    };
+    people_documentos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this documento. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoDetail"];
+                };
+            };
+        };
+    };
+    people_documentos_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this documento. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["DocumentoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["DocumentoWrite"];
+                "application/json": components["schemas"]["DocumentoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoWrite"];
+                };
+            };
+        };
+    };
+    people_documentos_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this documento. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_documentos_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this documento. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": components["schemas"]["PatchedDocumentoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedDocumentoWrite"];
+                "application/json": components["schemas"]["PatchedDocumentoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoWrite"];
+                };
+            };
+        };
+    };
+    people_lotacoes_list: {
+        parameters: {
+            query?: {
+                ativo?: boolean;
+                codigo?: string;
+                lotacao_pai?: number;
+                nome?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                raiz?: boolean;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLotacaoListList"];
+                };
+            };
+        };
+    };
+    people_lotacoes_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotacaoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["LotacaoWrite"];
+                "multipart/form-data": components["schemas"]["LotacaoWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotacaoWrite"];
+                };
+            };
+        };
+    };
+    people_lotacoes_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this lotacao. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotacaoDetail"];
+                };
+            };
+        };
+    };
+    people_lotacoes_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this lotacao. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LotacaoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["LotacaoWrite"];
+                "multipart/form-data": components["schemas"]["LotacaoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotacaoWrite"];
+                };
+            };
+        };
+    };
+    people_lotacoes_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this lotacao. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_lotacoes_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this lotacao. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedLotacaoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedLotacaoWrite"];
+                "multipart/form-data": components["schemas"]["PatchedLotacaoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LotacaoWrite"];
+                };
+            };
+        };
+    };
+    people_servidores_list: {
+        parameters: {
+            query?: {
+                ativo?: boolean;
+                cargo?: number;
+                lotacao?: number;
+                matricula?: string;
+                nome?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                regime?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `M` - Masculino
+                 *     * `F` - Feminino
+                 */
+                sexo?: "F" | "M";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedServidorListList"];
+                };
+            };
+        };
+    };
+    people_servidores_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServidorWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["ServidorWrite"];
+                "multipart/form-data": components["schemas"]["ServidorWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorWrite"];
+                };
+            };
+        };
+    };
+    people_servidores_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorDetail"];
+                };
+            };
+        };
+    };
+    people_servidores_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServidorWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["ServidorWrite"];
+                "multipart/form-data": components["schemas"]["ServidorWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorWrite"];
+                };
+            };
+        };
+    };
+    people_servidores_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_servidores_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedServidorWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedServidorWrite"];
+                "multipart/form-data": components["schemas"]["PatchedServidorWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorWrite"];
+                };
+            };
+        };
+    };
+    people_servidores_desligar_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DesligamentoInput"];
+                "application/x-www-form-urlencoded": components["schemas"]["DesligamentoInput"];
+                "multipart/form-data": components["schemas"]["DesligamentoInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DesligamentoInput"];
+                };
+            };
+        };
+    };
+    people_servidores_historico_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorDetail"];
+                };
+            };
+        };
+    };
+    people_servidores_admitir_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdmissaoInput"];
+                "application/x-www-form-urlencoded": components["schemas"]["AdmissaoInput"];
+                "multipart/form-data": components["schemas"]["AdmissaoInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdmissaoInput"];
+                };
+            };
+        };
+    };
+    people_vinculos_list: {
+        parameters: {
+            query?: {
+                admitido_apos?: string;
+                admitido_ate?: string;
+                ativo?: boolean;
+                cargo?: number;
+                lotacao?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /**
+                 * @description * `estatutario` - Estatutario
+                 *     * `celetista` - Celetista
+                 *     * `comissionado` - Comissionado
+                 *     * `temporario` - Temporario
+                 *     * `estagiario` - Estagiario
+                 */
+                regime?: "celetista" | "comissionado" | "estagiario" | "estatutario" | "temporario";
+                /** @description A search term. */
+                search?: string;
+                servidor?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedVinculoListList"];
+                };
+            };
+        };
+    };
+    people_vinculos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VinculoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["VinculoWrite"];
+                "multipart/form-data": components["schemas"]["VinculoWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VinculoWrite"];
+                };
+            };
+        };
+    };
+    people_vinculos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vinculo funcional. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VinculoDetail"];
+                };
+            };
+        };
+    };
+    people_vinculos_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vinculo funcional. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VinculoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["VinculoWrite"];
+                "multipart/form-data": components["schemas"]["VinculoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VinculoWrite"];
+                };
+            };
+        };
+    };
+    people_vinculos_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vinculo funcional. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_vinculos_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vinculo funcional. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedVinculoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedVinculoWrite"];
+                "multipart/form-data": components["schemas"]["PatchedVinculoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VinculoWrite"];
+                };
+            };
+        };
+    };
+    people_vinculos_transferir_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this vinculo funcional. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransferenciaInput"];
+                "application/x-www-form-urlencoded": components["schemas"]["TransferenciaInput"];
+                "multipart/form-data": components["schemas"]["TransferenciaInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransferenciaInput"];
+                };
+            };
+        };
+    };
 }

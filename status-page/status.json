@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-03",
+  "ultima_atualizacao": "2026-05-05",
   "bloco_atual": 1,
-  "progresso_geral_pct": 42,
+  "progresso_geral_pct": 45,
   "blocos": [
     {
       "numero": 0,
@@ -34,8 +34,8 @@
       "periodo": "Maio – Junho 2026",
       "data_inicio": "2026-05-01",
       "data_fim_prevista": "2026-06-30",
-      "data_fim_real": null,
-      "status": "em_andamento",
+      "data_fim_real": "2026-05-05",
+      "status": "concluido",
       "progresso_pct": 100,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
@@ -48,10 +48,13 @@
         "✅ Cadastro de rubricas (esqueleto, sem cálculo ainda)",
         "✅ Comando para criar usuário e atribuir papel via linha de comando",
         "✅ Frontend autenticado: tela de login, layout, troca de município, dashboard",
-        "✅ Telas de domínio: Cargos, Lotações, Rubricas (CRUD completo) e Servidores (lista + admissão + detalhe com 4 abas)",
-        "✅ Edição inline do servidor + desligamento + transferência de vínculo + CRUD de dependentes",
+        "✅ Telas de domínio: Cargos, Lotações, Rubricas (CRUD completo) e Servidores (lista + admissão + detalhe com 5 abas)",
+        "✅ Edição inline do servidor + desligamento + transferência de vínculo + CRUD de dependentes + upload/download/delete de documentos digitalizados",
         "✅ Code-splitting por rota: bundle inicial reduzido em 31%",
-        "✅ Importador Fiorilli SIP (Firebird → Postgres): pipeline ETL idempotente, 91/91 cargos, 66/66 lotações, 517/517 servidores importados em smoke E2E"
+        "✅ Importador Fiorilli SIP (Firebird → Postgres): pipeline ETL idempotente, 91/91 cargos, 66/66 lotações, 517/517 servidores importados em smoke E2E",
+        "✅ Configurações: edição de perfil, troca de senha, gestão de usuários e papéis do município",
+        "✅ Pesquisa global ⌘K (servidores, cargos, lotações, rubricas) + atalhos por área",
+        "✅ Guia de uso do sistema (documentação viva acessível em /guia)"
       ]
     },
     {
@@ -164,6 +167,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-05",
+      "tipo": "marco",
+      "titulo": "Bloco 1 fechado: Documentos, Configurações, Pesquisa global e Guia de uso (Onda 1.5)",
+      "descricao": "A onda 1.5 fecha as últimas lacunas de UX do Bloco 1. O servidor agora tem aba Documentos com upload de PDF/JPG/PNG até 10 MB, lista, download e exclusão. A página de Configurações ganhou três abas: Perfil (editar nome), Segurança (trocar senha com validações de força do Django) e Usuários (admin do município lista, cria, troca papel e remove acesso de outros usuários — sem precisar de SSH no servidor). A pesquisa global por ⌘K busca em paralelo em servidores, cargos, lotações e rubricas; quando vazia mostra atalhos para todas as áreas. O sino de notificações foi limpo do badge fake e agora exibe um dropdown honesto explicando que alertas reais entram nos Blocos 5 (TCE) e 7 (alertas inteligentes). O Guia de uso foi atualizado com tudo isso. Backend: 4 endpoints novos, 19 testes novos (244 verde no total). Frontend: 4 áreas, build verde, 10/10 testes verde. Próximo passo: Bloco 2 — engine de cálculo de folha."
+    },
     {
       "data": "2026-05-03",
       "tipo": "entrega",

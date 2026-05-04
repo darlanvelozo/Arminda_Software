@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-05-03 · Bloco corrente: **Bloco 1 COMPLETO ✅ — fundação multi-tenant + cadastros + serviços de RH + frontend completo + Importador Fiorilli SIP (smoke E2E contra FDB real). 225 testes verde, 94% cobertura. Próximo: Bloco 2 (Engine de cálculo de folha).**
+> Última atualização: 2026-05-05 · Bloco corrente: **Bloco 1 100% CONCLUÍDO ✅** — fundação multi-tenant, cadastros, serviços de RH, frontend completo (incluindo Documentos, Configurações com perfil/senha/usuários, pesquisa global ⌘K e guia de uso), Importador Fiorilli SIP. 244 testes backend verde + 10 testes frontend, 94% cobertura. Próximo: **Bloco 2 — Engine de cálculo de folha** (Jul-Ago/2026).
 
 ---
 

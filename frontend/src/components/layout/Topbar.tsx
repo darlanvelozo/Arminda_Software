@@ -1,10 +1,11 @@
 /**
- * Topbar — Bloco 1.3 (design Arminda).
+ * Topbar — Bloco 1.5.
  *
  * Estrutura:
  *   - Esquerda: breadcrumb (gerado automaticamente da rota).
- *   - Centro/direita: search trigger (placeholder do CmdK — Onda 1.3b).
- *   - Direita: separador, toggle de tema, sino (placeholder), avatar dropdown.
+ *   - Centro/direita: search trigger (abre CommandPalette via ⌘K ou clique).
+ *   - Direita: separador, toggle de tema, dropdown de notificações
+ *     (sem badge fake — alertas reais entram em Bloco 5/7), avatar dropdown.
  *
  * Altura fixa: 60px.
  */
@@ -79,13 +80,13 @@ function Breadcrumb() {
   );
 }
 
-function SearchTrigger() {
+function SearchTrigger({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      className="hidden md:flex items-center gap-2 h-9 px-3 rounded-md border bg-muted text-muted-foreground text-[13px] min-w-[280px] hover:bg-accent transition-colors"
-      title="Buscar (placeholder — Onda 1.3b vai implementar CmdK)"
-      aria-label="Buscar"
+      onClick={onClick}
+      className="hidden md:flex items-center gap-2 h-9 px-3 rounded-md border bg-muted text-muted-foreground text-[13px] min-w-[280px] hover:bg-accent hover:text-foreground transition-colors"
+      aria-label="Pesquisa global"
     >
       <Search className="h-3.5 w-3.5" />
       <span>Buscar servidor, cargo, rubrica…</span>
@@ -112,19 +113,36 @@ function ThemeToggle() {
   );
 }
 
-function NotifTrigger() {
+function NotificacoesDropdown() {
+  // Onda 1.5: sem alertas reais ainda. Estrutura preparada para receber
+  // notificações de domínio quando os Blocos 5 (TCE — histórico de envios)
+  // e 7 (alertas inteligentes) chegarem.
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      className="relative"
-      aria-label="Notificações"
-      title="Notificações (em breve)"
-    >
-      <Bell className="h-4 w-4" />
-      <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-destructive ring-2 ring-card" />
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Notificações"
+          title="Notificações"
+        >
+          <Bell className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-72">
+        <DropdownMenuLabel>Notificações</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <div className="px-3 py-6 text-center">
+          <Bell className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
+          <p className="text-sm font-medium">Nada por enquanto</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Avisos de envios para Tribunal de Contas e alertas de anomalias
+            aparecem aqui (Blocos 5 e 7).
+          </p>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -164,8 +182,13 @@ function PerfilDropdown() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>Meu perfil</DropdownMenuItem>
-        <DropdownMenuItem disabled>Trocar senha</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate("/configuracoes")}>
+          Meu perfil
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate("/configuracoes")}>
+          Trocar senha
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate("/guia")}>Guia de uso</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={handleLogout}
@@ -178,19 +201,19 @@ function PerfilDropdown() {
   );
 }
 
-export function Topbar() {
+export function Topbar({ onSearchOpen }: { onSearchOpen: () => void }) {
   return (
     <header className="h-[60px] flex-shrink-0 border-b bg-card flex items-center px-6 gap-4">
       <div className="flex-1 min-w-0">
         <Breadcrumb />
       </div>
 
-      <SearchTrigger />
+      <SearchTrigger onClick={onSearchOpen} />
 
       <Separator orientation="vertical" className="h-6 hidden md:block" />
 
       <ThemeToggle />
-      <NotifTrigger />
+      <NotificacoesDropdown />
       <PerfilDropdown />
     </header>
   );
