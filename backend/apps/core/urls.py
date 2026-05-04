@@ -1,11 +1,16 @@
 """
-URLs do app core.
+URLs do app core (rotas tenant — exigem header X-Tenant).
 
-Roteamento da API será definido nos próximos blocos.
+Sub-rotas:
+- usuarios/ — gestão de usuários do município (admin_municipio only)
 """
+
+from __future__ import annotations
+
+from django.urls import include, path
 
 app_name = "core"
 
-urlpatterns: list = [
-    # path("", views.IndexView.as_view(), name="index"),
+urlpatterns = [
+    path("", include("apps.core.users.urls")),
 ]

@@ -24,7 +24,9 @@ from rest_framework_simplejwt.views import (
 
 from apps.core.auth.serializers import (
     ArmindaTokenObtainPairSerializer,
+    ChangePasswordSerializer,
     UserMeSerializer,
+    UserMeUpdateSerializer,
 )
 
 
@@ -65,9 +67,27 @@ class LogoutView(APIView):
 
 
 class MeView(APIView):
-    """GET /api/auth/me/ — retorna o usuario autenticado + papeis."""
+    """GET/PATCH /api/auth/me/ — retorna ou edita o usuário autenticado."""
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
         return Response(UserMeSerializer(request.user).data)
+
+    def patch(self, request: Request) -> Response:
+        ser = UserMeUpdateSerializer(request.user, data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response(UserMeSerializer(request.user).data)
+
+
+class ChangePasswordView(APIView):
+    """POST /api/auth/change-password/ — troca a senha do próprio usuário."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        ser = ChangePasswordSerializer(data=request.data, context={"request": request})
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

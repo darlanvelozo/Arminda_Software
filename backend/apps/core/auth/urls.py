@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from django.urls import path
 
-from apps.core.auth.views import LoginView, LogoutView, MeView, RefreshView
+from apps.core.auth.views import (
+    ChangePasswordView,
+    LoginView,
+    LogoutView,
+    MeView,
+    RefreshView,
+)
 
 app_name = "auth"
 
@@ -13,4 +19,5 @@ urlpatterns = [
     path("refresh/", RefreshView.as_view(), name="refresh"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("me/", MeView.as_view(), name="me"),
+    path("change-password/", ChangePasswordView.as_view(), name="change-password"),
 ]
