@@ -124,14 +124,21 @@ class Command(BaseCommand):
 
         all_stats: list[LoaderStats] = []
 
+        class _DryRunRollback(Exception):
+            """Exceção interna para forçar rollback do `transaction.atomic` em dry-run."""
+
         with open_connection(config) as conn:
             with schema_context(tenant_schema):
                 if opts["dry_run"]:
-                    sid = transaction.savepoint()
+                    # Wrap em atomic + raise no fim → o rollback é garantido,
+                    # diferente de `savepoint_rollback` solto (que é no-op
+                    # fora de bloco atômico, em autocommit).
                     try:
-                        all_stats = self._executar(conn, tabelas, limit=opts["limit"])
-                    finally:
-                        transaction.savepoint_rollback(sid)
+                        with transaction.atomic():
+                            all_stats = self._executar(conn, tabelas, limit=opts["limit"])
+                            raise _DryRunRollback()
+                    except _DryRunRollback:
+                        pass
                 else:
                     all_stats = self._executar(conn, tabelas, limit=opts["limit"])
 
