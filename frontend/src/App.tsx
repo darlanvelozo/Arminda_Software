@@ -37,6 +37,7 @@ const LotacoesListPage = lazy(() => import("@/pages/lotacoes/LotacoesListPage"))
 const RubricasListPage = lazy(() => import("@/pages/rubricas/RubricasListPage"));
 const ServidoresListPage = lazy(() => import("@/pages/servidores/ServidoresListPage"));
 const ServidorDetailPage = lazy(() => import("@/pages/servidores/ServidorDetailPage"));
+const GuiaPage = lazy(() => import("@/pages/GuiaPage"));
 
 function PageFallback() {
   return (
@@ -92,6 +93,7 @@ function App() {
         <Route path="rubricas" element={lazyRoute(<RubricasListPage />)} />
         <Route path="relatorios" element={<EmConstrucaoPage area="Relatórios" />} />
         <Route path="configuracoes" element={<EmConstrucaoPage area="Configurações" />} />
+        <Route path="guia" element={lazyRoute(<GuiaPage />)} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

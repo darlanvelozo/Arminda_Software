@@ -136,6 +136,11 @@ Após qualquer alteração relevante:
 1. **Atualizar `CHANGELOG.md`** com a entrada estruturada.
 2. **Atualizar o `CONTEXT.md` pertinente** se a alteração mudou padrão, regra ou estrutura.
 3. **Criar/atualizar ADR** se a decisão for difícil de reverter ou influencia futuras decisões (ver `docs/CONTRIBUTING.md`).
+4. **Atualizar o Guia de uso (`frontend/src/pages/GuiaPage.tsx`)** se a alteração afetou
+   o que o usuário final vê — nova feature, mudança de fluxo, novo papel, troca de
+   permissão. O guia é a documentação viva acessível dentro do sistema; não pode ficar
+   desatualizado em relação ao que está em produção. Lembre-se de atualizar a constante
+   `LAST_UPDATED` no topo do arquivo.
 
 ---
 

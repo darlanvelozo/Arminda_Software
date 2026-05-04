@@ -35,6 +35,76 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### docs(frontend): Guia de uso do sistema acessível em /guia · 2026-05-03
+
+> Página viva de documentação dentro do próprio sistema. Substitui a
+> necessidade de manual em PDF — o usuário-operador encontra tudo o que
+> precisa direto no menu da sidebar (rodapé, junto com "Configurações").
+
+#### Adicionado
+
+- **feat(frontend):** `pages/GuiaPage.tsx` (rota `/guia`, lazy-loaded em chunk
+  separado de 22 KB). Layout em 2 colunas: TOC sticky à esquerda + conteúdo à
+  direita com 9 seções:
+  - Visão geral
+  - Como começar
+  - Município ativo (multi-tenant)
+  - Papéis e permissões (tabela com 5 papéis: staff_arminda,
+    admin_municipio, rh_municipio, financeiro_municipio, leitura_municipio)
+  - Cadastros centrais (Cargos, Lotações, Rubricas)
+  - Servidores (admissão, edição, desligamento, transferência, dependentes,
+    histórico, documentos)
+  - Importador Fiorilli SIP
+  - Em construção (Bloco 2 a 7 com período-alvo)
+  - Suporte
+  - Componentes auxiliares: `Section`, `Status`, `FeatureCard`, `FlowItem`,
+    `RoadmapItem`, `Callout` (info/warning/tip).
+  - Constante `LAST_UPDATED` no topo do arquivo, exibida no header da página.
+  - Cada feature recebe um `<Status>` indicando se é "Disponível" /
+    "Parcial" / "Em construção" / "No roadmap" — permite ao operador saber
+    o que pode usar agora.
+
+- **feat(frontend/layout):** Link "Guia de uso" no rodapé da
+  `Sidebar.tsx` (acima de "Configurações"); `BookOpen` icon. Ativa o
+  estado visual de NavLink quando a rota é `/guia`.
+
+- **feat(frontend/layout):** Breadcrumb do `Topbar.tsx` reconhece o
+  segmento `guia` → exibe "Guia de uso".
+
+- **docs(context):** `CONTEXT.md` raiz ganhou regra de escrita
+  obrigatória item 4: "Atualizar o Guia de uso se a alteração afetou
+  o que o usuário final vê" + lembrete de atualizar `LAST_UPDATED`.
+
+#### Por quê
+
+- **Onboarding sem fricção.** Operador novo (RH ou financeiro de
+  prefeitura) não precisa de manual externo nem de treinamento longo
+  para entender o que está disponível e onde ficam os fluxos.
+- **Documentação viva, não documentação morta.** Manual fora do sistema
+  desatualiza em semanas. Manter dentro do código, com convenção de
+  atualização vinculada ao CHANGELOG, garante que a regra "atualizar a
+  cada feature" tenha um lar visível.
+- **Honestidade sobre o que está pronto.** Cada feature tem um badge de
+  status; o operador não tropeça em um botão fake — sabe exatamente
+  o que dá para usar e o que ainda virá.
+
+#### Impacto
+
+- Bundle inicial inalterado (468 KB / 145 KB gzip) — `GuiaPage` só
+  carrega quando o usuário navega para `/guia`.
+- Sem mudança de backend ou contrato.
+- 10/10 testes verde, build verde, lint verde.
+
+#### Próximos passos
+
+- A cada onda entregue, atualizar `LAST_UPDATED` + as seções
+  pertinentes. Política agora também documentada em `CONTEXT.md` raiz.
+- Onda 1.5 (escopo a alinhar) deve atualizar este guia ao adicionar:
+  documentos digitalizados (aba do servidor), página de Configurações
+  com perfil/segurança/usuários, e pesquisa global ⌘K.
+
+---
+
 ### Bloco 1.4 — Onda 1.4: Importador Fiorilli SIP (cadastros) · 2026-05-03
 
 > Importador unidirecional do banco legado Fiorilli SIP (Firebird 2.5) para

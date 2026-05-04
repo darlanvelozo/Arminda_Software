@@ -43,6 +43,7 @@ const SECTION_LABELS: Record<string, string> = {
   rubricas: "Rubricas",
   relatorios: "Relatórios",
   configuracoes: "Configurações",
+  guia: "Guia de uso",
   "selecionar-municipio": "Selecionar município",
 };
 

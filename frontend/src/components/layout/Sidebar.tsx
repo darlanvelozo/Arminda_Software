@@ -11,6 +11,7 @@
  */
 
 import {
+  BookOpen,
   Briefcase,
   Building2,
   ChevronRight,
@@ -131,6 +132,22 @@ export function Sidebar() {
       {/* Footer */}
       <div className="border-t" style={{ padding: collapsed ? 8 : 12 }}>
         <div className="flex flex-col gap-0.5">
+          <NavLink
+            to="/guia"
+            title={collapsed ? "Guia de uso" : undefined}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-2.5 rounded-md text-sm font-medium transition-colors",
+                collapsed ? "h-10 w-10 justify-center" : "h-9 px-3",
+                isActive
+                  ? "bg-primary-soft text-primary-soft-foreground [&_svg]:text-primary"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              )
+            }
+          >
+            <BookOpen className="h-4 w-4 shrink-0" />
+            {!collapsed && <span>Guia de uso</span>}
+          </NavLink>
           <button
             type="button"
             onClick={() => navigate("/configuracoes")}
