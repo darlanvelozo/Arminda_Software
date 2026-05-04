@@ -33,6 +33,12 @@ drf-spectacular==0.27.2
 # Utilidades
 python-dateutil==2.9.0.post0
 
+# Importador Fiorilli SIP — Bloco 1.4 (ADR-0009)
+# firebirdsql é pure Python, sem deps nativas; passlib é necessário para
+# o hashing DES da autenticação do Firebird 2.5.
+firebirdsql==1.4.5
+passlib==1.7.4
+
 # ============================================================
 # Dev dependencies
 # ============================================================

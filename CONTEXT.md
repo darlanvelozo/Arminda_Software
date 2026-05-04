@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-04-30 · Bloco corrente: **Bloco 1.3 — Ondas 1.3a + 1.3b + 1.3c concluídas ✅ (frontend autenticado completo: telas de domínio + ciclo de vida do servidor + lazy routes). Próximo: Onda 1.4 (Importador Fiorilli) com diagnóstico do FDB já feito**
+> Última atualização: 2026-05-03 · Bloco corrente: **Bloco 1 COMPLETO ✅ — fundação multi-tenant + cadastros + serviços de RH + frontend completo + Importador Fiorilli SIP (smoke E2E contra FDB real). 225 testes verde, 94% cobertura. Próximo: Bloco 2 (Engine de cálculo de folha).**
 
 ---
 

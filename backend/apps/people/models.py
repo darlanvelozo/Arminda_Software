@@ -80,6 +80,13 @@ class Cargo(TimeStampedModel):
     )
     ativo = models.BooleanField(default=True)
 
+    # Campos enriquecidos (Bloco 1.4 — vindos do SIP/eSocial; opcionais)
+    data_criacao = models.DateField(null=True, blank=True)
+    data_extincao = models.DateField(null=True, blank=True)
+    vagas_total = models.PositiveIntegerField(null=True, blank=True)
+    dedicacao_exclusiva = models.BooleanField(default=False)
+    atribuicoes = models.TextField(blank=True)
+
     history = HistoricalRecords(excluded_fields=["atualizado_em"])
 
     class Meta:
@@ -149,6 +156,15 @@ class Servidor(TimeStampedModel):
     uf = models.CharField(max_length=2, blank=True)
     cep = models.CharField("CEP", max_length=10, blank=True)
 
+    # Campos enriquecidos (Bloco 1.4 — vindos do SIP/eSocial; opcionais)
+    nacionalidade = models.CharField(max_length=2, blank=True)
+    raca = models.CharField("raça/cor", max_length=1, blank=True)
+    nome_pai = models.CharField(max_length=200, blank=True)
+    nome_mae = models.CharField(max_length=200, blank=True)
+    instrucao = models.CharField(
+        "código de instrução (eSocial)", max_length=2, blank=True
+    )
+
     ativo = models.BooleanField(default=True)
 
     history = HistoricalRecords(excluded_fields=["atualizado_em"])
@@ -179,6 +195,15 @@ class VinculoFuncional(TimeStampedModel):
     carga_horaria = models.PositiveIntegerField(help_text="Horas semanais", default=40)
     salario_base = models.DecimalField(max_digits=12, decimal_places=2)
     ativo = models.BooleanField(default=True)
+
+    # Campos enriquecidos (Bloco 1.4 — vindos do SIP; opcionais)
+    matricula_contrato = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Identificador do contrato no sistema legado (TRABALHADOR.REGISTRO).",
+    )
+    tipo_admissao = models.CharField(max_length=2, blank=True)
+    processo_admissao = models.CharField(max_length=20, blank=True)
 
     history = HistoricalRecords(excluded_fields=["atualizado_em"])
 

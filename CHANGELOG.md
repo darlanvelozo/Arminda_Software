@@ -35,6 +35,140 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 1.4 — Onda 1.4: Importador Fiorilli SIP (cadastros) · 2026-05-03
+
+> Importador unidirecional do banco legado Fiorilli SIP (Firebird 2.5) para
+> o schema do município no Postgres. Pipeline ETL em 3 camadas (extract /
+> transform / load) com idempotência via chave SIP estável. Smoke E2E
+> contra o FDB real do município de São Raimundo do Doca Bezerra/MA
+> (`SIP.FDB`, 1029 tabelas, 409 MB) entregou: **91/91 cargos, 66/66 lotações,
+> 517/517 servidores, 1.503/2.762 vínculos, 279/303 dependentes** importados
+> em dry-run. Os 1.259 vínculos com erro são CPFs que existem em
+> TRABALHADOR mas não em PESSOA (registros históricos órfãos) — comportamento
+> esperado, fora do controle do importador.
+
+#### Adicionado
+
+- **docs(adr):** [ADR-0009 — Importador Fiorilli SIP](docs/adr/0009-importador-fiorilli-sip.md).
+  Decisões: `firebirdsql` (pure Python), pipeline ETL em 3 camadas, chave
+  SIP estável (`<EMPRESA>-<CODIGO>` para Cargo/Lotação, `CPF` para Servidor,
+  `<EMPRESA>-<REGISTRO>` para Vínculo), `update_or_create` para idempotência,
+  política de "linhas com erro não param o batch", dry-run com rollback,
+  senha do FDB nunca persistida.
+
+- **feat(backend/imports):** Novo app `apps.imports` em `TENANT_APPS` com:
+  - `models.py` — `SipImportRecord` (audita uma linha SIP importada).
+    Indexado por `(tipo, chave_sip)` único + `(tipo, status)`. Guarda
+    `arminda_id`, `payload_sip_hash` (sha256 do dict bruto, detecta drift),
+    `status` (ok/erro), `erro_mensagem`.
+  - `adapters/firebird.py` — read-only. `FirebirdConfig` (dataclass),
+    `open_connection` (context manager), e `fetch_<entidade>` para
+    cargos/locais_trabalho/pessoas/trabalhadores/dependentes/eventos.
+    Charset WIN1252, normalização de espaços/bytes.
+  - `services/mapping.py` — funções **puras** SIP-row → Arminda-dict.
+    Mapeamento de códigos SIP (instrução, sexo, estado civil, parentesco,
+    vínculo) para enums Arminda. `payload_hash()` para detecção de drift.
+  - `services/loaders/{cargos,lotacoes,servidores,vinculos,dependentes}.py`
+    — `update_or_create` por entidade. Resolve FKs via `SipImportRecord`
+    (não consulta o banco de domínio direto, evita fan-out de queries).
+    `LoaderStats` (lidos/criados/atualizados/erros) para relatório.
+  - `management/commands/import_fiorilli_sip.py` — CLI orquestrador
+    (`--tenant`, `--host`, `--database`, `--user`, `--password`,
+    `--tabelas`, `--limit`, `--dry-run`). Imprime relatório final
+    com erros (até 20 visíveis, restante em SipImportRecord).
+
+- **feat(backend/people):** Migrations `0002` adiciona campos opcionais
+  necessários para receber dados ricos do SIP/eSocial:
+  - **Cargo:** `data_criacao`, `data_extincao`, `vagas_total`,
+    `dedicacao_exclusiva`, `atribuicoes`.
+  - **Servidor:** `nacionalidade`, `raca`, `nome_pai`, `nome_mae`,
+    `instrucao` (código eSocial).
+  - **VinculoFuncional:** `matricula_contrato`, `tipo_admissao`,
+    `processo_admissao`.
+  - Todos opcionais (blank/null) — frontend atual continua funcionando
+    sem preencher nenhum.
+
+- **chore(deps):** `firebirdsql==1.4.5` + `passlib==1.7.4` em
+  `requirements.txt` (Bloco 1.4).
+
+- **test(imports):** **32 testes novos** (24 mapping puro + 8 loaders
+  com Postgres). Cobertura por:
+  - `test_mapping.py` — input/output de cada função puro, casos de borda
+    (códigos desconhecidos, datas ausentes, CPF curto, situação demitido,
+    payload_hash estável independente de ordem).
+  - `test_loaders.py` — cria, atualiza idempotente, linha inválida não
+    para batch, FK ausente gera erro mas não levanta. Reusa fixture
+    `tenant_a` global.
+
+#### Smoke E2E (validação contra FDB real)
+
+Subimos `jacobalberty/firebird:2.5-ss` em Docker com o `SIP.FDB` do
+município-piloto montado, criamos usuário `FSCSIP` (owner do FDB,
+necessário para SYSDBA estar bloqueado por SQL ROLE típico do Fiorilli),
+rodamos:
+
+```bash
+manage.py import_fiorilli_sip --tenant mun_sao_raimundo \
+  --host 127.0.0.1 --port 13050 \
+  --database /firebird/data/SIP.FDB \
+  --user FSCSIP --password fscpw \
+  --tabelas cargos,lotacoes,servidores,vinculos,dependentes --dry-run
+```
+
+Resultado:
+
+| Tabela | Lidas | OK | Taxa | Erros |
+|---|---|---|---|---|
+| Cargos | 91 | 91 | 100% | 0 |
+| Lotações | 66 | 66 | 100% | 0 |
+| Servidores | 517 | 517 | 100% | 0 |
+| Vínculos | 2.762 | 1.503 | 54% | 1.259 |
+| Dependentes | 303 | 279 | 92% | 24 |
+
+Os 1.259 erros em Vínculos têm a mesma causa: o CPF de TRABALHADOR não
+existe na tabela PESSOA. Dado típico de Fiorilli (registros históricos
+órfãos). Está fora do controle do importador — em produção, o município
+corrige os CPFs em PESSOA e re-roda (a importação é idempotente).
+
+#### Por quê
+
+- **Bloqueia o piloto.** Sem importar os 517 servidores reais, o
+  município-piloto não consegue testar o fluxo de folha contra dados
+  conhecidos. A importação dos cadastros é gate para o Bloco 6.
+- **Pipeline em 3 camadas isola o adaptador.** O `mapping` puro fica
+  trivialmente testável (24 testes em 0.10s, sem DB). Trocar Fiorilli
+  SIP por outro sistema legado é trocar `adapters/`, sem mexer em
+  loaders ou mapping.
+- **Idempotência por chave SIP elimina rework.** O usuário pode rodar
+  3 vezes seguidas (corrigindo CPFs entre runs) e o estado final
+  converge.
+- **Histórico financeiro foi deixado para depois.** EVENTOSFIXOS (1.387)
+  e MOVIMENTO (~250k) só fazem sentido depois do Bloco 2 (engine de
+  cálculo) — o que importamos agora dá pra calcular folha do zero,
+  sem precisar do histórico.
+
+#### Impacto
+
+- **Backend:** 4 apps → **5 apps** (`apps.imports` novo). 2 migrations
+  novas (people 0002, imports 0001). **225 testes verde** (193 → 225,
+  +32) com 94% cobertura (97% → 94% pelo código novo do adapter
+  Firebird que só é exercido em smoke E2E, não em CI).
+- **Sem mudança de contrato API.** As migrations adicionam campos
+  opcionais; nenhum endpoint mudou.
+- **Deps novas:** `firebirdsql` e `passlib` (ambas pure Python; sem
+  binários nativos pra deploy).
+
+#### Próximos passos
+
+- **Onda 1.4-bis (curta):** Filtrar `TRABALHADOR.SITUACAO` para excluir
+  registros históricos antes de tentar resolver CPF, reduzindo a
+  contagem de erros "esperados" para ~0.
+- **Bloco 2:** Engine de cálculo (DSL de fórmulas). Aí podemos ressuscitar
+  o `fetch_eventos` do adapter (esqueleto já está) e importar EVENTOSFIXOS
+  + MOVIMENTO histórico para testes de paridade.
+
+---
+
 ### Bloco 1.3 — Onda 1.3c: Edição inline + ações + lazy routes · 2026-04-30
 
 > Fecha as lacunas que estavam read-only na onda anterior. Servidor pode

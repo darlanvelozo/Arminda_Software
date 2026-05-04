@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-04-30",
+  "ultima_atualizacao": "2026-05-03",
   "bloco_atual": 1,
-  "progresso_geral_pct": 38,
+  "progresso_geral_pct": 42,
   "blocos": [
     {
       "numero": 0,
@@ -36,7 +36,7 @@
       "data_fim_prevista": "2026-06-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 92,
+      "progresso_pct": 100,
       "entregas": [
         "✅ Modelo multi-tenant (cada município isolado por schema PostgreSQL)",
         "✅ Autenticação JWT e controle de acesso (RBAC por município)",
@@ -49,9 +49,9 @@
         "✅ Comando para criar usuário e atribuir papel via linha de comando",
         "✅ Frontend autenticado: tela de login, layout, troca de município, dashboard",
         "✅ Telas de domínio: Cargos, Lotações, Rubricas (CRUD completo) e Servidores (lista + admissão + detalhe com 4 abas)",
-        "✅ Edição inline do servidor + desligamento + transferência de vínculo + CRUD de dependentes (Onda 1.3c)",
+        "✅ Edição inline do servidor + desligamento + transferência de vínculo + CRUD de dependentes",
         "✅ Code-splitting por rota: bundle inicial reduzido em 31%",
-        "Importador inicial do sistema atual (Fiorilli SIP → Postgres) — Onda 1.4"
+        "✅ Importador Fiorilli SIP (Firebird → Postgres): pipeline ETL idempotente, 91/91 cargos, 66/66 lotações, 517/517 servidores importados em smoke E2E"
       ]
     },
     {
@@ -164,6 +164,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-03",
+      "tipo": "entrega",
+      "titulo": "Importador Fiorilli SIP funcional — Bloco 1 completo",
+      "descricao": "Foi entregue o importador unidirecional do banco legado Fiorilli SIP (Firebird 2.5) para o Arminda. O pipeline lê o arquivo .FDB do município, transforma os dados e grava no schema do tenant — tudo dentro de uma transação que pode ser revertida em modo de teste. A importação é idempotente: rodar duas vezes produz o mesmo resultado. O smoke end-to-end contra o banco real do município de São Raimundo do Doca Bezerra/MA importou 91/91 cargos, 66/66 lotações e 517/517 servidores com 100% de sucesso, mais 1503/2762 vínculos (54%) e 279/303 dependentes (92%). Os erros remanescentes são CPFs históricos órfãos no SIP — registros que nunca tiveram cadastro completo na PESSOA — e estão fora do controle do importador; em produção o município corrige a origem e re-roda. A onda 1.4 fecha o Bloco 1: a fundação técnica está completa, com 225 testes verde e 94% de cobertura. Próximo passo: Bloco 2, engine de cálculo de folha."
+    },
     {
       "data": "2026-04-30",
       "tipo": "entrega",
