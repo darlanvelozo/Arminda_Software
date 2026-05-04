@@ -77,8 +77,14 @@ async function fetchServidor(id: number): Promise<ServidorDetail> {
 }
 
 async function fetchHistorico(id: number): Promise<HistoricoServidorEntry[]> {
-  const { data } = await api.get<HistoricoServidorEntry[]>(`${BASE}${id}/historico/`);
-  return data;
+  // O endpoint pode vir paginado (DRF default { count, results, ... }) ou
+  // como array direto, dependendo da configuração do paginator no viewset.
+  // Aceitamos ambos para evitar runtime error no consumidor.
+  const { data } = await api.get<
+    HistoricoServidorEntry[] | { results: HistoricoServidorEntry[] }
+  >(`${BASE}${id}/historico/`);
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
 }
 
 async function admitirServidor(payload: AdmissaoInput): Promise<ServidorDetail> {
