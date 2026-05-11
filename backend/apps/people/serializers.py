@@ -102,9 +102,11 @@ class CargoWriteSerializer(serializers.ModelSerializer):
 class LotacaoListSerializer(serializers.ModelSerializer):
     """Versao enxuta para listagem."""
 
+    natureza_display = serializers.CharField(source="get_natureza_display", read_only=True)
+
     class Meta:
         model = Lotacao
-        fields = ["id", "codigo", "nome", "sigla", "ativo"]
+        fields = ["id", "codigo", "nome", "sigla", "natureza", "natureza_display", "ativo"]
         read_only_fields = fields
 
 
@@ -114,6 +116,7 @@ class LotacaoDetailSerializer(serializers.ModelSerializer):
     lotacao_pai_nome = serializers.CharField(
         source="lotacao_pai.nome", read_only=True, default=None
     )
+    natureza_display = serializers.CharField(source="get_natureza_display", read_only=True)
 
     class Meta:
         model = Lotacao
@@ -122,13 +125,21 @@ class LotacaoDetailSerializer(serializers.ModelSerializer):
             "codigo",
             "nome",
             "sigla",
+            "natureza",
+            "natureza_display",
             "lotacao_pai",
             "lotacao_pai_nome",
             "ativo",
             "criado_em",
             "atualizado_em",
         ]
-        read_only_fields = ["id", "criado_em", "atualizado_em", "lotacao_pai_nome"]
+        read_only_fields = [
+            "id",
+            "criado_em",
+            "atualizado_em",
+            "lotacao_pai_nome",
+            "natureza_display",
+        ]
 
 
 class LotacaoWriteSerializer(serializers.ModelSerializer):
@@ -136,7 +147,7 @@ class LotacaoWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lotacao
-        fields = ["id", "codigo", "nome", "sigla", "lotacao_pai", "ativo"]
+        fields = ["id", "codigo", "nome", "sigla", "natureza", "lotacao_pai", "ativo"]
         read_only_fields = ["id"]
 
     def validate_codigo(self, value: str) -> str:

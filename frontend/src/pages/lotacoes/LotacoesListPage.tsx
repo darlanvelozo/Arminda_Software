@@ -59,6 +59,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { extractDomainErrorMessage } from "@/lib/api";
+import { NATUREZA_VARIANTS, NATUREZAS } from "@/lib/constants";
 import {
   useDeleteLotacao,
   useLotacao,
@@ -73,6 +74,7 @@ import { LotacaoFormSheet } from "./LotacaoFormSheet";
 const PAGE_SIZE = 20;
 
 type StatusFilter = "todos" | "ativos" | "inativos";
+type NaturezaFilter = "todos" | "administracao" | "saude" | "educacao" | "assistencia_social" | "outros";
 
 function useDebounced<T>(value: T, delayMs = 300): T {
   const [debounced, setDebounced] = useState(value);
@@ -86,6 +88,7 @@ function useDebounced<T>(value: T, delayMs = 300): T {
 export default function LotacoesListPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("todos");
+  const [natureza, setNatureza] = useState<NaturezaFilter>("todos");
   const [orderBy, setOrderBy] = useState<"nome" | "codigo">("nome");
   const [orderDir, setOrderDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);
@@ -93,16 +96,17 @@ export default function LotacoesListPage() {
   const debouncedSearch = useDebounced(search);
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status, orderBy, orderDir]);
+  }, [debouncedSearch, status, natureza, orderBy, orderDir]);
 
   const params: LotacoesListParams = useMemo(
     () => ({
       search: debouncedSearch,
       ativo: status === "todos" ? undefined : status === "ativos",
+      natureza: natureza === "todos" ? undefined : natureza,
       ordering: `${orderDir === "desc" ? "-" : ""}${orderBy}`,
       page,
     }),
-    [debouncedSearch, status, orderBy, orderDir, page],
+    [debouncedSearch, status, natureza, orderBy, orderDir, page],
   );
 
   const { data, isLoading, isError, error, isFetching } = useLotacoesList(params);
@@ -184,6 +188,19 @@ export default function LotacoesListPage() {
             className="pl-9"
           />
         </div>
+        <Select value={natureza} onValueChange={(v) => setNatureza(v as NaturezaFilter)}>
+          <SelectTrigger className="w-full sm:w-52">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas as áreas</SelectItem>
+            {NATUREZAS.map((n) => (
+              <SelectItem key={n.value} value={n.value}>
+                {n.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={status} onValueChange={(v) => setStatus(v as StatusFilter)}>
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue />
@@ -219,6 +236,7 @@ export default function LotacoesListPage() {
                 </button>
               </TableHead>
               <TableHead className="w-[120px]">Sigla</TableHead>
+              <TableHead className="w-[160px]">Natureza</TableHead>
               <TableHead className="w-[120px]">Status</TableHead>
               <TableHead className="w-[64px]"></TableHead>
             </TableRow>
@@ -227,14 +245,14 @@ export default function LotacoesListPage() {
             {isLoading && <SkeletonRows />}
             {isError && (
               <TableRow>
-                <TableCell colSpan={5} className="py-12 text-center text-sm text-destructive">
+                <TableCell colSpan={6} className="py-12 text-center text-sm text-destructive">
                   {extractDomainErrorMessage(error) ?? "Falha ao carregar lotações."}
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && !isError && data?.results.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="py-16 text-center">
+                <TableCell colSpan={6} className="py-16 text-center">
                   <div className="flex flex-col items-center gap-3 text-muted-foreground">
                     <Library className="h-8 w-8" />
                     <div>
@@ -255,6 +273,11 @@ export default function LotacoesListPage() {
                 <TableCell className="font-medium">{lotacao.nome}</TableCell>
                 <TableCell className="font-mono text-xs">
                   {lotacao.sigla || <span className="text-muted-foreground">—</span>}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={NATUREZA_VARIANTS[lotacao.natureza] ?? "outline"}>
+                    {lotacao.natureza_display}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   {lotacao.ativo ? (
@@ -386,6 +409,9 @@ function SkeletonRows() {
           </TableCell>
           <TableCell>
             <Skeleton className="h-4 w-16" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-5 w-20" />
           </TableCell>
           <TableCell>
             <Skeleton className="h-5 w-16" />

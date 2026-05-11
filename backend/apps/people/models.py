@@ -37,11 +37,22 @@ class EstadoCivil(models.TextChoices):
 
 
 class Regime(models.TextChoices):
-    ESTATUTARIO = "estatutario", "Estatutario"
+    ESTATUTARIO = "estatutario", "Efetivo (concursado)"
     CELETISTA = "celetista", "Celetista"
     COMISSIONADO = "comissionado", "Comissionado"
-    TEMPORARIO = "temporario", "Temporario"
+    TEMPORARIO = "temporario", "Contratado temporario"
+    ELETIVO = "eletivo", "Eletivo"
     ESTAGIARIO = "estagiario", "Estagiario"
+
+
+class NaturezaLotacao(models.TextChoices):
+    """Classificação macro da lotação por secretaria/área de atuação."""
+
+    ADMINISTRACAO = "administracao", "Administração"
+    SAUDE = "saude", "Saúde"
+    EDUCACAO = "educacao", "Educação"
+    ASSISTENCIA = "assistencia_social", "Assistência social"
+    OUTROS = "outros", "Outros"
 
 
 class Parentesco(models.TextChoices):
@@ -109,6 +120,12 @@ class Lotacao(TimeStampedModel):
     codigo = models.CharField(max_length=20, unique=True)
     nome = models.CharField(max_length=200)
     sigla = models.CharField(max_length=20, blank=True)
+    natureza = models.CharField(
+        max_length=30,
+        choices=NaturezaLotacao.choices,
+        default=NaturezaLotacao.OUTROS,
+        help_text="Classificação macro: administração, saúde, educação, assistência social ou outros.",
+    )
     lotacao_pai = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,

@@ -16,8 +16,11 @@ import json
 from datetime import date, datetime
 from typing import Any
 
+import re
+
 from apps.people.models import (
     EstadoCivil,
+    NaturezaLotacao,
     NivelEscolaridade,
     Parentesco,
     Regime,
@@ -140,12 +143,62 @@ def map_cargo(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
 # ============================================================
 
 
+# Padrões de classificação da natureza da lotação, reusam a lógica das
+# migrations 0004-0006 (mantida aqui pra que importações novas já classifiquem
+# corretamente sem precisar de data migration adicional).
+_PADROES_NATUREZA = {
+    NaturezaLotacao.SAUDE: [
+        r"\bsa[uú]de\b", r"\bacs\b", r"\bubs\b", r"\bhospital\b", r"\bsamu\b",
+        r"\bvigil[âa]ncia\s+sanit[áa]ria\b", r"\bsesau\b", r"\bsemsa\b", r"\bsms\b",
+        r"\benfermagem\b", r"\bm[eé]dico\b", r"\bsa[uú]de\s+da\s+fam[íi]lia\b",
+        r"\bunidade\s+(de\s+)?sa[uú]de\b", r"\bcaps\b", r"\bpsf\b", r"\besf\b",
+    ],
+    NaturezaLotacao.EDUCACAO: [
+        r"\beduca[çc][ãa]o\b", r"\bescola\b", r"\bcreche\b", r"\bemef\b", r"\bemei\b",
+        r"\bbiblioteca\b", r"\bniiped\b", r"\bensino\b", r"\bsemed\b",
+        r"\bunidade\s+escolar\b", r"\bsec(retaria)?\s+(municipal\s+)?de\s+edu[ck]",
+        r"\bcentro\s+multidisciplinar.*pedag", r"^\s*esc\b", r"^\s*g\s+e\b",
+        r"^\s*ge\b", r"\binfantil\b", r"\bcrescer\b",
+    ],
+    NaturezaLotacao.ASSISTENCIA: [
+        r"\bassist[êe]ncia\s+social\b", r"\bcras\b", r"\bcreas\b",
+        r"\bconselho\s+tutelar\b", r"\babrigo\b", r"\bbolsa\s+fam[íi]lia\b",
+        r"\bcad[uú]nico\b", r"\bsemtas\b", r"\bsemas\b",
+        r"\bdesenvolvimento\s+social\b", r"\bidoso\b",
+        r"\bsec(retaria)?\s+(municipal\s+)?de\s+ass(ist)?", r"\bscfv\b",
+        r"\bcrian[çc]a\s+feliz\b",
+    ],
+    NaturezaLotacao.ADMINISTRACAO: [
+        r"\bgabinete\b", r"\bprefeit[oa]\b", r"\bvereador\b", r"\bc[âa]mara\b",
+        r"\bfinan[çc]as?\b", r"\bfazenda\b", r"\btribut", r"\bcontroladoria\b",
+        r"\bjur[íi]dico\b", r"\bprocuradoria\b", r"\brecursos\s+humanos\b",
+        r"\bcentro\s+administrativo\b", r"\badmin", r"\bplanejamento\b",
+        r"\borçamento\b", r"\bauditoria\b",
+        r"\bsec(retaria)?\s+(municipal\s+)?de\s+admin",
+        r"\bsec(retaria)?\s+(de\s+)?rela[çc][õo]es",
+    ],
+}
+
+
+def _classifica_natureza(nome: str) -> str:
+    """Retorna a natureza inferida do nome da lotação. 'outros' se não bater."""
+    if not nome:
+        return NaturezaLotacao.OUTROS
+    n = nome.lower()
+    for natureza, padroes in _PADROES_NATUREZA.items():
+        for p in padroes:
+            if re.search(p, n):
+                return natureza
+    return NaturezaLotacao.OUTROS
+
+
 def map_lotacao(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     """
     Mapeia uma linha de LOCAL_TRABALHO (SIP) → kwargs de `apps.people.Lotacao`.
 
     Chave SIP estável: `{EMPRESA}-LT-{CODIGO}`.
     Não usamos hierarquia (lotacao_pai) na importação — fica plana.
+    A natureza é inferida do nome via padrões; "outros" se nenhum bater.
     """
     empresa = _safe_str(row.get("empresa"))
     codigo = _safe_str(row.get("codigo"))
@@ -164,6 +217,7 @@ def map_lotacao(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         "codigo": chave_sip[:20],
         "nome": nome,
         "sigla": sigla[:20],
+        "natureza": _classifica_natureza(nome),
         "lotacao_pai": None,
         "ativo": True,
     }
@@ -244,9 +298,11 @@ def map_servidor(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
 # ============================================================
 
 # Mapeamento aproximado VINCULO.CODIGO (SIP) → Regime (Arminda).
-# Os códigos exatos variam por município; este é o mapeamento padrão.
+# Os códigos exatos variam por município; este é o mapeamento padrão Fiorilli.
+# VINCULO=01 (AGENTE POLITICO) cobre Prefeito, Vice e Vereadores — é
+# regime ELETIVO no nosso modelo (não comissionado).
 _VINCULO_SIP_TO_REGIME = {
-    "01": Regime.COMISSIONADO,  # AGENTE_POLITICO geralmente
+    "01": Regime.ELETIVO,  # AGENTE_POLITICO (Prefeito, Vice, Vereadores)
     "02": Regime.COMISSIONADO,
     "03": Regime.ESTATUTARIO,
     "04": Regime.ESTATUTARIO,

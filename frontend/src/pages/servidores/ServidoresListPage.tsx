@@ -14,7 +14,7 @@ import {
   Search,
   Users,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { extractDomainErrorMessage } from "@/lib/api";
+import { NATUREZAS, REGIMES } from "@/lib/constants";
 import { useServidoresList, type ServidoresListParams } from "@/lib/queries/servidores";
 
 import { ServidorAdmissaoSheet } from "./ServidorAdmissaoSheet";
@@ -43,6 +44,14 @@ import { ServidorAdmissaoSheet } from "./ServidorAdmissaoSheet";
 const PAGE_SIZE = 20;
 
 type StatusFilter = "todos" | "ativos" | "inativos";
+type VinculoFilter = "todos" | (typeof REGIMES)[number]["value"];
+type NaturezaFilter =
+  | "todos"
+  | "administracao"
+  | "saude"
+  | "educacao"
+  | "assistencia_social"
+  | "outros";
 
 function useDebounced<T>(value: T, delayMs = 300): T {
   const [debounced, setDebounced] = useState(value);
@@ -60,9 +69,16 @@ function formatCpf(cpf: string): string {
 
 export default function ServidoresListPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("ativos");
+  const [vinculo, setVinculo] = useState<VinculoFilter>(
+    (searchParams.get("regime") as VinculoFilter) || "todos",
+  );
+  const [natureza, setNatureza] = useState<NaturezaFilter>(
+    (searchParams.get("natureza") as NaturezaFilter) || "todos",
+  );
   const [orderBy, setOrderBy] = useState<"nome" | "matricula">("nome");
   const [orderDir, setOrderDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);
@@ -70,16 +86,29 @@ export default function ServidoresListPage() {
   const debouncedSearch = useDebounced(search);
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status, orderBy, orderDir]);
+  }, [debouncedSearch, status, vinculo, natureza, orderBy, orderDir]);
+
+  // Sincroniza filtros principais na URL para deep-link a partir do Dashboard
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (vinculo !== "todos") next.set("regime", vinculo);
+    else next.delete("regime");
+    if (natureza !== "todos") next.set("natureza", natureza);
+    else next.delete("natureza");
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vinculo, natureza]);
 
   const params: ServidoresListParams = useMemo(
     () => ({
       search: debouncedSearch,
       ativo: status === "todos" ? undefined : status === "ativos",
+      regime: vinculo === "todos" ? undefined : vinculo,
+      natureza: natureza === "todos" ? undefined : natureza,
       ordering: `${orderDir === "desc" ? "-" : ""}${orderBy}`,
       page,
     }),
-    [debouncedSearch, status, orderBy, orderDir, page],
+    [debouncedSearch, status, vinculo, natureza, orderBy, orderDir, page],
   );
 
   const { data, isLoading, isError, error, isFetching } = useServidoresList(params);
@@ -125,6 +154,32 @@ export default function ServidoresListPage() {
             className="pl-9"
           />
         </div>
+        <Select value={vinculo} onValueChange={(v) => setVinculo(v as VinculoFilter)}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os vínculos</SelectItem>
+            {REGIMES.map((r) => (
+              <SelectItem key={r.value} value={r.value}>
+                {r.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={natureza} onValueChange={(v) => setNatureza(v as NaturezaFilter)}>
+          <SelectTrigger className="w-full sm:w-52">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas as áreas</SelectItem>
+            {NATUREZAS.map((n) => (
+              <SelectItem key={n.value} value={n.value}>
+                {n.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={status} onValueChange={(v) => setStatus(v as StatusFilter)}>
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue />

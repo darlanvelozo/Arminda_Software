@@ -20,6 +20,7 @@ export type LotacaoInput = Omit<LotacaoWrite, "id">;
 export interface LotacoesListParams {
   search?: string;
   ativo?: boolean;
+  natureza?: string;
   raiz?: boolean;
   lotacaoPaiId?: number;
   ordering?: string;
@@ -39,6 +40,7 @@ async function fetchLotacoes(params: LotacoesListParams): Promise<Paginated<Lota
     params: {
       search: params.search || undefined,
       ativo: params.ativo,
+      natureza: params.natureza || undefined,
       raiz: params.raiz,
       lotacao_pai: params.lotacaoPaiId,
       ordering: params.ordering || undefined,

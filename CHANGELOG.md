@@ -35,6 +35,130 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 1.5b: Organização por vínculo e por área (secretaria) · 2026-05-08
+
+> Resposta direta ao caso real do município de São Raimundo do Doca Bezerra:
+> 369 servidores estavam num "balde genérico sem nome" no Fiorilli SIP,
+> impossibilitando saber quem trabalha na Saúde, Educação, etc., sem
+> recadastramento manual. Esta onda dá ao sistema a estrutura para
+> organizar servidores em **duas dimensões independentes**: vínculo
+> (Efetivo/Comissionado/Contratado/Eletivo) e área da secretaria
+> (Administração/Saúde/Educação/Assistência social). A classificação
+> automática rodou nos dados reais e cobriu 1.103 dos 1.503 vínculos
+> ativos em 4 áreas claras; os 400 restantes ficam como "Outros"
+> (cultura/esporte/obras/balde sem nome) para revisão manual.
+
+#### Adicionado — Backend
+
+- **feat(people/models):** Novo regime `ELETIVO` (cobre Prefeito, Vice e
+  Vereadores — antes virava `comissionado` indevidamente). Labels do enum
+  Regime ficaram mais explícitos: "Efetivo (concursado)" em vez de só
+  "Estatutário", "Contratado temporário" em vez de "Temporário".
+- **feat(people/models):** Novo enum `NaturezaLotacao` com 5 valores
+  (administração, saúde, educação, assistência_social, outros) e campo
+  `natureza` em `Lotacao` (default="outros").
+- **migration 0003:** Schema — adiciona `Lotacao.natureza` e adapta
+  `Regime` choices.
+- **migration 0004 + 0005 + 0006 (data migrations):** Classifica
+  automaticamente as 66 lotações importadas baseado em padrões no nome:
+  - Saúde: ACS, UBS, hospital, posto, PSF/ESF, SAMU, vigilância sanitária
+  - Educação: escola, creche, EMEF/EMEI, biblioteca, NIIPED, "G E", "ESC", "UI"
+  - Assistência social: CRAS, CREAS, conselho tutelar, SCFV, Criança Feliz
+  - Administração: gabinete, prefeitura, câmara, finanças, jurídico,
+    procuradoria, controladoria
+  - As 3 passadas sequenciais elevaram a cobertura para 73% (1.103 de 1.503
+    vínculos classificados em 4 áreas claras; 400 restantes em "Outros").
+- **feat(people/filters):** `LotacaoFilter` ganha filtro por `natureza`.
+  `ServidorFilter` ganha filtro por `natureza` (via
+  `vinculos__lotacao__natureza`). Todos os filtros via `vinculos__*` agora
+  têm `distinct=True` para evitar duplicação por servidor com múltiplos
+  vínculos.
+- **feat(people/serializers):** `natureza` e `natureza_display` em
+  Lotacao{List,Detail,Write}Serializer.
+- **feat(imports/mapping):**
+  - `VINCULO=01` (AGENTE POLÍTICO no Fiorilli) agora vira `Regime.ELETIVO`
+    (era `comissionado`).
+  - `map_lotacao` chama `_classifica_natureza` automaticamente — novas
+    importações já chegam classificadas, sem precisar de data migration
+    adicional.
+- **test:** 6 testes novos (mapping de natureza + ELETIVO) → 248 verde.
+
+#### Adicionado — Frontend
+
+- **feat(lib/constants):** Tabelas centrais `REGIMES` e `NATUREZAS` com
+  labels em português e variantes de Badge consistentes — usadas em
+  todas as 4 telas afetadas e no Dashboard.
+- **feat(lotacoes/form):** `LotacaoFormSheet` ganha Select obrigatório
+  de Natureza (5 opções) com hint sobre quando usar "Outros".
+- **feat(lotacoes/list):** `LotacoesListPage` ganha:
+  - Nova coluna "Natureza" com Badge colorida (cores estáveis por natureza)
+  - Filtro de Natureza na toolbar
+- **feat(servidores/list):** `ServidoresListPage` ganha 2 filtros novos
+  (Vínculo + Natureza) que combinam entre si. Suporta deep-link via URL
+  (`?regime=estatutario&natureza=saude`) — filtros são sincronizados
+  bidirecionalmente.
+- **feat(queries/kpis):** Novo hook `useDashboardKpis` que dispara 10
+  contagens em paralelo (total + 5 vínculos + 4 naturezas + outros),
+  cada uma com cache de 60s. Reusa o endpoint `?ativo=true&page_size=1`
+  e lê `count` da resposta paginada — sem precisar de endpoint dedicado.
+- **feat(dashboard):** Dashboard reescrito com 3 seções:
+  - Header com nome + município + **total de servidores ativos**
+  - "Servidores por vínculo": 4 cards (Efetivos / Comissionados /
+    Contratados / Eletivos), cada um clicável navega para a lista filtrada
+  - "Servidores por área": 4 cards (Administração / Saúde / Educação /
+    Assistência social), cada um navega para a lista filtrada
+  - Linha extra "outros" para a quinta categoria quando > 0
+  - Atalhos para áreas operacionais (Servidores / Cargos / Lotações / Folha
+    / Rubricas / Relatórios)
+- **docs(guia):** `LAST_UPDATED` para 2026-05-08. Nova seção "Organização:
+  vínculos e áreas (secretarias)" explica as duas dimensões e como
+  combiná-las no dia a dia, com referência direta ao Dashboard e à
+  pesquisa filtrada. Posicionada antes de Cadastros centrais — é a
+  base conceitual.
+
+#### Por quê
+
+- **Demanda real do município-piloto.** O Dr. Renzo levantou em conversa
+  que o sistema atual não distingue secretarias e exige recadastramento
+  manual para descobrir quem é de cada área. Validamos a frustração nos
+  dados reais (369 servidores num balde sem nome) e atacamos a raiz: o
+  Fiorilli mistura "lotação física" com "natureza de despesa" no mesmo
+  campo; o Arminda separa em dimensões independentes.
+- **Eletivo como regime próprio é correção semântica.** Tratar Prefeito
+  como "comissionado" estava errado — eletivo tem mandato, não cargo de
+  confiança, e o cálculo de folha futuro pode precisar diferenciar
+  (Bloco 2).
+- **Classificação automática + revisão manual é o padrão certo.** A
+  máquina cobre o caso fácil (escola é educação), o humano resolve o
+  caso difícil (Sec. de Cultura → onde encaixa?). Sem isso, ou se gasta
+  meses recadastrando, ou se aceita o caos do "balde genérico".
+- **Dashboard navegacional (não decorativo).** Cada KPI é um link para
+  a lista filtrada — o operador descobre que algo está estranho clicando,
+  não esperando um relatório.
+
+#### Impacto
+
+- **Backend:** 248 testes verde (era 244, +4). 3 migrations novas (1 schema +
+  2 data). Sem mudança de contrato exceto adição de campo (todas opcionais
+  no payload, default no banco). Importador agora classifica natureza
+  automaticamente na ingestão (mas mantém compatibilidade — sem natureza
+  vira "outros").
+- **Frontend:** Bundle inicial 500 KB / 155 KB gzip (+1 KB pelo Dashboard
+  reescrito + kpis hook). Build verde, typecheck verde, 10/10 testes verde.
+- **Sem regressão.** Todas as telas continuam funcionando; filtros novos
+  são opcionais.
+
+#### Próximos passos
+
+- **Onda 1.4-bis (Importador estendido):** importar `DEPDESPESA` do SIP e
+  cruzar com `LOCAL_TRABALHO` para inferir natureza pelo empenho quando
+  divergir do nome da lotação. Resolve os 369 servidores no "balde sem
+  nome" automaticamente para a maioria — caso edge do Dr. Renzo.
+- **Bloco 2 (engine de cálculo):** vai consumir natureza para
+  determinar unidade orçamentária do empenho de cada lançamento.
+
+---
+
 ### Bloco 1.5 — Onda 1.5: Documentos, Configurações, Pesquisa global, Notificações honestas · 2026-05-05
 
 > Fecha as lacunas reais do Bloco 1: aba Documentos no detalhe do servidor,

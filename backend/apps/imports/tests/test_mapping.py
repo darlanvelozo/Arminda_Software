@@ -149,11 +149,28 @@ class TestMapLotacao:
         assert defaults["nome"] == "Secretaria Municipal de Educacao"
         assert defaults["sigla"] == "SMDE"
         assert defaults["lotacao_pai"] is None
+        # Padrão "educacao" no nome classifica como Educação
+        assert defaults["natureza"] == "educacao"
 
     def test_uma_palavra_usa_primeiros_6_chars(self):
         row = {"empresa": "001", "codigo": "5", "nome": "Saúde"}
         _, defaults = map_lotacao(row)
         assert defaults["sigla"] == "SAÚDE"
+        assert defaults["natureza"] == "saude"
+
+    def test_classifica_psf_como_saude(self):
+        _, defaults = map_lotacao({"empresa": "001", "codigo": "30", "nome": "PSF SEDE"})
+        assert defaults["natureza"] == "saude"
+
+    def test_classifica_cras_como_assistencia(self):
+        _, defaults = map_lotacao({"empresa": "001", "codigo": "40", "nome": "CRAS Centro"})
+        assert defaults["natureza"] == "assistencia_social"
+
+    def test_nome_sem_match_vira_outros(self):
+        _, defaults = map_lotacao(
+            {"empresa": "001", "codigo": "70", "nome": "Sec de Cultura"}
+        )
+        assert defaults["natureza"] == "outros"
 
 
 # ============================================================
@@ -284,6 +301,14 @@ class TestMapVinculo:
             self._row(vinculo="ZZ"), servidor_id=1, cargo_id=2, lotacao_id=3
         )
         assert defaults["regime"] == Regime.ESTATUTARIO
+
+    def test_agente_politico_codigo_01_vira_eletivo(self):
+        # Prefeito, Vice-Prefeito e Vereadores no SIP têm VINCULO=01 (AGENTE
+        # POLITICO). No Arminda esse é regime ELETIVO, não comissionado.
+        _, defaults = map_vinculo(
+            self._row(vinculo="01"), servidor_id=1, cargo_id=2, lotacao_id=3
+        )
+        assert defaults["regime"] == Regime.ELETIVO
 
 
 # ============================================================

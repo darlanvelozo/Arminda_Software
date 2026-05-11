@@ -41,6 +41,7 @@ export interface ServidoresListParams {
   cargoId?: number;
   lotacaoId?: number;
   regime?: string;
+  natureza?: string;
   ordering?: string;
   page?: number;
 }
@@ -64,6 +65,7 @@ async function fetchServidores(params: ServidoresListParams): Promise<Paginated<
       cargo: params.cargoId,
       lotacao: params.lotacaoId,
       regime: params.regime || undefined,
+      natureza: params.natureza || undefined,
       ordering: params.ordering || undefined,
       page: params.page || undefined,
     },

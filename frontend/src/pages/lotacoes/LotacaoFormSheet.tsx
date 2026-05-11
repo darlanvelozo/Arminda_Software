@@ -38,6 +38,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { extractDomainErrorMessage } from "@/lib/api";
+import { NATUREZAS } from "@/lib/constants";
 import {
   useCreateLotacao,
   useLotacoesList,
@@ -57,6 +58,13 @@ const lotacaoSchema = z.object({
     .min(2, "Nome muito curto.")
     .max(200, "Nome deve ter no máximo 200 caracteres."),
   sigla: z.string().max(20, "Sigla deve ter no máximo 20 caracteres."),
+  natureza: z.enum([
+    "administracao",
+    "saude",
+    "educacao",
+    "assistencia_social",
+    "outros",
+  ]),
   lotacao_pai: z.number().int().nullable(),
   ativo: z.boolean(),
 });
@@ -78,6 +86,7 @@ export function LotacaoFormSheet({ open, onOpenChange, lotacao }: LotacaoFormShe
       codigo: "",
       nome: "",
       sigla: "",
+      natureza: "outros",
       lotacao_pai: null,
       ativo: true,
     },
@@ -94,6 +103,12 @@ export function LotacaoFormSheet({ open, onOpenChange, lotacao }: LotacaoFormShe
         codigo: lotacao.codigo,
         nome: lotacao.nome,
         sigla: lotacao.sigla || "",
+        natureza: (lotacao.natureza ?? "outros") as
+          | "administracao"
+          | "saude"
+          | "educacao"
+          | "assistencia_social"
+          | "outros",
         lotacao_pai: lotacao.lotacao_pai ?? null,
         ativo: lotacao.ativo,
       });
@@ -102,6 +117,7 @@ export function LotacaoFormSheet({ open, onOpenChange, lotacao }: LotacaoFormShe
         codigo: "",
         nome: "",
         sigla: "",
+        natureza: "outros",
         lotacao_pai: null,
         ativo: true,
       });
@@ -217,6 +233,40 @@ export function LotacaoFormSheet({ open, onOpenChange, lotacao }: LotacaoFormShe
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="natureza"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Natureza (secretaria/área)</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isSubmitting}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {NATUREZAS.map((n) => (
+                        <SelectItem key={n.value} value={n.value}>
+                          {n.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Usada para agrupar servidores por área e nos filtros de
+                    pesquisa. Selecione "Outros" para lotações fora das 4 áreas
+                    macro (cultura, esporte, obras, etc.).
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}

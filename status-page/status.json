@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-05",
+  "ultima_atualizacao": "2026-05-08",
   "bloco_atual": 1,
-  "progresso_geral_pct": 45,
+  "progresso_geral_pct": 47,
   "blocos": [
     {
       "numero": 0,
@@ -54,7 +54,8 @@
         "✅ Importador Fiorilli SIP (Firebird → Postgres): pipeline ETL idempotente, 91/91 cargos, 66/66 lotações, 517/517 servidores importados em smoke E2E",
         "✅ Configurações: edição de perfil, troca de senha, gestão de usuários e papéis do município",
         "✅ Pesquisa global ⌘K (servidores, cargos, lotações, rubricas) + atalhos por área",
-        "✅ Guia de uso do sistema (documentação viva acessível em /guia)"
+        "✅ Guia de uso do sistema (documentação viva acessível em /guia)",
+        "✅ Organização dos servidores por vínculo (Efetivo/Comissionado/Contratado/Eletivo) e por área da secretaria (Administração/Saúde/Educação/Assistência social) — Dashboard com 8 KPIs clicáveis + filtros combinados na lista"
       ]
     },
     {
@@ -167,6 +168,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-08",
+      "tipo": "entrega",
+      "titulo": "Organização por vínculo e por área da secretaria",
+      "descricao": "Os servidores agora podem ser organizados em duas dimensões independentes que combinam livremente: por vínculo (Efetivo, Comissionado, Contratado, Eletivo) e por área da secretaria (Administração, Saúde, Educação, Assistência social, Outros). O dashboard ganhou 8 cards-KPI clicáveis com a contagem por categoria — cada um navega para a lista de servidores filtrada. Esse trabalho responde a um caso real do município-piloto: 369 servidores estavam num 'balde genérico' no Fiorilli e era preciso recadastrar tudo para saber quem era de cada secretaria. Agora a classificação é automática (rodou em 3 passadas e cobriu 1.103 dos 1.503 vínculos em 4 áreas claras) e o admin pode reclassificar pela tela qualquer caso especial. Como bônus, criamos o regime 'Eletivo' separado (Prefeito, Vice e Vereadores não são mais comissionados). O Bloco 2 (cálculo de folha) vai usar a natureza da lotação para determinar a unidade orçamentária do empenho. 248 testes verde."
+    },
     {
       "data": "2026-05-05",
       "tipo": "marco",

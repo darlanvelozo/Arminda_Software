@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-05";
+const LAST_UPDATED = "2026-05-08";
 
 interface TocItem {
   id: string;
@@ -56,6 +56,7 @@ const TOC: TocItem[] = [
   { id: "como-comecar", label: "Como começar", icon: ListChecks },
   { id: "municipio", label: "Município ativo", icon: Building2 },
   { id: "papeis", label: "Papéis e permissões", icon: Shield },
+  { id: "organizacao", label: "Organização: vínculos e áreas", icon: Library },
   { id: "cadastros", label: "Cadastros centrais", icon: Briefcase },
   { id: "servidores", label: "Servidores", icon: Users },
   { id: "configuracoes", label: "Configurações", icon: SettingsIcon },
@@ -112,6 +113,7 @@ export default function GuiaPage() {
           <SectionComoComecar />
           <SectionMunicipio />
           <SectionPapeis />
+          <SectionOrganizacao />
           <SectionCadastros />
           <SectionServidores />
           <SectionConfiguracoes />
@@ -282,6 +284,118 @@ function SectionPapeis() {
         (<code className="text-xs bg-muted px-1 rounded">simple-history</code>) — quem
         mudou, quando mudou, e o que estava antes.
       </Callout>
+    </Section>
+  );
+}
+
+function SectionOrganizacao() {
+  return (
+    <Section
+      id="organizacao"
+      icon={Library}
+      title="Organização: vínculos e áreas (secretarias)"
+    >
+      <p>
+        Os servidores são organizados em duas dimensões independentes que
+        combinam livremente. Isso resolve o problema clássico do sistema
+        legado em que "todo mundo aparece numa única lotação".
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Por vínculo (contrato)</h3>
+      <p>
+        Cada vínculo tem um regime próprio. O mesmo servidor pode ter dois
+        vínculos com regimes diferentes (raro, mas existe em prefeituras
+        pequenas onde o concursado também ocupa cargo comissionado).
+      </p>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-0 list-none">
+        <li className="rounded-md border p-3">
+          <strong>Efetivos</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            Concursados estatutários. Regime jurídico próprio da prefeitura.
+          </p>
+        </li>
+        <li className="rounded-md border p-3">
+          <strong>Comissionados</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            Cargo de confiança, nomeação por ato do Prefeito.
+          </p>
+        </li>
+        <li className="rounded-md border p-3">
+          <strong>Contratados</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            Temporários, contratos administrativos com prazo determinado.
+          </p>
+        </li>
+        <li className="rounded-md border p-3">
+          <strong>Eletivos</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            Prefeito, Vice-Prefeito e Vereadores — exercem mandato.
+          </p>
+        </li>
+      </ul>
+
+      <h3 className="text-base font-semibold mt-4">Por área (secretaria)</h3>
+      <p>
+        Cada lotação tem uma natureza macro. Quando o sistema importa do
+        Fiorilli, classifica automaticamente baseado em padrões no nome
+        ("Escola" → Educação, "UBS/PSF" → Saúde, "CRAS" → Assistência, etc.).
+        O admin do município pode reclassificar manualmente o que ficou em
+        "Outros" pela tela de Lotações.
+      </p>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-0 list-none">
+        <li className="rounded-md border p-3">
+          <strong>Administração</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            Gabinete, Finanças, Procuradoria, Recursos Humanos, Controladoria,
+            Câmara.
+          </p>
+        </li>
+        <li className="rounded-md border p-3">
+          <strong>Saúde</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            SEMSA, UBS, Hospital, PSF/ESF, ACS, SAMU, Vigilância Sanitária.
+          </p>
+        </li>
+        <li className="rounded-md border p-3">
+          <strong>Educação</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            SEMED, escolas, creches, EMEF/EMEI, biblioteca.
+          </p>
+        </li>
+        <li className="rounded-md border p-3">
+          <strong>Assistência social</strong>
+          <p className="text-xs text-muted-foreground mt-1">
+            CRAS, CREAS, Conselho Tutelar, Bolsa Família, SCFV, Criança Feliz.
+          </p>
+        </li>
+      </ul>
+      <Callout variant="info">
+        Lotações fora das 4 áreas macro (Cultura, Esporte, Obras, Meio
+        Ambiente, Agricultura, Juventude, etc.) ficam classificadas como{" "}
+        <strong>"Outros"</strong> e aparecem em uma seção própria no
+        dashboard.
+      </Callout>
+
+      <h3 className="text-base font-semibold mt-4">No dia a dia</h3>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>
+          O <Link to="/" className="underline">Dashboard</Link> exibe contagens
+          por vínculo e por área, cada card clicável navega para a lista
+          filtrada.
+        </li>
+        <li>
+          Em <Link to="/servidores" className="underline">Servidores</Link>,
+          os filtros de vínculo e área se combinam — você consegue, por
+          exemplo, "Efetivos da Saúde" em 2 cliques.
+        </li>
+        <li>
+          A URL reflete os filtros, então o link
+          <code className="text-xs bg-muted px-1 rounded mx-1">
+            /servidores?regime=eletivo
+          </code>
+          pode ser compartilhado direto.
+        </li>
+      </ul>
     </Section>
   );
 }

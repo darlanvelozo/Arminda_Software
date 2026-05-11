@@ -34,15 +34,19 @@ class LotacaoFilter(django_filters.FilterSet):
 
     class Meta:
         model = Lotacao
-        fields = ["codigo", "nome", "lotacao_pai", "ativo"]
+        fields = ["codigo", "nome", "natureza", "lotacao_pai", "ativo"]
 
 
 class ServidorFilter(django_filters.FilterSet):
     nome = django_filters.CharFilter(lookup_expr="icontains")
     matricula = django_filters.CharFilter(lookup_expr="iexact")
-    cargo = django_filters.NumberFilter(field_name="vinculos__cargo")
-    lotacao = django_filters.NumberFilter(field_name="vinculos__lotacao")
-    regime = django_filters.CharFilter(field_name="vinculos__regime")
+    cargo = django_filters.NumberFilter(field_name="vinculos__cargo", distinct=True)
+    lotacao = django_filters.NumberFilter(field_name="vinculos__lotacao", distinct=True)
+    regime = django_filters.CharFilter(field_name="vinculos__regime", distinct=True)
+    # Filtra servidores por natureza da lotação em pelo menos um vínculo ativo
+    natureza = django_filters.CharFilter(
+        field_name="vinculos__lotacao__natureza", distinct=True
+    )
 
     class Meta:
         model = Servidor

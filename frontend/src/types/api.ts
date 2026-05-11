@@ -689,6 +689,17 @@ export interface components {
             codigo: string;
             nome: string;
             sigla?: string;
+            /**
+             * @description Classificação macro: administração, saúde, educação, assistência social ou outros.
+             *
+             *     * `administracao` - Administração
+             *     * `saude` - Saúde
+             *     * `educacao` - Educação
+             *     * `assistencia_social` - Assistência social
+             *     * `outros` - Outros
+             */
+            natureza?: components["schemas"]["NaturezaEnum"];
+            readonly natureza_display: string;
             lotacao_pai?: number | null;
             readonly lotacao_pai_nome: string;
             ativo?: boolean;
@@ -703,6 +714,17 @@ export interface components {
             readonly codigo: string;
             readonly nome: string;
             readonly sigla: string;
+            /**
+             * @description Classificação macro: administração, saúde, educação, assistência social ou outros.
+             *
+             *     * `administracao` - Administração
+             *     * `saude` - Saúde
+             *     * `educacao` - Educação
+             *     * `assistencia_social` - Assistência social
+             *     * `outros` - Outros
+             */
+            readonly natureza: components["schemas"]["NaturezaEnum"];
+            readonly natureza_display: string;
             readonly ativo: boolean;
         };
         /** @description Versao para create/update. */
@@ -711,9 +733,28 @@ export interface components {
             codigo: string;
             nome: string;
             sigla?: string;
+            /**
+             * @description Classificação macro: administração, saúde, educação, assistência social ou outros.
+             *
+             *     * `administracao` - Administração
+             *     * `saude` - Saúde
+             *     * `educacao` - Educação
+             *     * `assistencia_social` - Assistência social
+             *     * `outros` - Outros
+             */
+            natureza?: components["schemas"]["NaturezaEnum"];
             lotacao_pai?: number | null;
             ativo?: boolean;
         };
+        /**
+         * @description * `administracao` - Administração
+         *     * `saude` - Saúde
+         *     * `educacao` - Educação
+         *     * `assistencia_social` - Assistência social
+         *     * `outros` - Outros
+         * @enum {string}
+         */
+        NaturezaEnum: "administracao" | "saude" | "educacao" | "assistencia_social" | "outros";
         /**
          * @description * `fundamental` - Fundamental
          *     * `medio` - Medio
@@ -896,6 +937,16 @@ export interface components {
             codigo?: string;
             nome?: string;
             sigla?: string;
+            /**
+             * @description Classificação macro: administração, saúde, educação, assistência social ou outros.
+             *
+             *     * `administracao` - Administração
+             *     * `saude` - Saúde
+             *     * `educacao` - Educação
+             *     * `assistencia_social` - Assistência social
+             *     * `outros` - Outros
+             */
+            natureza?: components["schemas"]["NaturezaEnum"];
             lotacao_pai?: number | null;
             ativo?: boolean;
         };
@@ -959,14 +1010,15 @@ export interface components {
             ativo?: boolean;
         };
         /**
-         * @description * `estatutario` - Estatutario
+         * @description * `estatutario` - Efetivo (concursado)
          *     * `celetista` - Celetista
          *     * `comissionado` - Comissionado
-         *     * `temporario` - Temporario
+         *     * `temporario` - Contratado temporario
+         *     * `eletivo` - Eletivo
          *     * `estagiario` - Estagiario
          * @enum {string}
          */
-        RegimeEnum: "estatutario" | "celetista" | "comissionado" | "temporario" | "estagiario";
+        RegimeEnum: "estatutario" | "celetista" | "comissionado" | "temporario" | "eletivo" | "estagiario";
         RubricaDetail: {
             readonly id: number;
             codigo: string;
@@ -2145,6 +2197,16 @@ export interface operations {
                 ativo?: boolean;
                 codigo?: string;
                 lotacao_pai?: number;
+                /**
+                 * @description Classificação macro: administração, saúde, educação, assistência social ou outros.
+                 *
+                 *     * `administracao` - Administração
+                 *     * `saude` - Saúde
+                 *     * `educacao` - Educação
+                 *     * `assistencia_social` - Assistência social
+                 *     * `outros` - Outros
+                 */
+                natureza?: "administracao" | "assistencia_social" | "educacao" | "outros" | "saude";
                 nome?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -2301,6 +2363,7 @@ export interface operations {
                 cargo?: number;
                 lotacao?: number;
                 matricula?: string;
+                natureza?: string;
                 nome?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -2543,13 +2606,14 @@ export interface operations {
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /**
-                 * @description * `estatutario` - Estatutario
+                 * @description * `estatutario` - Efetivo (concursado)
                  *     * `celetista` - Celetista
                  *     * `comissionado` - Comissionado
-                 *     * `temporario` - Temporario
+                 *     * `temporario` - Contratado temporario
+                 *     * `eletivo` - Eletivo
                  *     * `estagiario` - Estagiario
                  */
-                regime?: "celetista" | "comissionado" | "estagiario" | "estatutario" | "temporario";
+                regime?: "celetista" | "comissionado" | "eletivo" | "estagiario" | "estatutario" | "temporario";
                 /** @description A search term. */
                 search?: string;
                 servidor?: number;
