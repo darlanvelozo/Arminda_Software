@@ -30,6 +30,7 @@ from apps.imports.adapters.firebird import (
     fetch_locais_trabalho,
     fetch_pessoas,
     fetch_trabalhadores,
+    fetch_unidades_orcamentarias,
     open_connection,
 )
 from apps.imports.services.loaders import LoaderStats
@@ -37,14 +38,24 @@ from apps.imports.services.loaders.cargos import load_cargos
 from apps.imports.services.loaders.dependentes import load_dependentes
 from apps.imports.services.loaders.lotacoes import load_lotacoes
 from apps.imports.services.loaders.servidores import load_servidores
+from apps.imports.services.loaders.unidades_orcamentarias import (
+    load_unidades_orcamentarias,
+)
 from apps.imports.services.loaders.vinculos import load_vinculos
 
 # Ordem de importação respeita dependências de FK:
-#   cargos e lotacoes não dependem de nada
-#   servidores não depende
-#   vinculos depende de cargos + lotacoes + servidores
+#   cargos, lotacoes, unidades não dependem de nada entre si
+#   servidores não depende de nada
+#   vinculos depende de cargos + lotacoes + (unidades, opcional) + servidores
 #   dependentes depende de servidores
-TABELAS_VALIDAS = ("cargos", "lotacoes", "servidores", "vinculos", "dependentes")
+TABELAS_VALIDAS = (
+    "cargos",
+    "lotacoes",
+    "unidades",
+    "servidores",
+    "vinculos",
+    "dependentes",
+)
 
 
 class Command(BaseCommand):
@@ -71,6 +82,16 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--limit", type=int, default=None, help="processa apenas as N primeiras linhas (debug)"
+        )
+        parser.add_argument(
+            "--ano-unidade",
+            type=int,
+            default=None,
+            help=(
+                "ano-base para importar UnidadeOrcamentaria (UNIDADE.ANO). "
+                "Default: ano corrente. Se vínculos forem importados, o ano informado "
+                "aqui também é usado para resolver a FK unidade_orcamentaria do vínculo."
+            ),
         )
         parser.add_argument(
             "--dry-run",
@@ -127,6 +148,10 @@ class Command(BaseCommand):
         class _DryRunRollback(Exception):
             """Exceção interna para forçar rollback do `transaction.atomic` em dry-run."""
 
+        import datetime
+
+        ano_unidade = opts.get("ano_unidade") or datetime.date.today().year
+
         with open_connection(config) as conn:
             with schema_context(tenant_schema):
                 if opts["dry_run"]:
@@ -135,16 +160,30 @@ class Command(BaseCommand):
                     # fora de bloco atômico, em autocommit).
                     try:
                         with transaction.atomic():
-                            all_stats = self._executar(conn, tabelas, limit=opts["limit"])
+                            all_stats = self._executar(
+                                conn,
+                                tabelas,
+                                limit=opts["limit"],
+                                ano_unidade=ano_unidade,
+                            )
                             raise _DryRunRollback()
                     except _DryRunRollback:
                         pass
                 else:
-                    all_stats = self._executar(conn, tabelas, limit=opts["limit"])
+                    all_stats = self._executar(
+                        conn, tabelas, limit=opts["limit"], ano_unidade=ano_unidade
+                    )
 
         self._imprime_relatorio(all_stats, dry_run=opts["dry_run"])
 
-    def _executar(self, conn, tabelas: list[str], *, limit: int | None) -> list[LoaderStats]:
+    def _executar(
+        self,
+        conn,
+        tabelas: list[str],
+        *,
+        limit: int | None,
+        ano_unidade: int,
+    ) -> list[LoaderStats]:
         stats: list[LoaderStats] = []
 
         for tabela in tabelas:
@@ -155,12 +194,16 @@ class Command(BaseCommand):
             elif tabela == "lotacoes":
                 rows = fetch_locais_trabalho(conn, limit=limit)
                 stats.append(load_lotacoes(rows))
+            elif tabela == "unidades":
+                rows = fetch_unidades_orcamentarias(conn, ano=ano_unidade, limit=limit)
+                self.stdout.write(f"   (ano-base: {ano_unidade})")
+                stats.append(load_unidades_orcamentarias(rows))
             elif tabela == "servidores":
                 rows = fetch_pessoas(conn, limit=limit)
                 stats.append(load_servidores(rows))
             elif tabela == "vinculos":
                 rows = fetch_trabalhadores(conn, limit=limit)
-                stats.append(load_vinculos(rows))
+                stats.append(load_vinculos(rows, ano_unidade=ano_unidade))
             elif tabela == "dependentes":
                 rows = fetch_dependentes(conn, limit=limit)
                 stats.append(load_dependentes(rows))

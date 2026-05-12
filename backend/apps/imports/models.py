@@ -12,6 +12,7 @@ from django.db import models
 class TipoEntidadeSip(models.TextChoices):
     CARGO = "cargo", "Cargo"
     LOTACAO = "lotacao", "Lotação"
+    UNIDADE_ORCAMENTARIA = "unidade_orcamentaria", "Unidade orçamentária"
     SERVIDOR = "servidor", "Servidor"
     VINCULO = "vinculo", "Vínculo Funcional"
     DEPENDENTE = "dependente", "Dependente"

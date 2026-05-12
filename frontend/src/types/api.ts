@@ -1196,6 +1196,11 @@ export interface components {
             readonly lotacao_nome: string;
             regime: components["schemas"]["RegimeEnum"];
             readonly regime_display: string;
+            /** @description De qual orçamento sai o empenho deste vínculo (Onda 1.4-bis). */
+            unidade_orcamentaria?: number | null;
+            readonly unidade_orcamentaria_codigo: string;
+            readonly unidade_orcamentaria_nome: string;
+            readonly unidade_orcamentaria_natureza: string;
             /** Format: date */
             data_admissao: string;
             /** Format: date */
@@ -1282,6 +1287,11 @@ export interface components {
             readonly lotacao_nome: string;
             regime: components["schemas"]["RegimeEnum"];
             readonly regime_display: string;
+            /** @description De qual orçamento sai o empenho deste vínculo (Onda 1.4-bis). */
+            unidade_orcamentaria?: number | null;
+            readonly unidade_orcamentaria_codigo: string;
+            readonly unidade_orcamentaria_nome: string;
+            readonly unidade_orcamentaria_natureza: string;
             /** Format: date */
             data_admissao: string;
             /** Format: date */
@@ -2364,6 +2374,7 @@ export interface operations {
                 lotacao?: number;
                 matricula?: string;
                 natureza?: string;
+                natureza_unidade?: string;
                 nome?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;

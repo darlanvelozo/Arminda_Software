@@ -114,6 +114,56 @@ class Cargo(TimeStampedModel):
 # ============================================================
 
 
+class UnidadeOrcamentaria(TimeStampedModel):
+    """
+    Unidade orçamentária — de onde sai o empenho do vínculo (Onda 1.4-bis).
+
+    Modela o conceito do Fiorilli SIP `DEPDESPESA × ANO`: cada município
+    tem ~65 unidades por exercício fiscal, e cada vínculo aponta para uma
+    delas. É a fonte de verdade da divisão por secretaria/área, mesmo
+    quando a lotação física diverge (servidor fisicamente no Centro
+    Administrativo, mas pago pela SEMSA).
+    """
+
+    codigo = models.CharField(
+        max_length=10,
+        help_text="Código no SIP (DEPDESPESA), ex.: '201013'.",
+    )
+    codigo_interno_sip = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text=(
+            "PK interno (UNIDADE.CODIGO) do Fiorilli SIP. É por ele que "
+            "TRABALHADOR.DEPDESPESA aponta — o nome do campo no SIP é enganoso."
+        ),
+    )
+    ano = models.PositiveIntegerField(help_text="Exercício fiscal.")
+    nome = models.CharField(max_length=200)
+    sigla = models.CharField(max_length=20, blank=True)
+    natureza = models.CharField(
+        max_length=30,
+        choices=NaturezaLotacao.choices,
+        default=NaturezaLotacao.OUTROS,
+    )
+    ativo = models.BooleanField(default=True)
+
+    history = HistoricalRecords(excluded_fields=["atualizado_em"])
+
+    class Meta:
+        ordering = ["-ano", "codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["codigo", "ano"], name="unidade_unica_por_codigo_e_ano"
+            ),
+        ]
+        verbose_name = "unidade orçamentária"
+        verbose_name_plural = "unidades orçamentárias"
+
+    def __str__(self) -> str:
+        return f"{self.codigo}/{self.ano} — {self.nome}"
+
+
 class Lotacao(TimeStampedModel):
     """Lotacao/Secretaria (ex: Secretaria de Educacao, Saude)."""
 
@@ -206,6 +256,14 @@ class VinculoFuncional(TimeStampedModel):
     servidor = models.ForeignKey(Servidor, on_delete=models.CASCADE, related_name="vinculos")
     cargo = models.ForeignKey(Cargo, on_delete=models.PROTECT, related_name="vinculos")
     lotacao = models.ForeignKey(Lotacao, on_delete=models.PROTECT, related_name="vinculos")
+    unidade_orcamentaria = models.ForeignKey(
+        UnidadeOrcamentaria,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="vinculos",
+        help_text="De qual orçamento sai o empenho deste vínculo (Onda 1.4-bis).",
+    )
     regime = models.CharField(max_length=30, choices=Regime.choices)
     data_admissao = models.DateField()
     data_demissao = models.DateField(null=True, blank=True)

@@ -35,6 +35,122 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 1.4-bis: Unidade orçamentária (DEPDESPESA do SIP) · 2026-05-10
+
+> Extensão do importador para puxar a tabela `UNIDADE` do Fiorilli SIP
+> (~65 unidades orçamentárias por exercício fiscal) e associar cada
+> vínculo à sua unidade de despesa. Antes da onda, o sistema só sabia
+> da "lotação física" (onde o servidor trabalha); agora sabe também
+> da "unidade orçamentária" (de onde sai o empenho do salário) — que é
+> a fonte de verdade quando os dois divergem, conforme caso real do
+> município-piloto.
+
+#### Adicionado — Backend
+
+- **feat(people/models):** Novo modelo `UnidadeOrcamentaria` em
+  `apps.people` com `codigo` (DEPDESPESA do SIP, ex.: '201013'),
+  `codigo_interno_sip` (PK numérico interno do Fiorilli — é por ele
+  que `TRABALHADOR.DEPDESPESA` aponta; o nome do campo no SIP é
+  enganoso), `ano`, `nome`, `sigla`, `natureza` e `ativo`. Chave
+  única por `(codigo, ano)`. Auditoria via `simple-history`.
+- **feat(people/models):** Novo campo `unidade_orcamentaria` (FK
+  nullable) em `VinculoFuncional` — quando preenchido, vence sobre
+  a natureza inferida pela lotação física para classificação por
+  secretaria.
+- **migrations 0007 + 0008:** Schema da nova tabela + campo
+  `codigo_interno_sip` (descoberta tardia durante o smoke E2E).
+- **feat(imports/adapter):** Novo `fetch_unidades_orcamentarias`
+  lê de `UNIDADE` filtrando por ano. `fetch_trabalhadores` agora
+  inclui `DEPDESPESA` no SELECT (estava ausente).
+- **feat(imports/mapping):** Novo `map_unidade_orcamentaria` que
+  classifica a natureza por prioridade (1º nome → fallback no prefixo
+  numérico do código `DEPDESPESA`: 1=adm, 2=saúde, 3=educação,
+  4=assistência, 5=adm, 6=outros, 7=adm — convenção empírica
+  observada no município-piloto). O `map_vinculo` aceita o parâmetro
+  opcional `unidade_orcamentaria_id`.
+- **feat(imports/loaders):** Novo
+  `load_unidades_orcamentarias`. O `load_vinculos` agora aceita
+  `ano_unidade` e resolve a FK do vínculo via mapa
+  `codigo_interno_sip → arminda_id` (consultando direto o ORM em vez
+  do `SipImportRecord`, mais simples para esse JOIN específico).
+- **feat(imports/command):** `import_fiorilli_sip` aceita a tabela
+  `unidades` e a flag `--ano-unidade <ano>` (default: ano corrente).
+- **feat(people/serializers):** `VinculoDetailSerializer` e
+  `_VinculoEmbutidoSerializer` agora expõem
+  `unidade_orcamentaria` (FK), `unidade_orcamentaria_codigo`,
+  `unidade_orcamentaria_nome` e `unidade_orcamentaria_natureza`.
+- **feat(people/filters):** Novo filtro `natureza_unidade` em
+  `ServidorFilter` via `vinculos__unidade_orcamentaria__natureza`.
+  Convive com o `natureza` existente (via lotação) — quem quiser
+  agrupar pelo empenho usa `?natureza_unidade=saude`.
+- **test:** 8 testes novos para `map_unidade_orcamentaria` (256
+  testes verde no total; era 248).
+
+#### Smoke E2E real
+
+Re-rodamos contra `SIP.FDB` do município de São Raimundo do Doca
+Bezerra (MA) com `--ano-unidade 2026`:
+
+| Métrica | Resultado |
+|---|---|
+| Unidades orçamentárias importadas | **65 / 65 (100%)** |
+| Distribuição: adm/educ/saúde/assist/outros | 21 / 19 / 13 / 7 / 5 |
+| Vínculos ativos cruzados com unidade | **472 / 1.503 (31%)** |
+| Vínculos sem unidade no SIP (DEPDESPESA=0) | 1.031 (69%) |
+| Ex-"outros" pela lotação física, agora identificados | 29 vínculos (15 outros, 14 adm) |
+
+A cobertura de 31% reflete a realidade do município: muitos
+servidores históricos têm `DEPDESPESA=0` no SIP, sem informação
+de empenho. Para os 472 que têm o dado, o cruzamento foi 100%
+correto. O admin pode classificar manualmente o resto via tela
+de Lotação (a natureza da lotação física vira a referência
+quando a unidade não existe).
+
+#### Adicionado — Frontend
+
+- **feat(servidores/detalhe):** Card do vínculo agora exibe a
+  unidade orçamentária associada (quando existe), com código
+  monoespaçado, nome e badge colorida da natureza inferida. O
+  ícone `Wallet` reforça que é informação de empenho.
+- **docs(GuiaPage):** Nova subseção "Unidade orçamentária (origem
+  do empenho)" dentro de "Organização". Novo `FlowItem` na seção
+  Servidores. `LAST_UPDATED` para 2026-05-10.
+
+#### Por quê
+
+- **Fecha a demanda do Dr. Renzo.** A conversa original foi sobre
+  "todo mundo numa única lotação no Fiorilli, era preciso recadastrar
+  para saber quem é de cada secretaria". A unidade orçamentária é
+  exatamente o dado que resolve isso onde existe.
+- **Pré-requisito do Bloco 2.** O cálculo de folha precisa saber
+  para qual orçamento empenhar cada lançamento financeiro. Com a
+  FK no Vínculo, o engine de cálculo já encontra o dado pronto
+  quando entrar em ação.
+- **JOIN correto descoberto cedo.** A descoberta de que o nome do
+  campo `DEPDESPESA` no Fiorilli é enganoso (referência é via
+  `UNIDADE.CODIGO`, não pelo VARCHAR de mesmo nome) só pôde
+  acontecer no smoke E2E. Ficar essa armadilha para o Bloco 2
+  seria muito mais caro.
+
+#### Impacto
+
+- **Backend:** 256 testes verde (248 → 256, +8), 2 migrations novas,
+  1 modelo novo, FK opcional no Vínculo. Sem mudança de contrato
+  destrutivo (todos campos opcionais).
+- **Frontend:** Bundle inicial inalterado (500 KB / 155 KB gzip).
+  Build verde, typecheck verde, 10/10 testes verde.
+- **Importador:** agora rodar com `--tabelas
+  cargos,lotacoes,unidades,servidores,vinculos,dependentes` traz
+  o panorama completo do município, incluindo o dado de empenho.
+
+#### Próximos passos
+
+- **Bloco 2.1 — DSL de fórmulas das rubricas.** É o item mais
+  incerto do Bloco 2; começar por ele destrava o resto.
+- **Tabelas legais 2026** (INSS, IRRF, deduções) entram junto.
+
+---
+
 ### Onda 1.5b: Organização por vínculo e por área (secretaria) · 2026-05-08
 
 > Resposta direta ao caso real do município de São Raimundo do Doca Bezerra:

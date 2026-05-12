@@ -192,6 +192,79 @@ def _classifica_natureza(nome: str) -> str:
     return NaturezaLotacao.OUTROS
 
 
+# Onda 1.4-bis: o código DEPDESPESA do Fiorilli usa primeiro dígito para
+# indicar a função-governo (1=adm, 2=saúde, 3=educação, 4=assistência social,
+# 5=administração II, 6=obras, 7=finanças). É uma convenção empírica do
+# município-piloto — em outros municípios o esquema pode variar; nesse caso,
+# o nome da unidade fala mais alto.
+_PREFIXO_DEPDESPESA_NATUREZA = {
+    "1": NaturezaLotacao.ADMINISTRACAO,
+    "2": NaturezaLotacao.SAUDE,
+    "3": NaturezaLotacao.EDUCACAO,
+    "4": NaturezaLotacao.ASSISTENCIA,
+    "5": NaturezaLotacao.ADMINISTRACAO,
+    "6": NaturezaLotacao.OUTROS,  # obras — fica em "Outros" (não é 1 das 4 macro)
+    "7": NaturezaLotacao.ADMINISTRACAO,  # finanças
+}
+
+
+def _classifica_natureza_unidade(codigo: str, nome: str) -> str:
+    """
+    Classifica a natureza de uma unidade orçamentária.
+
+    Prefere o nome (mais específico) ao prefixo numérico (heurística).
+    Só recorre ao prefixo quando o nome não casa com nenhum padrão claro.
+    """
+    por_nome = _classifica_natureza(nome)
+    if por_nome != NaturezaLotacao.OUTROS:
+        return por_nome
+    if codigo and codigo[0] in _PREFIXO_DEPDESPESA_NATUREZA:
+        return _PREFIXO_DEPDESPESA_NATUREZA[codigo[0]]
+    return NaturezaLotacao.OUTROS
+
+
+def map_unidade_orcamentaria(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    """
+    Mapeia uma linha de UNIDADE (SIP) → kwargs de `apps.people.UnidadeOrcamentaria`.
+
+    Chave SIP estável: `{ANO}-{EMPRESA}-{DEPDESPESA}`.
+    A natureza é inferida do nome (preferido) ou do prefixo numérico
+    (fallback) via `_classifica_natureza_unidade`.
+    """
+    empresa = _safe_str(row.get("empresa"))
+    codigo = _safe_str(row.get("depdespesa"))
+    ano_raw = row.get("ano")
+    try:
+        ano = int(_safe_str(ano_raw))
+    except (TypeError, ValueError):
+        raise ValueError(f"UNIDADE com ANO inválido: {ano_raw!r}")
+    nome = _safe_str(row.get("nome"), max_len=200)
+    sigla = _safe_str(row.get("sigla"), max_len=20)
+
+    chave_sip = f"{ano}-{empresa}-{codigo}"
+
+    # CODIGO interno do Fiorilli (PK auto-increment da tabela UNIDADE) — é
+    # POR ELE que TRABALHADOR.DEPDESPESA aponta. Sem isso, não tem como
+    # cruzar vínculo → unidade orçamentária.
+    codigo_interno_raw = row.get("codigo_interno")
+    codigo_interno = None
+    if codigo_interno_raw is not None:
+        try:
+            codigo_interno = int(codigo_interno_raw)
+        except (TypeError, ValueError):
+            codigo_interno = None
+
+    return chave_sip, {
+        "codigo": codigo,
+        "codigo_interno_sip": codigo_interno,
+        "ano": ano,
+        "nome": nome,
+        "sigla": sigla,
+        "natureza": _classifica_natureza_unidade(codigo, nome),
+        "ativo": True,
+    }
+
+
 def map_lotacao(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     """
     Mapeia uma linha de LOCAL_TRABALHO (SIP) → kwargs de `apps.people.Lotacao`.
@@ -319,6 +392,7 @@ def map_vinculo(
     servidor_id: int,
     cargo_id: int,
     lotacao_id: int,
+    unidade_orcamentaria_id: int | None = None,
 ) -> tuple[str, dict[str, Any]]:
     """
     Mapeia TRABALHADOR (SIP) → kwargs de `apps.people.VinculoFuncional`.
@@ -349,6 +423,7 @@ def map_vinculo(
         "servidor_id": servidor_id,
         "cargo_id": cargo_id,
         "lotacao_id": lotacao_id,
+        "unidade_orcamentaria_id": unidade_orcamentaria_id,
         "regime": regime,
         "data_admissao": _safe_date(row.get("dtadmissao")) or date(2020, 1, 1),
         "data_demissao": _safe_date(row.get("dtdemissao")),

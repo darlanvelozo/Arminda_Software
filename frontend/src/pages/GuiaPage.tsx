@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-08";
+const LAST_UPDATED = "2026-05-10";
 
 interface TocItem {
   id: string;
@@ -376,6 +376,23 @@ function SectionOrganizacao() {
         dashboard.
       </Callout>
 
+      <h3 className="text-base font-semibold mt-4">Unidade orçamentária (origem do empenho)</h3>
+      <p>
+        Além da lotação física (onde o servidor trabalha) e do vínculo (tipo
+        de contrato), o sistema também guarda a <strong>unidade
+        orçamentária</strong> — de qual orçamento sai o empenho do salário.
+        É essa a fonte de verdade da divisão por secretaria quando o
+        Fiorilli SIP do município preenche o dado de despesa.
+      </p>
+      <p>
+        Importamos 65 unidades orçamentárias do município-piloto, cada uma
+        já classificada por área (saúde/educação/administração/assistência).
+        No detalhe do servidor, cada vínculo mostra a unidade associada
+        quando existe. Filtro por unidade está disponível no backend
+        (<code className="text-xs bg-muted px-1 rounded">?natureza_unidade=saude</code>)
+        e é a forma definitiva de responder "quem é da Saúde de verdade".
+      </p>
+
       <h3 className="text-base font-semibold mt-4">No dia a dia</h3>
       <ul className="list-disc pl-5 space-y-1">
         <li>
@@ -481,6 +498,11 @@ function SectionServidores() {
           status="ok"
           title="Consultar histórico"
           desc="Aba 'Histórico'. Timeline com todas as mudanças do registro (criação, alterações, desligamento), com data, autor e snapshot dos campos."
+        />
+        <FlowItem
+          status="ok"
+          title="Ver unidade orçamentária do vínculo"
+          desc="Cada vínculo no detalhe do servidor mostra a unidade orçamentária associada (de qual orçamento sai o empenho). É a fonte de verdade da divisão por secretaria — quando preenchida no SIP, o sistema importa e exibe automaticamente."
         />
         <FlowItem
           status="ok"

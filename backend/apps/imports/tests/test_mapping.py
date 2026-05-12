@@ -16,6 +16,7 @@ from apps.imports.services.mapping import (
     map_dependente,
     map_lotacao,
     map_servidor,
+    map_unidade_orcamentaria,
     map_vinculo,
     payload_hash,
 )
@@ -310,6 +311,24 @@ class TestMapVinculo:
         )
         assert defaults["regime"] == Regime.ELETIVO
 
+    def test_aceita_unidade_orcamentaria_id_opcional(self):
+        # Onda 1.4-bis: vínculo pode opcionalmente apontar para uma
+        # unidade orçamentária (FK nullable).
+        _, defaults = map_vinculo(
+            self._row(),
+            servidor_id=1,
+            cargo_id=2,
+            lotacao_id=3,
+            unidade_orcamentaria_id=42,
+        )
+        assert defaults["unidade_orcamentaria_id"] == 42
+
+    def test_unidade_orcamentaria_omitida_vira_none(self):
+        _, defaults = map_vinculo(
+            self._row(), servidor_id=1, cargo_id=2, lotacao_id=3
+        )
+        assert defaults["unidade_orcamentaria_id"] is None
+
 
 # ============================================================
 # map_dependente
@@ -352,6 +371,64 @@ class TestMapDependente:
     def test_parentesco_desconhecido_vira_outro(self):
         _, defaults = map_dependente(self._row(parentesco="99"), servidor_id=42)
         assert defaults["parentesco"] == Parentesco.OUTRO
+
+
+# ============================================================
+# map_unidade_orcamentaria (Onda 1.4-bis)
+# ============================================================
+
+
+class TestMapUnidadeOrcamentaria:
+    def _row(self, **overrides):
+        base = {
+            "empresa": "001",
+            "depdespesa": "201013",
+            "ano": "2026",
+            "nome": "SEC. DE SAUDE",
+            "sigla": "SAU",
+        }
+        base.update(overrides)
+        return base
+
+    def test_basico_inferindo_natureza_por_nome(self):
+        chave, defaults = map_unidade_orcamentaria(self._row())
+        assert chave == "2026-001-201013"
+        assert defaults["codigo"] == "201013"
+        assert defaults["ano"] == 2026
+        assert defaults["nome"] == "SEC. DE SAUDE"
+        assert defaults["natureza"] == "saude"
+
+    def test_prefixo_3_classifica_educacao_quando_nome_nao_decide(self):
+        # Nome genérico sem padrão claro; só o prefixo 3 = educação
+        _, defaults = map_unidade_orcamentaria(
+            self._row(depdespesa="302011", nome="FUNDEB MDE")
+        )
+        assert defaults["natureza"] == "educacao"
+
+    def test_prefixo_4_classifica_assistencia_social(self):
+        _, defaults = map_unidade_orcamentaria(
+            self._row(depdespesa="402004", nome="FUNDO ASS. SOC. - CRAS")
+        )
+        assert defaults["natureza"] == "assistencia_social"
+
+    def test_nome_tem_prioridade_sobre_prefixo(self):
+        # Prefixo 1 (administração) mas nome diz "SAUDE" — vence o nome
+        _, defaults = map_unidade_orcamentaria(
+            self._row(depdespesa="100100", nome="ESPECIAL DA SAUDE")
+        )
+        assert defaults["natureza"] == "saude"
+
+    def test_outros_quando_nada_decide(self):
+        _, defaults = map_unidade_orcamentaria(
+            self._row(depdespesa="999999", nome="ALGUMA COISA")
+        )
+        assert defaults["natureza"] == "outros"
+
+    def test_ano_invalido_levanta(self):
+        import pytest as _pytest
+
+        with _pytest.raises(ValueError, match="ANO inválido"):
+            map_unidade_orcamentaria(self._row(ano="abc"))
 
 
 # ============================================================

@@ -47,6 +47,10 @@ class ServidorFilter(django_filters.FilterSet):
     natureza = django_filters.CharFilter(
         field_name="vinculos__lotacao__natureza", distinct=True
     )
+    # Onda 1.4-bis: filtra por natureza da unidade orçamentária (do empenho)
+    natureza_unidade = django_filters.CharFilter(
+        field_name="vinculos__unidade_orcamentaria__natureza", distinct=True
+    )
 
     class Meta:
         model = Servidor

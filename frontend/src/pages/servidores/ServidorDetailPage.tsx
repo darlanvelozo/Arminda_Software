@@ -27,6 +27,7 @@ import {
   Trash2,
   Upload,
   Users,
+  Wallet,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -54,6 +55,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { extractDomainErrorMessage } from "@/lib/api";
+import { NATUREZA_VARIANTS, naturezaLabel } from "@/lib/constants";
 import { useDeleteDependente } from "@/lib/queries/dependentes";
 import {
   useDeleteDocumento,
@@ -399,6 +401,26 @@ function VinculosTab({
                 <Building2 className="h-3.5 w-3.5" />
                 {v.lotacao_nome}
               </div>
+              {v.unidade_orcamentaria_nome && (
+                <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5 flex-wrap">
+                  <Wallet className="h-3 w-3" />
+                  Empenho:
+                  <span className="font-mono">
+                    {v.unidade_orcamentaria_codigo}
+                  </span>
+                  <span>{v.unidade_orcamentaria_nome}</span>
+                  {v.unidade_orcamentaria_natureza && (
+                    <Badge
+                      variant={
+                        NATUREZA_VARIANTS[v.unidade_orcamentaria_natureza] ??
+                        "outline"
+                      }
+                    >
+                      {naturezaLabel(v.unidade_orcamentaria_natureza)}
+                    </Badge>
+                  )}
+                </div>
+              )}
               <div className="text-xs text-muted-foreground">
                 Admissão: {formatDate(v.data_admissao)}
                 {v.data_demissao && ` · Demissão: ${formatDate(v.data_demissao)}`}

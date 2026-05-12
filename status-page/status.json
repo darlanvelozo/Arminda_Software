@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-08",
+  "ultima_atualizacao": "2026-05-10",
   "bloco_atual": 1,
-  "progresso_geral_pct": 47,
+  "progresso_geral_pct": 48,
   "blocos": [
     {
       "numero": 0,
@@ -168,6 +168,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-10",
+      "tipo": "entrega",
+      "titulo": "Importador estendido: unidade orçamentária do empenho (Onda 1.4-bis)",
+      "descricao": "O importador agora puxa também a tabela UNIDADE do Fiorilli SIP — 65 unidades orçamentárias por exercício fiscal do município, com nomes que já trazem a área (Sec. de Saúde, Fundo de Saúde, FUNDEB Educação, CRAS, etc.) e o regime (CONCURSADOS, COMISSIONADOS, CONTRATADOS). Cada vínculo agora tem uma FK opcional para a unidade orçamentária correspondente, vista no detalhe do servidor com badge colorida da área. Smoke contra o banco real do município trouxe as 65 unidades classificadas (21 administração, 19 educação, 13 saúde, 7 assistência, 5 outros) e cruzou 472 dos 1.503 vínculos ativos com sua unidade. Os 1.031 restantes têm DEPDESPESA=0 no Fiorilli — registros históricos sem empenho consignado, fora do controle do importador. Isso fecha o ponto que o Dr. Renzo levantou: a divisão por secretaria agora vem do orçamento quando o município preencheu o dado. Pré-requisito do Bloco 2 também atendido: o cálculo de folha vai encontrar a unidade orçamentária pronta. 256 testes verde."
+    },
     {
       "data": "2026-05-08",
       "tipo": "entrega",

@@ -216,6 +216,15 @@ class _VinculoEmbutidoSerializer(serializers.ModelSerializer):
     cargo_nome = serializers.CharField(source="cargo.nome", read_only=True)
     lotacao_nome = serializers.CharField(source="lotacao.nome", read_only=True)
     regime_display = serializers.CharField(source="get_regime_display", read_only=True)
+    unidade_orcamentaria_nome = serializers.CharField(
+        source="unidade_orcamentaria.nome", read_only=True, default=None
+    )
+    unidade_orcamentaria_codigo = serializers.CharField(
+        source="unidade_orcamentaria.codigo", read_only=True, default=None
+    )
+    unidade_orcamentaria_natureza = serializers.CharField(
+        source="unidade_orcamentaria.natureza", read_only=True, default=None
+    )
 
     class Meta:
         model = VinculoFuncional
@@ -227,6 +236,10 @@ class _VinculoEmbutidoSerializer(serializers.ModelSerializer):
             "lotacao_nome",
             "regime",
             "regime_display",
+            "unidade_orcamentaria",
+            "unidade_orcamentaria_codigo",
+            "unidade_orcamentaria_nome",
+            "unidade_orcamentaria_natureza",
             "data_admissao",
             "data_demissao",
             "carga_horaria",
@@ -386,6 +399,15 @@ class VinculoDetailSerializer(serializers.ModelSerializer):
     cargo_nome = serializers.CharField(source="cargo.nome", read_only=True)
     lotacao_nome = serializers.CharField(source="lotacao.nome", read_only=True)
     regime_display = serializers.CharField(source="get_regime_display", read_only=True)
+    unidade_orcamentaria_nome = serializers.CharField(
+        source="unidade_orcamentaria.nome", read_only=True, default=None
+    )
+    unidade_orcamentaria_codigo = serializers.CharField(
+        source="unidade_orcamentaria.codigo", read_only=True, default=None
+    )
+    unidade_orcamentaria_natureza = serializers.CharField(
+        source="unidade_orcamentaria.natureza", read_only=True, default=None
+    )
 
     class Meta:
         model = VinculoFuncional
@@ -398,6 +420,10 @@ class VinculoDetailSerializer(serializers.ModelSerializer):
             "lotacao_nome",
             "regime",
             "regime_display",
+            "unidade_orcamentaria",
+            "unidade_orcamentaria_codigo",
+            "unidade_orcamentaria_nome",
+            "unidade_orcamentaria_natureza",
             "data_admissao",
             "data_demissao",
             "carga_horaria",
@@ -413,6 +439,9 @@ class VinculoDetailSerializer(serializers.ModelSerializer):
             "cargo_nome",
             "lotacao_nome",
             "regime_display",
+            "unidade_orcamentaria_codigo",
+            "unidade_orcamentaria_nome",
+            "unidade_orcamentaria_natureza",
         ]
 
 

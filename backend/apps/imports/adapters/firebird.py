@@ -146,7 +146,7 @@ def fetch_trabalhadores(
     """
     sql = (
         "SELECT T.EMPRESA, T.REGISTRO, T.MATRICULA, T.CONTRATO, "
-        "T.CPF, T.CARGOATUAL, T.LOCAL_TRABALHO, T.VINCULO, "
+        "T.CPF, T.CARGOATUAL, T.LOCAL_TRABALHO, T.VINCULO, T.DEPDESPESA, "
         "T.SITUACAO, T.DTADMISSAO, T.DTDEMISSAO, T.TIPOADMISSAO, "
         "T.HORASEMANAL, T.PROCESSO "
         "FROM TRABALHADOR T "
@@ -178,6 +178,30 @@ def fetch_dependentes(
         "FROM DEPENDENTES D "
         "LEFT JOIN TRABALHADOR T ON T.EMPRESA = D.EMPRESA AND T.REGISTRO = D.REGISTRO"
     )
+    if limit:
+        sql = sql.replace("SELECT ", f"SELECT FIRST {int(limit)} ")
+    cur = conn.cursor()
+    cur.execute(sql)
+    return _rows_to_dicts(cur)
+
+
+def fetch_unidades_orcamentarias(
+    conn: firebirdsql.Connection, *, ano: int | None = None, limit: int | None = None
+) -> list[dict]:
+    """
+    Extrai unidades orçamentárias do SIP (tabela UNIDADE).
+
+    Cada município costuma ter ~65 unidades por exercício fiscal. Se `ano`
+    for informado, filtra apenas as desse ano (uso típico: ano corrente).
+    Chave SIP: (EMPRESA, DEPDESPESA, ANO).
+    """
+    sql = (
+        "SELECT EMPRESA, DEPDESPESA, ANO, CODIGO AS CODIGO_INTERNO, "
+        "NOMEUNIDADE AS NOME, SIGLA "
+        "FROM UNIDADE"
+    )
+    if ano:
+        sql += f" WHERE ANO = '{int(ano)}'"
     if limit:
         sql = sql.replace("SELECT ", f"SELECT FIRST {int(limit)} ")
     cur = conn.cursor()
