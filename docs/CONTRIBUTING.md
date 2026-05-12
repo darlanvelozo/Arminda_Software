@@ -135,6 +135,30 @@ cd frontend && npm test
 
 ---
 
+## Versionamento e releases
+
+A política completa está em [`docs/adr/0010-versionamento-e-releases.md`](adr/0010-versionamento-e-releases.md). Resumo operacional:
+
+**Esquema:** `MAJOR.MINOR.PATCH` adaptado ao roadmap por blocos.
+- `MAJOR=0` enquanto pré-piloto · vira `1` quando a folha calcular (fim do Bloco 2) · vira `2` quando o piloto encerrar (Bloco 6).
+- `MINOR` avança a cada bloco/onda que entrega feature visível.
+- `PATCH` avança em correções e polimentos dentro da mesma onda.
+
+**Toda onda fecha com 6 passos:**
+
+1. Commit final em `main` com CI verde.
+2. `CHANGELOG.md` com a entrada estruturada da onda.
+3. `status-page/status.json` atualizado (progresso + changelog visível ao stakeholder).
+4. `frontend/src/pages/GuiaPage.tsx` atualizado se a feature mudou o que o operador vê (lembre do `LAST_UPDATED`).
+5. **Tag anotada** com a mensagem padronizada — ver template na ADR-0010 §3.
+6. `git push origin main && git push origin <tag>`.
+
+**Relatório quinzenal:** a cada 15 dias, publicar um HTML em `status-page/relatorios/<YYYY-MM-DD>-quinzenal-NN.html` com o consolidado da quinzena, e adicionar entrada no array `relatorios` do `status.json`. Próximos: 22/05/2026, 05/06/2026, e assim por diante.
+
+**Não fazer:** tag leve (use sempre `git tag -a`), back-port em branches de manutenção (suba PATCH na corrente — ver §5 da ADR).
+
+---
+
 ## ADRs (Architecture Decision Records)
 
 Decisões técnicas relevantes vão em `docs/adr/`. Use o template existente. Resumo:

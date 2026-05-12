@@ -141,6 +141,15 @@ Após qualquer alteração relevante:
    permissão. O guia é a documentação viva acessível dentro do sistema; não pode ficar
    desatualizado em relação ao que está em produção. Lembre-se de atualizar a constante
    `LAST_UPDATED` no topo do arquivo.
+5. **Criar tag anotada** quando a entrega fechar uma onda ou bloco — ver ADR-0010
+   ([`docs/adr/0010-versionamento-e-releases.md`](docs/adr/0010-versionamento-e-releases.md))
+   para o esquema `MAJOR.MINOR.PATCH` adaptado ao roadmap. Sequência completa de release
+   está em [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) §Versionamento. Nunca usar tag
+   leve (`git tag X`); sempre `git tag -a X -m "..."` com mensagem padronizada.
+6. **A cada 15 dias publicar um relatório quinzenal** em
+   `status-page/relatorios/<YYYY-MM-DD>-quinzenal-NN.html` consolidando o período,
+   e adicionar entrada no array `relatorios` do `status-page/status.json`. Próximo:
+   2026-05-22.
 
 ---
 
