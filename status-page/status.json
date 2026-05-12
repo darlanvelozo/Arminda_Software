@@ -259,7 +259,13 @@
       "descricao": "Repositório, ambiente de desenvolvimento, backend Django, frontend e documentação fundacional foram estruturados. O projeto está pronto para entrar na construção do Bloco 1."
     }
   ],
-  "relatorios": [],
+  "relatorios": [
+    {
+      "data": "2026-05-08",
+      "titulo": "Relatório Quinzenal #1 — Primeira quinzena (27/04 a 08/05)",
+      "url": "relatorios/2026-05-08-quinzenal-01.html"
+    }
+  ],
   "contato": {
     "responsavel": "Darlan Velozo",
     "papel": "Desenvolvedor",

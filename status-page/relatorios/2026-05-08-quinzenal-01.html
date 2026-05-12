@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Relatório quinzenal de desenvolvimento do Arminda — primeira quinzena (27/04 a 08/05/2026)." />
+    <meta name="robots" content="noindex" />
+    <title>Arminda — Relatório Quinzenal #1 (27/04 – 08/05/2026)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+
+    <style>
+      .doc {
+        max-width: 820px;
+        margin: 64px auto;
+        padding: 0 24px;
+      }
+      .doc h1 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+      }
+      .doc .meta {
+        color: var(--cor-texto-fraco, #6b6b73);
+        font-size: 14px;
+        margin: 0 0 40px;
+      }
+      .doc h2 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(22px, 3vw, 30px);
+        font-weight: 600;
+        margin: 56px 0 16px;
+        letter-spacing: -0.015em;
+      }
+      .doc h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 32px 0 12px;
+      }
+      .doc p {
+        font-size: 16px;
+        line-height: 1.7;
+        margin: 12px 0;
+      }
+      .doc ul {
+        font-size: 16px;
+        line-height: 1.7;
+        padding-left: 22px;
+      }
+      .doc li {
+        margin: 6px 0;
+      }
+      .doc .resumo {
+        background: var(--cor-fundo-alt, #f7f6f3);
+        border-left: 3px solid var(--cor-marca, #2d3142);
+        padding: 20px 24px;
+        margin: 32px 0;
+        font-size: 15.5px;
+      }
+      .doc .tabela {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 32px;
+        font-size: 14.5px;
+      }
+      .doc .tabela th,
+      .doc .tabela td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--cor-borda, #e5e3dd);
+      }
+      .doc .tabela th {
+        font-weight: 600;
+        color: var(--cor-texto-fraco, #6b6b73);
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+      }
+      .doc .tabela tbody tr:hover {
+        background: var(--cor-fundo-alt, #f7f6f3);
+      }
+      .doc code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13.5px;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+      .doc .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin: 20px 0 40px;
+      }
+      .doc .kpi {
+        border: 1px solid var(--cor-borda, #e5e3dd);
+        border-radius: 6px;
+        padding: 16px 18px;
+      }
+      .doc .kpi-valor {
+        font-family: "Fraunces", serif;
+        font-size: 32px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .doc .kpi-label {
+        font-size: 12px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .doc .voltar {
+        display: inline-block;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        text-decoration: none;
+      }
+      .doc .voltar:hover {
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc footer {
+        margin: 80px 0 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--cor-borda, #e5e3dd);
+        font-size: 13px;
+        color: var(--cor-texto-fraco, #6b6b73);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="doc">
+      <a href="../index.html#relatorios" class="voltar">← Acompanhamento do desenvolvimento</a>
+
+      <h1>Relatório Quinzenal #1</h1>
+      <p class="meta">
+        Período: <strong>27/04/2026 a 08/05/2026</strong> · Publicado em 08/05/2026 ·
+        <span class="badge">Bloco 1 — Fundação multi-tenant e cadastros</span>
+      </p>
+
+      <div class="resumo">
+        <strong>Resumo executivo.</strong> A primeira quinzena de desenvolvimento entregou o
+        Bloco 1 do roadmap em ritmo acelerado — todas as fundações técnicas estão prontas e
+        validadas, incluindo o importador do banco legado Fiorilli SIP. O sistema já consegue
+        receber dados reais do município-piloto, organizá-los por vínculo e por área da
+        secretaria, e operar com múltiplos usuários e papéis. O Bloco 1 fechou
+        <strong>cerca de 8 semanas antes do prazo original</strong> (alvo: 30/06; entregue:
+        08/05), abrindo folga no cronograma para iniciar o Bloco 2 (engine de cálculo de
+        folha) com antecedência.
+      </div>
+
+      <h2>O que foi entregue</h2>
+
+      <h3>Para o usuário-operador</h3>
+      <ul>
+        <li>
+          <strong>Sistema acessível por navegador</strong> com login por e-mail institucional,
+          troca de município ativo (multi-tenant) e identidade visual completa (dark mode
+          padrão, tipografia profissional).
+        </li>
+        <li>
+          <strong>Cadastros centrais funcionando</strong>: Cargos, Lotações, Rubricas e
+          Servidores — todos com busca, filtros, ordenação, paginação e ações por linha.
+        </li>
+        <li>
+          <strong>Fluxo completo do servidor</strong>: admissão (cria servidor + vínculo em
+          transação atômica), edição de dados pessoais, transferência de lotação,
+          desligamento, cadastro de dependentes (com flags de IR e salário-família), upload
+          de documentos digitalizados (PDF/JPG/PNG até 10 MB), e timeline de histórico funcional
+          com quem alterou e quando.
+        </li>
+        <li>
+          <strong>Organização por vínculo e área</strong>: Efetivos / Comissionados /
+          Contratados / Eletivos × Administração / Saúde / Educação / Assistência social —
+          Dashboard com cards-KPI clicáveis e filtros combináveis na lista de servidores.
+        </li>
+        <li>
+          <strong>Configurações de conta</strong>: edição do próprio perfil, troca de senha
+          com validações de força, e gestão de outros usuários do município (admin pode criar,
+          mudar papel e remover acesso pela tela, sem precisar de comando técnico).
+        </li>
+        <li>
+          <strong>Pesquisa global com ⌘K</strong> (Ctrl+K no Windows/Linux): busca paralela
+          em servidores, cargos, lotações e rubricas a partir de qualquer tela.
+        </li>
+        <li>
+          <strong>Guia de uso vivo</strong> embarcado no sistema, com a documentação completa
+          de como cada feature funciona e o que ainda está por vir.
+        </li>
+      </ul>
+
+      <h3>Para o município-piloto</h3>
+      <ul>
+        <li>
+          <strong>Importador do Fiorilli SIP funcional</strong>: o arquivo
+          <code>SIP.FDB</code> (Firebird 2.5) do município é lido diretamente pelo Arminda;
+          o pipeline transforma os dados e grava no schema do tenant em transação atômica.
+          A importação é idempotente — pode rodar quantas vezes precisar para corrigir
+          divergências sem duplicar registros.
+        </li>
+        <li>
+          <strong>Smoke E2E concluído</strong> contra o banco real do município de São
+          Raimundo do Doca Bezerra (MA):
+          <strong>91/91 cargos (100%)</strong>, <strong>66/66 lotações (100%)</strong>,
+          <strong>517/517 servidores (100%)</strong>, 1.503 vínculos (54%) e 279 dependentes
+          (92%). Os vínculos e dependentes não importados são CPFs órfãos no SIP
+          (registros históricos sem cadastro completo) — fora do controle do importador,
+          mas catalogados com mensagem específica para revisão.
+        </li>
+        <li>
+          <strong>Classificação automática de natureza</strong>: as 66 lotações importadas
+          foram automaticamente categorizadas por padrão de nome em Saúde / Educação /
+          Assistência social / Administração. Cobertura: 1.103 dos 1.503 vínculos em áreas
+          claras; os 400 restantes ficam em "Outros" para o admin revisar pela tela.
+        </li>
+      </ul>
+
+      <h2>Indicadores técnicos</h2>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-valor">248</div>
+          <div class="kpi-label">testes backend verde</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">94%</div>
+          <div class="kpi-label">cobertura de código</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">10</div>
+          <div class="kpi-label">testes frontend verde</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">5</div>
+          <div class="kpi-label">apps Django</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">9</div>
+          <div class="kpi-label">ADRs publicadas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">~16k</div>
+          <div class="kpi-label">linhas de código</div>
+        </div>
+      </div>
+
+      <h2>Marcos da quinzena</h2>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Onda</th>
+            <th>Entrega</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>27/04</td>
+            <td>Bloco 0</td>
+            <td>Estrutura inicial (repo, Django, Vite, status-page, CI)</td>
+          </tr>
+          <tr>
+            <td>28/04</td>
+            <td>Processo</td>
+            <td>Sistema de contexto distribuído implantado (CONTEXT.md + CHANGELOG)</td>
+          </tr>
+          <tr>
+            <td>29/04</td>
+            <td>1.1 / 1.2</td>
+            <td>Fundação técnica + cadastros centrais + serviços de RH em transação atômica</td>
+          </tr>
+          <tr>
+            <td>29/04</td>
+            <td>1.3a</td>
+            <td>Frontend autenticado: login, layout, troca de tenant, dashboard inicial</td>
+          </tr>
+          <tr>
+            <td>29/04</td>
+            <td>1.3a-bis</td>
+            <td>Identidade visual Arminda implantada (tokens OKLCH, dark mode, brand panel)</td>
+          </tr>
+          <tr>
+            <td>30/04</td>
+            <td>1.3b</td>
+            <td>Telas de domínio: CRUDs de Cargos, Lotações, Rubricas, Servidores</td>
+          </tr>
+          <tr>
+            <td>30/04</td>
+            <td>1.3c</td>
+            <td>Ciclo de vida do servidor completo + lazy routes (-31% no bundle)</td>
+          </tr>
+          <tr>
+            <td>03/05</td>
+            <td>Análise</td>
+            <td>Diagnóstico do FDB do município (1029 tabelas, 15 críticas mapeadas)</td>
+          </tr>
+          <tr>
+            <td>03/05</td>
+            <td>1.4</td>
+            <td>Importador Fiorilli SIP funcional (pipeline ETL idempotente)</td>
+          </tr>
+          <tr>
+            <td>03/05</td>
+            <td>Docs</td>
+            <td>Guia de uso vivo do sistema acessível em <code>/guia</code></td>
+          </tr>
+          <tr>
+            <td>05/05</td>
+            <td>1.5</td>
+            <td>Documentos, Configurações, Pesquisa global ⌘K, Notificações honestas</td>
+          </tr>
+          <tr>
+            <td>08/05</td>
+            <td>1.5b</td>
+            <td>Organização por vínculo (4 tipos) e por área da secretaria (4 categorias)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Decisões técnicas registradas</h2>
+      <p>
+        Toda decisão arquitetural significativa virou uma ADR (Architecture Decision Record),
+        garantindo rastreabilidade futura:
+      </p>
+      <ul>
+        <li>ADR-0001 a 0003 — Monorepo, Django no backend, Vite/React no frontend.</li>
+        <li>ADR-0004 e 0006 — Multi-tenant por schema PostgreSQL (django-tenants).</li>
+        <li>ADR-0005 — Usuário customizado autenticado por e-mail (sem username).</li>
+        <li>ADR-0007 — JWT + RBAC com 5 papéis-base por município.</li>
+        <li>ADR-0008 — Tipos TypeScript gerados a partir do schema OpenAPI.</li>
+        <li>ADR-0009 — Estratégia do importador Fiorilli SIP (Firebird).</li>
+      </ul>
+
+      <h2>O que ficou pendente</h2>
+      <ul>
+        <li>
+          <strong>400 servidores em "Outros"</strong> aguardam revisão manual ou serão
+          classificados automaticamente pelo importador estendido (próxima onda).
+        </li>
+        <li>
+          <strong>Salário-base = R$ 0</strong> nos vínculos importados — o Fiorilli guarda
+          o salário em outra tabela que ainda não importamos; depende da engine de cálculo
+          (Bloco 2).
+        </li>
+        <li>
+          <strong>Folha de pagamento e Relatórios</strong> (eSocial, RAIS, DIRF) — Blocos 2
+          e 4, ainda não disponíveis. Os ícones aparecem na sidebar com aviso de "em
+          construção".
+        </li>
+      </ul>
+
+      <h2>Próxima quinzena (08/05 a 22/05)</h2>
+      <ul>
+        <li>
+          <strong>Onda 1.4-bis</strong> — Importador estendido: ler também a tabela de
+          empenho (DEPDESPESA) do Fiorilli para classificar automaticamente os 400
+          servidores em "Outros" pelo orçamento que paga cada vínculo. Resolve o caso
+          relatado pela prefeitura em que servidores ficam "todos numa única lotação".
+        </li>
+        <li>
+          <strong>Início do Bloco 2 — Engine de cálculo de folha.</strong> A primeira
+          entrega será a linguagem de fórmulas configurável (DSL) que vai interpretar as
+          rubricas. Em seguida, cálculo mensal ordinário com incidências de INSS, IRRF e
+          FGTS, e a primeira geração de holerite.
+        </li>
+        <li>
+          <strong>Tabelas legais nacionais 2026</strong> (faixas IRRF/INSS, salário-mínimo,
+          deduções por dependente) — pré-requisito para os testes de paridade contra o
+          Fiorilli.
+        </li>
+      </ul>
+
+      <h2>Saúde do projeto</h2>
+      <p>
+        O ritmo da primeira quinzena foi acima do planejado: o Bloco 1 estava previsto para
+        encerrar em 30/06/2026 e fechou em 08/05 — uma folga de aproximadamente 8 semanas.
+        Toda a entrega passou em revisão automatizada (testes, lint, type-check), sem dívida
+        técnica significativa acumulada. A documentação foi mantida em paralelo ao código
+        (CONTEXT.md por área + 9 ADRs + Guia de uso embarcado), preservando o conhecimento
+        crítico independente de quem o leia depois.
+      </p>
+      <p>
+        <strong>Próximo relatório quinzenal:</strong> previsto para 22/05/2026, cobrindo o
+        início do Bloco 2 e a Onda 1.4-bis.
+      </p>
+
+      <footer>
+        Arminda — Acompanhamento do desenvolvimento ·
+        <a href="../index.html">Voltar ao painel</a>
+      </footer>
+    </div>
+  </body>
+</html>
