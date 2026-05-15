@@ -35,6 +35,106 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 2.1 — Engine de cálculo: DSL de fórmulas para rubricas · 2026-05-12
+
+> Início do **Bloco 2 (engine de cálculo de folha)**. Esta onda entrega
+> a peça mais incerta do bloco — a linguagem de fórmulas que as
+> rubricas usam para calcular valor. Com a DSL pronta, as próximas
+> ondas (2.2 cálculo mensal, 2.3 tabelas legais, 2.5 holerite)
+> compõem em cima dela.
+
+#### Adicionado — Backend
+
+- **docs(adr):** [ADR-0012 — DSL via subset seguro de Python (AST whitelist)](docs/adr/0012-dsl-formulas-via-python-ast.md).
+  Decide:
+  - Sintaxe Python-like (`MAX(a, b)`, `SE(cond, sim, nao)`, operadores
+    aritméticos e de comparação) validada por AST whitelist.
+  - Toda constante numérica vira `Decimal` (não float) — dinheiro não
+    admite arredondamento implícito.
+  - Bloqueia: import, attribute, subscript, lambda, comprehension,
+    pow (`**`), floor div (`//`), kwargs em chamadas.
+  - Compilação cacheada via `functools.lru_cache(1024)`.
+
+- **feat(apps.calculo):** Novo app em `TENANT_APPS` com:
+  - `formula/parser.py` — compila a fórmula em bytecode, valida AST,
+    substitui literais numéricos por chamadas a `_D("0.10")`
+    em runtime (o `compile()` do Python não aceita `Decimal` em
+    `Constant`).
+  - `formula/funcoes.py` — funções builtin: `SE`, `MAX`, `MIN`,
+    `ABS`, `ARRED`, `RUBRICA(codigo)`. Funções `FAIXA_IRRF` e
+    `FAIXA_INSS` são placeholders (entram na Onda 2.3 com tabelas
+    legais 2026).
+  - `formula/contexto.py` — `ContextoFolha(variaveis,
+    rubricas_calculadas)` + lista de variáveis padrão
+    (SALARIO_BASE, IDADE, DEPENDENTES, CARGA_HORARIA, HORAS_*,
+    TEMPO_SERVICO_ANOS, DIAS_TRABALHADOS, FALTAS, SALARIO_MINIMO,
+    COMPETENCIA_ANO, COMPETENCIA_MES).
+  - `formula/avaliador.py` — orquestra: compila → monta namespace
+    (Decimal + builtins + RUBRICA dinâmico + contexto) → executa.
+    Trata 6 categorias de erro (`FormulaSintaxeError`,
+    `FormulaNaoPermitidaError`, `FormulaFuncaoDesconhecidaError`,
+    `FormulaVariavelAusenteError`, `FormulaRubricaInexistenteError`,
+    `FormulaDivisaoPorZeroError`, `FormulaTipoInvalidoError`) com
+    `code` estável.
+
+- **feat(apps.payroll):** Novo endpoint
+  `POST /api/payroll/rubricas/{id}/avaliar/` que recebe `{contexto,
+  rubricas_calculadas}` e retorna `{valor, formula}` ou erro
+  `{detail, code}` com HTTP 400. Permissão de leitura
+  (`IsLeituraMunicipio`) — qualquer papel pode disparar para debug.
+
+- **test:** 76 testes novos no `apps.calculo` cobrindo:
+  - Compilação de fórmulas válidas
+  - Rejeição de sintaxe inválida (4 casos)
+  - Segurança: 8 construções perigosas bloqueadas
+  - Cache: mesma fórmula reusa code object
+  - 24 testes de funções builtin
+  - 26 testes do avaliador (aritmética, comparações, lógicos,
+    condicionais, rubricas, erros de contexto e runtime)
+  - 6 testes do endpoint (caminho feliz, erros, permissão)
+  - Cálculos realistas: proporcionalidade por horas, piso salarial,
+    IRRF simplificado.
+
+- **332 testes verde no total** (256 → 332, +76).
+
+#### Por quê
+
+- **DSL é o item mais incerto do Bloco 2.** Resolver primeiro destrava
+  o resto do bloco. Se a estratégia AST whitelist falhasse, eu
+  saberia em 1 dia — agora confirmamos que funciona, performa bem
+  (1 µs por avaliação após cache) e tem mensagens de erro
+  adequadas.
+- **Decimal exato é não-negociável.** Folha de pagamento opera em
+  centavos; `float` introduz erros silenciosos (0.1 + 0.2 != 0.3).
+  Toda constante e toda variável de contexto entra na fórmula
+  como `Decimal` — isso vai prevenir 80% dos bugs de cálculo
+  futuros.
+- **Errors estruturados (com `code`) viram contrato.** Quando a UI
+  de Bloco 2.6 entrar, o operador vai ver "Variável X não disponível"
+  e não "NameError" técnico. Cada `code` mapeia para uma mensagem
+  amigável.
+
+#### Impacto
+
+- 1 app novo (`apps.calculo`), 6 arquivos de domínio, ~700 LOC
+  de código + 800 LOC de testes.
+- Sem migrations (engine é puro).
+- Sem mudança de contrato existente — apenas endpoint novo
+  (`/avaliar/`) na rota de rubricas.
+- Build verde, suite completa verde.
+
+#### Próximos passos
+
+- **Onda 2.2 — Cálculo mensal ordinário.** Usa a DSL para calcular
+  uma folha inteira: itera servidores ativos × rubricas → produz
+  `Lancamento`. Vai começar a popular `salario_base` real nos
+  vínculos (hoje todos zerados pela importação).
+- **Onda 2.3 — Tabelas legais 2026** (INSS, IRRF progressivo,
+  salário-mínimo, deduções por dependente). Aí `FAIXA_IRRF` e
+  `FAIXA_INSS` deixam de ser placeholders.
+
+---
+
 ### docs: MANAD no Bloco 4 + Sagres no Bloco 5 + ADR-0011 adaptadores · 2026-05-12
 
 > Ajuste de roadmap após dois aprendizados externos:

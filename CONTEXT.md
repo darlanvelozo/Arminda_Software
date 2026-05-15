@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-05-10 · Bloco corrente: **Bloco 1 100% CONCLUÍDO ✅ + Onda 1.4-bis (importador estendido)** — fundação multi-tenant, cadastros, serviços de RH, frontend completo, Importador Fiorilli SIP com **unidade orçamentária do empenho** (resolve o caso "todo mundo na mesma lotação" do Dr. Renzo onde o SIP preencheu o dado). **256 testes backend verde** + 10 testes frontend. Próximo: **Bloco 2 — Engine de cálculo de folha** (DSL de fórmulas começando).
+> Última atualização: 2026-05-12 · Bloco corrente: **Bloco 2 — Engine de cálculo de folha em andamento (Onda 2.1 ✅)**. Bloco 1 100% concluído. Engine entregue: DSL de fórmulas via subset seguro de Python (ADR-0012), todas as variáveis em Decimal, endpoint `/api/payroll/rubricas/{id}/avaliar/`. **332 testes backend verde** + 10 testes frontend. Próximo: **Onda 2.2 — Cálculo de folha mensal ordinária**.
 
 ---
 

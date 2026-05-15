@@ -648,8 +648,8 @@ function SectionEmConstrucao() {
         <RoadmapItem
           icon={Wallet}
           title="Bloco 2 — Engine de cálculo de folha"
-          period="Julho – Agosto/2026"
-          desc="DSL de fórmulas para rubricas, cálculo mensal ordinário, incidências (INSS, IRRF, FGTS, previdência), holerite. Habilita as áreas Folha e KPIs do Dashboard."
+          period="Maio – Agosto/2026 (em andamento)"
+          desc="DSL de fórmulas (Onda 2.1 ✅ entregue em maio/2026, 6 semanas adiantada), cálculo mensal ordinário (próximo), incidências (INSS, IRRF, FGTS, previdência), tabelas legais 2026, geração de holerite. Habilita a área Folha e os KPIs financeiros do Dashboard."
         />
         <RoadmapItem
           icon={Wallet}

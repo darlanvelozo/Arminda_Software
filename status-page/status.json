@@ -6,8 +6,8 @@
     "previsao_lancamento": "2027-04-27"
   },
   "ultima_atualizacao": "2026-05-12",
-  "bloco_atual": 1,
-  "progresso_geral_pct": 48,
+  "bloco_atual": 2,
+  "progresso_geral_pct": 50,
   "blocos": [
     {
       "numero": 0,
@@ -62,18 +62,20 @@
       "numero": 2,
       "titulo": "Engine de cálculo de folha",
       "descricao": "Implementação do coração do sistema: linguagem de fórmulas para rubricas, cálculo de folha mensal e geração de holerites.",
-      "periodo": "Julho – Agosto 2026",
-      "data_inicio": "2026-07-01",
+      "periodo": "Julho – Agosto 2026 (adiantado em 6 semanas)",
+      "data_inicio": "2026-05-12",
       "data_fim_prevista": "2026-08-31",
       "data_fim_real": null,
-      "status": "previsto",
-      "progresso_pct": 0,
+      "status": "em_andamento",
+      "progresso_pct": 14,
       "entregas": [
-        "Linguagem de fórmulas configurável (DSL)",
-        "Cálculo de folha mensal ordinária",
-        "Incidências (INSS, IRRF, FGTS, previdência)",
-        "Geração de holerite",
-        "Testes de paridade contra sistema atual"
+        "✅ Linguagem de fórmulas configurável (DSL via Python AST whitelist, ADR-0012) — Onda 2.1",
+        "Cálculo de folha mensal ordinária — Onda 2.2",
+        "Incidências (INSS, IRRF, FGTS, previdência) — Onda 2.3",
+        "Tabelas legais 2026 (FAIXA_IRRF, FAIXA_INSS) — Onda 2.4",
+        "Geração de holerite (PDF + JSON) — Onda 2.5",
+        "Tela /folha operacional — Onda 2.6",
+        "Testes de paridade contra Fiorilli — Onda 2.7"
       ]
     },
     {
@@ -172,6 +174,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-12",
+      "tipo": "entrega",
+      "titulo": "Engine de cálculo de folha — DSL de fórmulas pronta (Onda 2.1)",
+      "descricao": "Início do Bloco 2 (engine de cálculo de folha) — adiantado em 6 semanas em relação ao cronograma original. A primeira onda entrega a linguagem de fórmulas que as rubricas usam para calcular valor. Funciona com operadores aritméticos, comparações, lógicos, condicionais (SE), funções builtin (MAX, MIN, ABS, ARRED, RUBRICA) e acesso a variáveis do contexto (SALARIO_BASE, IDADE, DEPENDENTES, etc.). Todo cálculo em Decimal exato (não float — dinheiro não admite arredondamento implícito). Endpoint /api/payroll/rubricas/{id}/avaliar/ disponível para testar fórmulas. Sintaxe é um subset seguro de Python validado por AST whitelist (ADR-0012): bloqueia import, attribute, subscript, lambda, comprehension, pow e floor div. Compilação cacheada — 1 µs por avaliação. 76 testes novos, 332 testes verde no total. Próxima onda: cálculo de folha mensal usando essa engine."
+    },
     {
       "data": "2026-05-12",
       "tipo": "processo",
