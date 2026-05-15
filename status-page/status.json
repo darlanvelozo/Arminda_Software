@@ -178,114 +178,133 @@
       "data": "2026-05-14",
       "tipo": "entrega",
       "titulo": "Cálculo de folha mensal funcionando ponta-a-ponta (Onda 2.2)",
+      "resumo_executivo": "O sistema agora calcula uma folha mensal inteira. O operador clica em \"calcular\", o Arminda processa todos os servidores ativos da competência e devolve um relatório com totais, ordem de cálculo e qualquer rubrica problemática. Pode recalcular quantas vezes precisar — não duplica nada.",
       "descricao": "Em cima da DSL entregue na Onda 2.1, agora calculamos uma folha inteira: o serviço carrega todas as rubricas ativas, ordena topologicamente pela dependência declarada (RUBRICA('X') em uma fórmula faz a rubrica X ser calculada antes), itera os vínculos ativos da competência e produz um Lancamento para cada par (vínculo, rubrica). É idempotente: rodar duas vezes converge para o mesmo estado, sem duplicação. Erros de fórmula em um vínculo são coletados num relatório, mas o batch segue — operador conserta a rubrica problemática e recalcula. Erros estruturais (ciclo entre rubricas, dependência inexistente) abortam tudo dentro de uma transação atômica. O endpoint POST /api/payroll/folhas/{id}/calcular/ dispara o cálculo e devolve um relatório com contadores (vínculos processados, lançamentos criados/atualizados/removidos), a ordem em que as rubricas foram calculadas e a lista de erros. Endpoints novos também para CRUD de folhas e consulta paginada de lançamentos. 34 testes novos cobrindo idempotência, ciclo, isolamento entre tenants, permissões e limpeza de órfãos. Suite completa: 366 testes verde. Próximas ondas: tabelas legais 2026 (INSS/IRRF reais), holerite em PDF, tela /folha operacional."
     },
     {
       "data": "2026-05-12",
       "tipo": "entrega",
       "titulo": "Engine de cálculo de folha — DSL de fórmulas pronta (Onda 2.1)",
+      "resumo_executivo": "Construímos a \"calculadora\" do Arminda: a linguagem que entende fórmulas de rubrica (ex.: \"INSS = salário × 11%\"). É o motor do sistema — tudo daqui pra frente roda em cima dele. Cronograma do bloco adiantado em 6 semanas.",
       "descricao": "Início do Bloco 2 (engine de cálculo de folha) — adiantado em 6 semanas em relação ao cronograma original. A primeira onda entrega a linguagem de fórmulas que as rubricas usam para calcular valor. Funciona com operadores aritméticos, comparações, lógicos, condicionais (SE), funções builtin (MAX, MIN, ABS, ARRED, RUBRICA) e acesso a variáveis do contexto (SALARIO_BASE, IDADE, DEPENDENTES, etc.). Todo cálculo em Decimal exato (não float — dinheiro não admite arredondamento implícito). Endpoint /api/payroll/rubricas/{id}/avaliar/ disponível para testar fórmulas. Sintaxe é um subset seguro de Python validado por AST whitelist (ADR-0012): bloqueia import, attribute, subscript, lambda, comprehension, pow e floor div. Compilação cacheada — 1 µs por avaliação. 76 testes novos, 332 testes verde no total. Próxima onda: cálculo de folha mensal usando essa engine."
     },
     {
       "data": "2026-05-12",
       "tipo": "processo",
       "titulo": "Roadmap ampliado: MANAD obrigatório + Sagres + adaptadores configuráveis",
+      "resumo_executivo": "Confirmamos que o MANAD (auditoria da Receita/INSS) é obrigatório em folha brasileira e entra no Bloco 4. Também planejamos que cada prefeitura vai configurar suas próprias integrações (TCE, eSocial, MANAD) direto no painel de administração — sem precisar chamar nosso suporte para cada cliente.",
       "descricao": "Refinamos o planejamento dos Blocos 4 e 5 após dois aprendizados: o doutor confirmou que o MANAD (Manual Normativo de Arquivos Digitais da Receita/INSS) é base obrigatória de toda folha brasileira, e tivemos acesso a arquivos MANAD reais de 2020 de outro município que serviram de referência técnica. Para suportar diversas prefeituras com perfis fiscais diferentes (TCE-MA aqui, Sagres-PB ali), o sistema vai ter no admin Django uma tabela onde cada município configura quais integrações está ativa, sem deploy de código. O frontend monta o menu de obrigações dinamicamente. Tudo formalizado na ADR-0011. Nenhuma mudança de produto neste ajuste — só documentação para orientar os blocos quando chegarem."
     },
     {
       "data": "2026-05-10",
       "tipo": "entrega",
       "titulo": "Importador estendido: unidade orçamentária do empenho (Onda 1.4-bis)",
+      "resumo_executivo": "Agora cada vínculo do servidor mostra de qual orçamento sai o salário (Sec. de Saúde, FUNDEB Educação, Fundo de Assistência, etc.). Resolve o ponto que o senhor levantou — distinguir de qual secretaria é o servidor, mesmo quando ele está fisicamente em outro lugar.",
       "descricao": "O importador agora puxa também a tabela UNIDADE do Fiorilli SIP — 65 unidades orçamentárias por exercício fiscal do município, com nomes que já trazem a área (Sec. de Saúde, Fundo de Saúde, FUNDEB Educação, CRAS, etc.) e o regime (CONCURSADOS, COMISSIONADOS, CONTRATADOS). Cada vínculo agora tem uma FK opcional para a unidade orçamentária correspondente, vista no detalhe do servidor com badge colorida da área. Smoke contra o banco real do município trouxe as 65 unidades classificadas (21 administração, 19 educação, 13 saúde, 7 assistência, 5 outros) e cruzou 472 dos 1.503 vínculos ativos com sua unidade. Os 1.031 restantes têm DEPDESPESA=0 no Fiorilli — registros históricos sem empenho consignado, fora do controle do importador. Isso fecha o ponto que o Dr. Renzo levantou: a divisão por secretaria agora vem do orçamento quando o município preencheu o dado. Pré-requisito do Bloco 2 também atendido: o cálculo de folha vai encontrar a unidade orçamentária pronta. 256 testes verde."
     },
     {
       "data": "2026-05-08",
       "tipo": "entrega",
       "titulo": "Organização por vínculo e por área da secretaria",
+      "resumo_executivo": "Servidores podem agora ser filtrados por tipo de vínculo (Efetivo, Comissionado, Contratado, Eletivo) e por área da secretaria (Saúde, Educação, Administração, Assistência). Resolve o caso real do município-piloto: 369 servidores estavam em \"balde genérico\" no Fiorilli e era preciso recadastrar tudo na mão — agora a classificação é automática.",
       "descricao": "Os servidores agora podem ser organizados em duas dimensões independentes que combinam livremente: por vínculo (Efetivo, Comissionado, Contratado, Eletivo) e por área da secretaria (Administração, Saúde, Educação, Assistência social, Outros). O dashboard ganhou 8 cards-KPI clicáveis com a contagem por categoria — cada um navega para a lista de servidores filtrada. Esse trabalho responde a um caso real do município-piloto: 369 servidores estavam num 'balde genérico' no Fiorilli e era preciso recadastrar tudo para saber quem era de cada secretaria. Agora a classificação é automática (rodou em 3 passadas e cobriu 1.103 dos 1.503 vínculos em 4 áreas claras) e o admin pode reclassificar pela tela qualquer caso especial. Como bônus, criamos o regime 'Eletivo' separado (Prefeito, Vice e Vereadores não são mais comissionados). O Bloco 2 (cálculo de folha) vai usar a natureza da lotação para determinar a unidade orçamentária do empenho. 248 testes verde."
     },
     {
       "data": "2026-05-05",
       "tipo": "marco",
       "titulo": "Bloco 1 fechado: Documentos, Configurações, Pesquisa global e Guia de uso (Onda 1.5)",
+      "resumo_executivo": "Fechamos a base do sistema. Cada servidor tem documentos digitalizados anexados (RG, CPF, comprovantes), o admin do município gerencia seus próprios usuários sem precisar do nosso suporte, e tudo é buscável com Ctrl+K. Próximo passo: cálculo de folha.",
       "descricao": "A onda 1.5 fecha as últimas lacunas de UX do Bloco 1. O servidor agora tem aba Documentos com upload de PDF/JPG/PNG até 10 MB, lista, download e exclusão. A página de Configurações ganhou três abas: Perfil (editar nome), Segurança (trocar senha com validações de força do Django) e Usuários (admin do município lista, cria, troca papel e remove acesso de outros usuários — sem precisar de SSH no servidor). A pesquisa global por ⌘K busca em paralelo em servidores, cargos, lotações e rubricas; quando vazia mostra atalhos para todas as áreas. O sino de notificações foi limpo do badge fake e agora exibe um dropdown honesto explicando que alertas reais entram nos Blocos 5 (TCE) e 7 (alertas inteligentes). O Guia de uso foi atualizado com tudo isso. Backend: 4 endpoints novos, 19 testes novos (244 verde no total). Frontend: 4 áreas, build verde, 10/10 testes verde. Próximo passo: Bloco 2 — engine de cálculo de folha."
     },
     {
       "data": "2026-05-03",
       "tipo": "entrega",
       "titulo": "Importador Fiorilli SIP funcional — Bloco 1 completo",
+      "resumo_executivo": "O Arminda agora consegue importar dados direto do Fiorilli atual. Testamos no banco real de São Raimundo do Doca Bezerra/MA: 517 servidores, 91 cargos e 66 lotações trazidos sem erro nenhum. O município não precisa recadastrar nada para migrar.",
       "descricao": "Foi entregue o importador unidirecional do banco legado Fiorilli SIP (Firebird 2.5) para o Arminda. O pipeline lê o arquivo .FDB do município, transforma os dados e grava no schema do tenant — tudo dentro de uma transação que pode ser revertida em modo de teste. A importação é idempotente: rodar duas vezes produz o mesmo resultado. O smoke end-to-end contra o banco real do município de São Raimundo do Doca Bezerra/MA importou 91/91 cargos, 66/66 lotações e 517/517 servidores com 100% de sucesso, mais 1503/2762 vínculos (54%) e 279/303 dependentes (92%). Os erros remanescentes são CPFs históricos órfãos no SIP — registros que nunca tiveram cadastro completo na PESSOA — e estão fora do controle do importador; em produção o município corrige a origem e re-roda. A onda 1.4 fecha o Bloco 1: a fundação técnica está completa, com 225 testes verde e 94% de cobertura. Próximo passo: Bloco 2, engine de cálculo de folha."
     },
     {
       "data": "2026-04-30",
       "tipo": "entrega",
       "titulo": "Ciclo de vida do servidor completo + bundle 31% menor (Onda 1.3c)",
+      "resumo_executivo": "Da admissão ao desligamento, todo o ciclo de vida do servidor pode ser feito pela interface — sem precisar acessar nada técnico. Também aceleramos o carregamento da página em 31%, importante porque prefeituras pequenas costumam ter internet limitada.",
       "descricao": "O detalhe do servidor agora tem todas as ações que faltavam: edição inline dos dados pessoais, botão de desligamento (encerra todos os vínculos e marca o servidor como inativo em transação atômica), transferência de vínculo entre lotações, cadastro/edição/exclusão de dependentes (com flags de IR e salário-família). Com isso, o ciclo de vida do servidor está completo end-to-end no frontend — admitir, manter, transferir e desligar — usando os endpoints atômicos que já existiam no backend desde o Bloco 1.2. Como bônus técnico, todas as rotas autenticadas viraram chunks separados via React.lazy: o bundle inicial caiu de 680 KB para 468 KB (gzip de 197 KB para 146 KB), o que melhora a primeira renderização em conexões lentas — importante porque o público-alvo são prefeituras de pequeno porte com internet limitada."
     },
     {
       "data": "2026-04-30",
       "tipo": "entrega",
       "titulo": "Telas de domínio do Bloco 1 entregues (Cargos, Lotações, Rubricas, Servidores)",
+      "resumo_executivo": "As telas principais do sistema (Cargos, Lotações, Rubricas, Servidores) deixaram de ser \"em construção\" e ganharam função real. O operador da prefeitura já consegue gerenciar todo o cadastro de pessoal direto pela interface.",
       "descricao": "As 4 áreas que estavam como placeholder ('em construção') ganharam tela real e funcional, ligadas à API. Cargos, Lotações e Rubricas têm CRUD completo (criar, editar, ativar/desativar, excluir) com busca, filtros, ordenação e paginação. Servidores tem listagem paginada, fluxo de admissão (cria servidor + vínculo em transação atômica) e página de detalhe com 4 abas: Pessoais, Vínculos, Dependentes e Histórico (timeline com simple-history). O padrão visual segue a identidade Arminda — toolbar com busca e filtros, tabela com badges de status, formulário em sheet slide-from-right. Edição inline do servidor, desligamento, transferência e cadastro de dependentes ficam para a sub-onda 1.3c."
     },
     {
       "data": "2026-04-30",
       "tipo": "processo",
       "titulo": "Análise do banco Fiorilli SIP concluída",
+      "resumo_executivo": "Estudamos o banco do Fiorilli atual em ambiente seguro. Mapeamos as tabelas críticas e confirmamos: importar os cadastros é viável em 3-5 dias de trabalho. Importar o histórico de folha aguarda o cálculo (Bloco 2) ficar pronto.",
       "descricao": "O arquivo SIP.FDB (banco Firebird 2.5 do município-piloto) foi extraído e analisado em ambiente isolado. Mapeamos as 1029 tabelas e identificamos as ~15 críticas para o importador: 517 pessoas, 2.762 trabalhadores, 91 cargos, 66 locais de trabalho, 201 rubricas, 1.387 lançamentos fixos, 249 mil lançamentos de movimentação histórica. Foram identificados gaps no nosso modelo (campos eSocial faltantes em Servidor, separação Lotação x Unidade Orçamentária, falta de modelo para Conta Bancária e Eventos Fixos) que serão fechados na onda do importador. A importação de cadastros (MVP) é viável após 3-5 dias de trabalho; importação de histórico de folha aguarda o engine de cálculo (Bloco 2)."
     },
     {
       "data": "2026-04-29",
       "tipo": "validacao",
       "titulo": "Frontend autenticado validado em produção",
+      "resumo_executivo": "Testamos a interface web em ambiente de produção. Encontramos um bug pequeno (dois links levavam a página vazia), corrigimos e confirmamos: a base está pronta para receber as telas de cadastro de servidor.",
       "descricao": "Varredura completa das rotas e telas implementadas até aqui (login, seleção de município, dashboard, sidebar com troca de município, topbar com breadcrumb e tema). Identificado e corrigido um bug de roteamento (links 'Folha' e 'Configurações' iam para 404) e reforçada a renderização do formulário de login para evitar problemas de tema. Build de produção verificado com a identidade visual nova. Backend mantém 193 testes verde com 97% de cobertura."
     },
     {
       "data": "2026-04-29",
       "tipo": "entrega",
       "titulo": "Identidade visual do Arminda implantada",
+      "resumo_executivo": "O sistema ganhou identidade visual própria: paleta de cores, fontes, logo, modo escuro. Saiu da \"cara de protótipo\" e ganhou aparência de produto pronto — importante quando for apresentar pra cliente.",
       "descricao": "O frontend ganhou uma identidade visual completa, gerada via Claude Design e adaptada para o nosso stack: paleta moderna em OKLCH, dark mode como padrão, fontes Inter e JetBrains Mono, logo SVG, brand panel no login com gradient e grid decorativo, sidebar com card de município ativo, topbar com breadcrumb e toggle de tema. Os componentes (botões, cards, dropdowns, formulários) seguem o sistema shadcn customizado."
     },
     {
       "data": "2026-04-29",
       "tipo": "entrega",
       "titulo": "Frontend autenticado disponível",
+      "resumo_executivo": "A interface web do Arminda agora tem login real e layout completo. Usuários que operam em mais de uma prefeitura podem trocar de município com um clique. As telas onde se cadastra servidor entram na próxima onda.",
       "descricao": "A interface web do Arminda agora tem login real, layout completo (sidebar + topbar) e troca de município ativo para usuários que operam em mais de uma prefeitura. Tipos TypeScript dos contratos de API são gerados automaticamente a partir do schema OpenAPI do backend, evitando dessincronização. As telas de cadastro de domínio entram na próxima onda."
     },
     {
       "data": "2026-04-29",
       "tipo": "validacao",
       "titulo": "Smoke end-to-end completo do backend",
+      "resumo_executivo": "Validamos o backend de ponta a ponta com dados reais: login, todos os cadastros, fluxos de admissão/desligamento/transferência, histórico funcional, isolamento entre municípios. Um bug foi achado e corrigido no processo.",
       "descricao": "O sistema foi validado de ponta a ponta com servidor real e usuários reais: login JWT, todos os CRUDs, fluxos de admissão/desligamento/transferência, histórico funcional com autor capturado, isolamento entre municípios e respostas de erro com códigos estáveis. Um bug de tratamento de CPF inválido foi detectado e corrigido. Frontend também foi validado (lint, testes, build de produção). 181 testes automatizados, 97% de cobertura."
     },
     {
       "data": "2026-04-29",
       "tipo": "entrega",
       "titulo": "Regras de negócio de RH em transação atômica",
+      "resumo_executivo": "Admissão, desligamento e transferência de servidor agora têm trava: ou tudo dá certo, ou nada é gravado. Não é possível mais deixar servidor sem vínculo, ou desligar duas vezes — o sistema impede.",
       "descricao": "Os fluxos de admissão, desligamento e transferência de servidor passaram a ser executados como serviços com invariantes de domínio explícitas e em transação única — não dá mais para deixar um servidor sem vínculo, ou desligar duas vezes. Cadastro de rubricas (sem cálculo, ainda) também foi disponibilizado."
     },
     {
       "data": "2026-04-29",
       "tipo": "entrega",
       "titulo": "Cadastros centrais via API REST disponíveis",
+      "resumo_executivo": "Cadastros de servidor, vínculo, dependente, documento, cargo e lotação prontos para uso. Inclui validação automática de CPF e PIS, isolamento entre municípios e histórico de cada servidor.",
       "descricao": "Foram entregues os cadastros completos de servidor, vínculo funcional, dependente e documento, além de cargo e lotação. Inclui validação de CPF e PIS/PASEP, controle de acesso por papel, isolamento real entre municípios e endpoint de histórico de cada servidor. 126 testes automatizados, 96% de cobertura. Performance medida: 100 servidores criados via API em ~5 segundos."
     },
     {
       "data": "2026-04-29",
       "tipo": "marco",
       "titulo": "Fundação técnica do Bloco 1 concluída",
+      "resumo_executivo": "A base do sistema está pronta: cada município opera isolado (não vê dados de outro), login seguro, controle de quem pode fazer o quê e tudo que muda fica auditado automaticamente. É a fundação sobre a qual o resto do produto é construído.",
       "descricao": "Multi-tenant ativo (cada município opera em schema isolado no PostgreSQL), autenticação por JWT, controle de acesso por papel (RBAC), auditoria automática de mudanças e usuário customizado por e-mail. A base sobre a qual o resto do produto é construído está pronta."
     },
     {
       "data": "2026-04-28",
       "tipo": "processo",
       "titulo": "Sistema de contexto distribuído implantado",
+      "resumo_executivo": "Implantamos regras escritas que o desenvolvimento precisa seguir em cada parte do código. Garante que nenhuma alteração saia fora de padrão e dá previsibilidade quando o time crescer.",
       "descricao": "Cada parte do projeto passou a ter regras escritas que devem ser consultadas antes de implementar e um registro vivo do que foi feito. Garante que nenhuma alteração ocorra fora de padrão."
     },
     {
       "data": "2026-04-27",
       "tipo": "marco",
       "titulo": "Bloco 0 concluído — projeto iniciado",
+      "resumo_executivo": "Repositório, ambiente de desenvolvimento e documentação fundacional estruturados. O projeto Arminda saiu do papel e está pronto para começar a construção do produto.",
       "descricao": "Repositório, ambiente de desenvolvimento, backend Django, frontend e documentação fundacional foram estruturados. O projeto está pronto para entrar na construção do Bloco 1."
     }
   ],

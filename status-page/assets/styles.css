@@ -686,19 +686,63 @@ body {
 .changelog-tipo.tipo-marco { background: #fef2f2; color: var(--accent); }
 .changelog-tipo.tipo-entrega { background: var(--green-bg); color: var(--green); }
 
-.changelog-content { display: flex; flex-direction: column; gap: 4px; }
+.changelog-content { display: flex; flex-direction: column; gap: 8px; }
 
 .changelog-titulo {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);
   line-height: 1.35;
+  margin-bottom: 2px;
 }
 
+.changelog-resumo {
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.55;
+  padding: 10px 14px;
+  background: var(--primary-glow);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+  margin: 0;
+}
+
+.changelog-detalhe {
+  margin-top: 2px;
+}
+
+.changelog-detalhe-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  user-select: none;
+  list-style: none;
+  padding: 4px 0;
+  transition: color 120ms ease;
+}
+.changelog-detalhe-toggle::-webkit-details-marker { display: none; }
+.changelog-detalhe-toggle::before {
+  content: '▸';
+  display: inline-block;
+  transition: transform 150ms ease;
+  font-size: 0.7rem;
+}
+.changelog-detalhe[open] > .changelog-detalhe-toggle::before {
+  transform: rotate(90deg);
+}
+.changelog-detalhe-toggle:hover { color: var(--text-secondary); }
+
 .changelog-descricao {
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   color: var(--text-secondary);
   line-height: 1.6;
+  margin: 8px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--border-light);
 }
 
 .changelog-empty {

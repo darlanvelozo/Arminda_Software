@@ -189,6 +189,18 @@
     ordenado.forEach(function (item) {
       var li = document.createElement('li');
       li.className = 'changelog-item';
+
+      var resumoHtml = item.resumo_executivo
+        ? '<p class="changelog-resumo">' + escapeHtml(item.resumo_executivo) + '</p>'
+        : '';
+
+      var detalheHtml = item.descricao
+        ? '<details class="changelog-detalhe">' +
+            '<summary class="changelog-detalhe-toggle">Detalhe tecnico</summary>' +
+            '<p class="changelog-descricao">' + escapeHtml(item.descricao) + '</p>' +
+          '</details>'
+        : '';
+
       li.innerHTML =
         '<div class="changelog-meta">' +
           '<span class="changelog-data">' + escapeHtml(fmtData(item.data)) + '</span>' +
@@ -196,7 +208,8 @@
         '</div>' +
         '<div class="changelog-content">' +
           '<h3 class="changelog-titulo">' + escapeHtml(item.titulo) + '</h3>' +
-          '<p class="changelog-descricao">' + escapeHtml(item.descricao) + '</p>' +
+          resumoHtml +
+          detalheHtml +
         '</div>';
       container.appendChild(li);
     });
