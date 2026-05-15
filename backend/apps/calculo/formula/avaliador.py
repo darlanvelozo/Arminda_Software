@@ -21,7 +21,6 @@ from apps.calculo.formula.errors import (
     FormulaVariavelAusenteError,
 )
 from apps.calculo.formula.funcoes import (
-    BUILTINS_DINAMICAS,
     BUILTINS_STATIC,
     NOMES_PERMITIDOS,
     make_fn_rubrica,
@@ -61,6 +60,37 @@ class _BuiltinsNoGlobals(dict):
         raise KeyError(key)
 
 
+def _normalizar_resultado(resultado: Any) -> Decimal:
+    """Converte o retorno do eval para Decimal puro."""
+    if isinstance(resultado, bool):
+        return Decimal(int(resultado))
+    if isinstance(resultado, int):
+        return Decimal(resultado)
+    if isinstance(resultado, Decimal):
+        return resultado
+    if isinstance(resultado, float):
+        # Não devia acontecer (constantes viram Decimal no parser), mas defensivo
+        return Decimal(str(resultado))
+    raise FormulaTipoInvalidoError(
+        f"Fórmula retornou tipo inesperado: {type(resultado).__name__}"
+    )
+
+
+def _traduzir_nameerror(exc: NameError, formula: str) -> FormulaError:
+    """Mapeia um NameError para o erro DSL apropriado (função vs variável)."""
+    nome = str(exc).split("'")[1] if "'" in str(exc) else "desconhecido"
+    if nome in NOMES_PERMITIDOS:
+        return FormulaError(f"Erro interno ao resolver '{nome}'.")
+    if re.search(rf"\b{re.escape(nome)}\s*\(", formula):
+        return FormulaFuncaoDesconhecidaError(
+            f"Função '{nome}' não é permitida em fórmulas. "
+            f"Funções disponíveis: {', '.join(sorted(NOMES_PERMITIDOS))}."
+        )
+    return FormulaVariavelAusenteError(
+        f"Variável '{nome}' não está disponível no contexto da fórmula."
+    )
+
+
 def avaliar(formula: str, contexto: ContextoFolha) -> Decimal:
     """
     Avalia uma fórmula DSL com o contexto fornecido.
@@ -95,17 +125,7 @@ def avaliar(formula: str, contexto: ContextoFolha) -> Decimal:
     except NameError as exc:
         # NameError pode vir de variável ausente OU função não permitida.
         # Distingue olhando o source: se aparecer "NOME(" na fórmula, é função.
-        nome = str(exc).split("'")[1] if "'" in str(exc) else "desconhecido"
-        if nome in NOMES_PERMITIDOS:
-            raise FormulaError(f"Erro interno ao resolver '{nome}'.") from exc
-        if re.search(rf"\b{re.escape(nome)}\s*\(", formula):
-            raise FormulaFuncaoDesconhecidaError(
-                f"Função '{nome}' não é permitida em fórmulas. "
-                f"Funções disponíveis: {', '.join(sorted(NOMES_PERMITIDOS))}."
-            ) from exc
-        raise FormulaVariavelAusenteError(
-            f"Variável '{nome}' não está disponível no contexto da fórmula."
-        ) from exc
+        raise _traduzir_nameerror(exc, formula) from exc
     except (DivisionByZero, ZeroDivisionError) as exc:
         raise FormulaDivisaoPorZeroError("Divisão por zero na fórmula.") from exc
     except InvalidOperation as exc:
@@ -120,16 +140,4 @@ def avaliar(formula: str, contexto: ContextoFolha) -> Decimal:
         # Erros já tipados (vindos de funcoes.py) sobem direto
         raise
 
-    # Garante saída sempre Decimal
-    if isinstance(resultado, bool):
-        return Decimal(int(resultado))
-    if isinstance(resultado, int):
-        return Decimal(resultado)
-    if isinstance(resultado, Decimal):
-        return resultado
-    if isinstance(resultado, float):
-        # Não devia acontecer (constantes viram Decimal no parser), mas defensivo
-        return Decimal(str(resultado))
-    raise FormulaTipoInvalidoError(
-        f"Fórmula retornou tipo inesperado: {type(resultado).__name__}"
-    )
+    return _normalizar_resultado(resultado)

@@ -13,10 +13,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import date, datetime
 from typing import Any
-
-import re
 
 from apps.people.models import (
     EstadoCivil,
@@ -26,7 +25,6 @@ from apps.people.models import (
     Regime,
     Sexo,
 )
-
 
 # ============================================================
 # Helpers
@@ -70,7 +68,7 @@ def payload_hash(payload: dict[str, Any]) -> str:
     """SHA-256 de um dict serializado de forma estável (chaves ordenadas)."""
 
     def default(obj: Any):
-        if isinstance(obj, (date, datetime)):
+        if isinstance(obj, date | datetime):
             return obj.isoformat()
         return str(obj)
 
@@ -236,8 +234,8 @@ def map_unidade_orcamentaria(row: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     ano_raw = row.get("ano")
     try:
         ano = int(_safe_str(ano_raw))
-    except (TypeError, ValueError):
-        raise ValueError(f"UNIDADE com ANO inválido: {ano_raw!r}")
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"UNIDADE com ANO inválido: {ano_raw!r}") from exc
     nome = _safe_str(row.get("nome"), max_len=200)
     sigla = _safe_str(row.get("sigla"), max_len=20)
 
@@ -411,7 +409,7 @@ def map_vinculo(
     regime = _VINCULO_SIP_TO_REGIME.get(regime_codigo, Regime.ESTATUTARIO)
 
     horas_semanais = row.get("horasemanal")
-    if isinstance(horas_semanais, (int, float)) and 1 <= horas_semanais <= 60:
+    if isinstance(horas_semanais, int | float) and 1 <= horas_semanais <= 60:
         carga = int(round(horas_semanais))
     else:
         carga = 40

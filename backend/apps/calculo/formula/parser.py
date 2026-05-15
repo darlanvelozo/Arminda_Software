@@ -13,7 +13,6 @@ uma vez; subsequentes apenas executam.
 from __future__ import annotations
 
 import ast
-from decimal import Decimal
 from functools import lru_cache
 from typing import Any
 
@@ -21,7 +20,6 @@ from apps.calculo.formula.errors import (
     FormulaNaoPermitidaError,
     FormulaSintaxeError,
 )
-
 
 # ============================================================
 # Whitelist de nós AST permitidos

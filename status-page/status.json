@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-14",
+  "ultima_atualizacao": "2026-05-15",
   "bloco_atual": 2,
   "progresso_geral_pct": 52,
   "blocos": [
@@ -174,6 +174,13 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-15",
+      "tipo": "validacao",
+      "titulo": "Validação integral pós-Onda 2.2: backend, frontend e cálculo de folha testados ponta-a-ponta",
+      "resumo_executivo": "Validamos todo o sistema antes de seguir adiante: backend (366 testes verde com 86% de cobertura), frontend (10 testes verde, build sem erro, lint sem erro), cálculo real de folha em ambiente local (admissão → criação de rubricas → cálculo → recálculo idempotente, todos OK) e a página de status pública conferida visualmente com os resumos executivos no ar. Encontramos e corrigimos um bug de migration faltando da Onda 1.4-bis. Daqui pra frente, toda atualização passa por essa rotina antes de subir.",
+      "descricao": "Rotina de qualidade completa executada antes de progredir para a Onda 2.3. Backend: ruff lint com 0 erros (16 erros pré-existentes corrigidos — refatoração de duas funções complexas + raise-from + isinstance moderno), django check 0 issues, pytest 366 passed em ~56s com 86% de cobertura de linhas (calculo.py do Bloco 2.2 com 99%). Frontend: ESLint 0 erros (6 warnings de HMR, inócuos), tsc --noEmit 0 erros, vitest 10/10 passed, build de produção em 4.33s gerando 156 KB gzip iniciais. Smoke E2E via API contra backend rodando: login JWT, listagem de perfil, criação de cargo/lotação, admissão atômica (servidor + vínculo), criação de rubricas com fórmula (SAL='SALARIO_BASE' + INSS=11%), criação de folha, /calcular/ produzindo 2 lançamentos (R$ 3500 provento + R$ 385 desconto = R$ 3115 líquido), recálculo confirmando idempotência (0 criados, 2 atualizados). Validação visual: captura headless da página de status pública (https://darlanvelozo.github.io/Arminda_Software/) confirma renderização dos resumos executivos em destaque com borda azul, todos os 19 itens do changelog presentes. Captura headless da tela de login local confirma identidade visual e brand panel. Bug encontrado e corrigido: a Onda 1.4-bis adicionou o enum UNIDADE_ORCAMENTARIA em TipoEntidadeSip mas a migration correspondente não foi gerada/commitada — agora está em 0002_alter_sipimportrecord_tipo.py. Decisão de processo: toda nova atualização passa por esta rotina antes de ser registrada na página de status, e o resultado vira uma entrada do tipo 'validacao' no changelog."
+    },
     {
       "data": "2026-05-14",
       "tipo": "entrega",

@@ -103,10 +103,10 @@ class Command(BaseCommand):
         tenant_schema = opts["tenant"]
         try:
             municipio = Municipio.objects.get(schema_name=tenant_schema)
-        except Municipio.DoesNotExist:
+        except Municipio.DoesNotExist as exc:
             raise CommandError(
                 f"Tenant '{tenant_schema}' não existe. Crie o município antes de importar."
-            )
+            ) from exc
 
         password = opts["password"] or os.environ.get("SIP_PASSWORD")
         if not password:
@@ -222,7 +222,7 @@ class Command(BaseCommand):
 
         if total_erros > 0:
             self.stdout.write("")
-            self.stdout.write(self.style.WARNING(f"Erros detalhados (até 20):"))
+            self.stdout.write(self.style.WARNING("Erros detalhados (até 20):"))
             mostrados = 0
             for s in stats:
                 for msg in s.mensagens_erro:

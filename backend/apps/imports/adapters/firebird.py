@@ -11,9 +11,10 @@ Idempotência e mapeamento ficam em `apps.imports.services.mapping` e
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Iterator
+from typing import Any
 
 import firebirdsql
 
@@ -53,7 +54,7 @@ def _rows_to_dicts(cursor: Any) -> list[dict[str, Any]]:
         return []
     cols = [d[0].strip().lower() for d in cursor.description]
     return [
-        {col: _normalize(value) for col, value in zip(cols, row)} for row in cursor.fetchall()
+        {col: _normalize(value) for col, value in zip(cols, row, strict=False)} for row in cursor.fetchall()
     ]
 
 
