@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-12";
+const LAST_UPDATED = "2026-05-15";
 
 interface TocItem {
   id: string;
@@ -61,6 +61,7 @@ const TOC: TocItem[] = [
   { id: "servidores", label: "Servidores", icon: Users },
   { id: "configuracoes", label: "Configurações", icon: SettingsIcon },
   { id: "atalhos", label: "Pesquisa e atalhos", icon: Keyboard },
+  { id: "folha", label: "Folha de pagamento", icon: Wallet },
   { id: "importador", label: "Importador Fiorilli SIP", icon: Upload },
   { id: "em-construcao", label: "Em construção", icon: Construction },
   { id: "suporte", label: "Suporte", icon: Lightbulb },
@@ -80,8 +81,9 @@ export default function GuiaPage() {
         </p>
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
-          <span className="ml-1 inline-flex items-center gap-1">
+          <span className="ml-1 inline-flex items-center gap-2">
             <Badge variant="success">Bloco 1 entregue</Badge>
+            <Badge variant="info">Bloco 2 em andamento (Onda 2.2 ✓)</Badge>
           </span>
         </p>
       </header>
@@ -118,6 +120,7 @@ export default function GuiaPage() {
           <SectionServidores />
           <SectionConfiguracoes />
           <SectionAtalhos />
+          <SectionFolha />
           <SectionImportador />
           <SectionEmConstrucao />
           <SectionSuporte />
@@ -442,8 +445,8 @@ function SectionCadastros() {
           icon={Tag}
           title="Rubricas"
           to="/rubricas"
-          status="parcial"
-          desc="Proventos, descontos e rubricas informativas. O cadastro funciona, mas a fórmula de cálculo (DSL) só será interpretada no Bloco 2 — engine de cálculo de folha."
+          status="ok"
+          desc="Proventos, descontos e rubricas informativas. A fórmula DSL é validada na criação e usada pelo motor de cálculo (Onda 2.1+). Veja a seção 'Folha de pagamento' para exemplos de fórmula e funções disponíveis."
         />
       </div>
       <p>Em todas essas telas você tem:</p>
@@ -514,8 +517,9 @@ function SectionServidores() {
       <Callout variant="warning">
         <strong>Salário-base = R$ 0</strong> nos vínculos importados via SIP — isso é
         intencional. O Fiorilli guarda o salário em outras tabelas (eventos fixos +
-        movimento histórico) que dependem do engine de cálculo (Bloco 2). Por enquanto,
-        edite cada vínculo e preencha manualmente se quiser testar fluxos.
+        movimento histórico) que dependem do engine de cálculo. Por enquanto, edite
+        cada vínculo e preencha o salário manualmente para testar o{" "}
+        <a href="#folha" className="underline">cálculo da folha</a> (Onda 2.2 ✓).
       </Callout>
     </Section>
   );
@@ -589,6 +593,161 @@ function SectionAtalhos() {
   );
 }
 
+function SectionFolha() {
+  return (
+    <Section id="folha" icon={Wallet} title="Folha de pagamento">
+      <p>
+        O <strong>cálculo da folha mensal</strong> está disponível desde a Onda 2.2
+        (mai/2026). Ainda não há tela operacional — a interface de Folha entra na
+        Onda 2.6. Por enquanto, o cálculo é disparado por API.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Como o cálculo funciona</h3>
+      <ol className="list-decimal pl-5 space-y-2">
+        <li>
+          <strong>Cadastre as rubricas</strong> em{" "}
+          <Link to="/rubricas" className="underline">/rubricas</Link> — código, nome,
+          tipo (provento / desconto / informativa) e fórmula DSL.
+        </li>
+        <li>
+          <strong>Defina a fórmula</strong> usando a DSL do Arminda. Exemplos:
+          <pre className="mt-1 text-[11px] bg-muted px-2 py-1.5 rounded leading-relaxed overflow-x-auto">
+{`SALARIO_BASE                          # salário base do vínculo
+RUBRICA('SAL_BASE') * 0.11            # INSS 11% sobre rubrica
+SE(DEPENDENTES > 0, 189.59 * DEPENDENTES, 0)
+MAX(SALARIO_BASE, SALARIO_MINIMO)     # piso salarial
+ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
+          </pre>
+        </li>
+        <li>
+          <strong>Crie uma folha</strong> da competência desejada (POST{" "}
+          <code className="text-xs bg-muted px-1 rounded">/api/payroll/folhas/</code>{" "}
+          com <code className="text-xs bg-muted px-1 rounded">{`{ "competencia": "2026-05-01", "tipo": "mensal" }`}</code>).
+        </li>
+        <li>
+          <strong>Dispare o cálculo</strong>: POST{" "}
+          <code className="text-xs bg-muted px-1 rounded">
+            /api/payroll/folhas/{`{id}`}/calcular/
+          </code>
+          . O sistema percorre todos os vínculos ativos × rubricas ativas em ordem
+          topológica e produz um lançamento por par.
+        </li>
+        <li>
+          <strong>Confira o relatório</strong>: a resposta traz contadores (vínculos
+          processados, lançamentos criados/atualizados/removidos), a ordem em que as
+          rubricas foram calculadas e a lista de erros por (vínculo, rubrica) — se
+          uma fórmula falhou, o batch continua e reporta no fim.
+        </li>
+      </ol>
+
+      <h3 className="text-base font-semibold mt-4">Variáveis disponíveis nas fórmulas</h3>
+      <ul className="list-disc pl-5 space-y-1 text-xs">
+        <li>
+          <code className="bg-muted px-1 rounded">SALARIO_BASE</code> — salário do
+          vínculo
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">CARGA_HORARIA</code>,{" "}
+          <code className="bg-muted px-1 rounded">HORAS_PADRAO</code>,{" "}
+          <code className="bg-muted px-1 rounded">HORAS_TRABALHADAS</code>
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">DIAS_TRABALHADOS</code>,{" "}
+          <code className="bg-muted px-1 rounded">FALTAS</code>
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">IDADE</code>,{" "}
+          <code className="bg-muted px-1 rounded">DEPENDENTES</code>,{" "}
+          <code className="bg-muted px-1 rounded">DEPENDENTES_SALFAM</code>
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">TEMPO_SERVICO_ANOS</code>,{" "}
+          <code className="bg-muted px-1 rounded">SALARIO_MINIMO</code>
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">COMPETENCIA_ANO</code>,{" "}
+          <code className="bg-muted px-1 rounded">COMPETENCIA_MES</code>
+        </li>
+      </ul>
+
+      <h3 className="text-base font-semibold mt-4">Funções builtin</h3>
+      <ul className="list-disc pl-5 space-y-1 text-xs">
+        <li>
+          <code className="bg-muted px-1 rounded">SE(condição, sim, não)</code>
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">MAX(a, b, …)</code>,{" "}
+          <code className="bg-muted px-1 rounded">MIN(a, b, …)</code>,{" "}
+          <code className="bg-muted px-1 rounded">ABS(x)</code>
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">ARRED(valor, casas)</code> —
+          arredondamento bancário (half-even)
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">RUBRICA('CODIGO')</code> — valor de
+          outra rubrica já calculada neste mesmo vínculo
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">FAIXA_IRRF(base, deps)</code> e{" "}
+          <code className="bg-muted px-1 rounded">FAIXA_INSS(base)</code> —
+          placeholders (entram na Onda 2.3 com as tabelas legais 2026)
+        </li>
+      </ul>
+
+      <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
+      <ul className="space-y-3">
+        <FlowItem
+          status="ok"
+          title="Calculadora de fórmulas"
+          desc="POST /api/payroll/rubricas/{id}/avaliar/ — testa uma fórmula com um contexto manual. Útil para depurar antes de fechar a competência."
+        />
+        <FlowItem
+          status="ok"
+          title="Cálculo mensal ordinário"
+          desc="POST /api/payroll/folhas/{id}/calcular/ — produz lançamentos para todos os vínculos ativos da competência. Idempotente (recalcular não duplica). Coleta erros por par sem parar o batch."
+        />
+        <FlowItem
+          status="ok"
+          title="Consulta de lançamentos"
+          desc="GET /api/payroll/lancamentos/?folha={id} — paginado, com filtros por servidor, rubrica, tipo e valor."
+        />
+        <FlowItem
+          status="em-construcao"
+          title="Tabelas legais 2026 (INSS, IRRF)"
+          desc="Onda 2.3 — FAIXA_INSS e FAIXA_IRRF deixam de ser placeholders, salário mínimo vira tabela versionada por exercício."
+        />
+        <FlowItem
+          status="em-construcao"
+          title="Holerite (PDF)"
+          desc="Onda 2.5 — gera contracheque a partir dos lançamentos da folha calculada."
+        />
+        <FlowItem
+          status="em-construcao"
+          title="Tela operacional de Folha"
+          desc="Onda 2.6 — abrir competência, lançamentos com filtros, disparar cálculo, ver erros estruturados, conferir totais, fechar."
+        />
+      </ul>
+
+      <Callout variant="warning">
+        Hoje os salários dos vínculos importados via SIP vêm zerados (intencional,
+        ver bloco Servidores). Para testar o cálculo, preencha{" "}
+        <strong>salario_base</strong> manualmente nos vínculos antes de disparar.
+      </Callout>
+
+      <Callout variant="info">
+        Erros de fórmula têm <strong>código estável</strong> que vai aparecer na UI
+        da Onda 2.6 com mensagem amigável:{" "}
+        <code className="text-xs bg-muted px-1 rounded">FORMULA_SINTAXE</code>,{" "}
+        <code className="text-xs bg-muted px-1 rounded">FORMULA_VARIAVEL_AUSENTE</code>,{" "}
+        <code className="text-xs bg-muted px-1 rounded">FORMULA_FUNCAO_DESCONHECIDA</code>,{" "}
+        <code className="text-xs bg-muted px-1 rounded">FORMULA_DIVISAO_POR_ZERO</code>,{" "}
+        <code className="text-xs bg-muted px-1 rounded">DEPENDENCIA_CICLICA</code> etc.
+      </Callout>
+    </Section>
+  );
+}
+
 function SectionImportador() {
   return (
     <Section id="importador" icon={Upload} title="Importador Fiorilli SIP">
@@ -649,7 +808,7 @@ function SectionEmConstrucao() {
           icon={Wallet}
           title="Bloco 2 — Engine de cálculo de folha"
           period="Maio – Agosto/2026 (em andamento)"
-          desc="DSL de fórmulas (Onda 2.1 ✅ maio/2026), cálculo mensal ordinário (Onda 2.2 ✅ maio/2026 — toposort de rubricas, serviço idempotente, endpoint /calcular/), incidências (INSS, IRRF, FGTS, previdência), tabelas legais 2026, geração de holerite. Habilita a área Folha e os KPIs financeiros do Dashboard."
+          desc="DSL de fórmulas (Onda 2.1 ✓ maio/26), cálculo mensal ordinário (Onda 2.2 ✓ maio/26 — disponível por API; ver seção 'Folha de pagamento'). Próximas: tabelas legais 2026 com INSS/IRRF reais (Onda 2.3), holerite em PDF (Onda 2.5), tela operacional de Folha (Onda 2.6), testes de paridade contra Fiorilli (Onda 2.7)."
         />
         <RoadmapItem
           icon={Wallet}

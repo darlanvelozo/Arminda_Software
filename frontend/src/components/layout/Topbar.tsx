@@ -189,6 +189,11 @@ function PerfilDropdown() {
           Trocar senha
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navigate("/guia")}>Guia de uso</DropdownMenuItem>
+        {(user.is_staff || papelAtual === "admin_municipio") && (
+          <DropdownMenuItem onSelect={() => navigate("/guia-admin")}>
+            Guia do desenvolvedor
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={handleLogout}

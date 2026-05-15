@@ -41,6 +41,7 @@ const ConfiguracoesPage = lazy(
   () => import("@/pages/configuracoes/ConfiguracoesPage"),
 );
 const GuiaPage = lazy(() => import("@/pages/GuiaPage"));
+const GuiaAdminPage = lazy(() => import("@/pages/GuiaAdminPage"));
 
 function PageFallback() {
   return (
@@ -97,6 +98,7 @@ function App() {
         <Route path="relatorios" element={<EmConstrucaoPage area="Relatórios" />} />
         <Route path="configuracoes" element={lazyRoute(<ConfiguracoesPage />)} />
         <Route path="guia" element={lazyRoute(<GuiaPage />)} />
+        <Route path="guia-admin" element={lazyRoute(<GuiaAdminPage />)} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
