@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-12",
+  "ultima_atualizacao": "2026-05-14",
   "bloco_atual": 2,
-  "progresso_geral_pct": 50,
+  "progresso_geral_pct": 52,
   "blocos": [
     {
       "numero": 0,
@@ -67,10 +67,10 @@
       "data_fim_prevista": "2026-08-31",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 14,
+      "progresso_pct": 28,
       "entregas": [
         "✅ Linguagem de fórmulas configurável (DSL via Python AST whitelist, ADR-0012) — Onda 2.1",
-        "Cálculo de folha mensal ordinária — Onda 2.2",
+        "✅ Cálculo de folha mensal ordinária (toposort de rubricas + serviço idempotente + endpoint /calcular/) — Onda 2.2",
         "Incidências (INSS, IRRF, FGTS, previdência) — Onda 2.3",
         "Tabelas legais 2026 (FAIXA_IRRF, FAIXA_INSS) — Onda 2.4",
         "Geração de holerite (PDF + JSON) — Onda 2.5",
@@ -174,6 +174,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-14",
+      "tipo": "entrega",
+      "titulo": "Cálculo de folha mensal funcionando ponta-a-ponta (Onda 2.2)",
+      "descricao": "Em cima da DSL entregue na Onda 2.1, agora calculamos uma folha inteira: o serviço carrega todas as rubricas ativas, ordena topologicamente pela dependência declarada (RUBRICA('X') em uma fórmula faz a rubrica X ser calculada antes), itera os vínculos ativos da competência e produz um Lancamento para cada par (vínculo, rubrica). É idempotente: rodar duas vezes converge para o mesmo estado, sem duplicação. Erros de fórmula em um vínculo são coletados num relatório, mas o batch segue — operador conserta a rubrica problemática e recalcula. Erros estruturais (ciclo entre rubricas, dependência inexistente) abortam tudo dentro de uma transação atômica. O endpoint POST /api/payroll/folhas/{id}/calcular/ dispara o cálculo e devolve um relatório com contadores (vínculos processados, lançamentos criados/atualizados/removidos), a ordem em que as rubricas foram calculadas e a lista de erros. Endpoints novos também para CRUD de folhas e consulta paginada de lançamentos. 34 testes novos cobrindo idempotência, ciclo, isolamento entre tenants, permissões e limpeza de órfãos. Suite completa: 366 testes verde. Próximas ondas: tabelas legais 2026 (INSS/IRRF reais), holerite em PDF, tela /folha operacional."
+    },
     {
       "data": "2026-05-12",
       "tipo": "entrega",

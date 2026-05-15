@@ -35,6 +35,121 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 2.2 — Cálculo mensal ordinário: do servidor ao Lançamento · 2026-05-14
+
+> Segunda onda do **Bloco 2 (engine de cálculo de folha)**. Em cima da
+> DSL entregue na Onda 2.1, agora **calculamos uma folha inteira**:
+> itera vínculos ativos × rubricas (em ordem topológica) e produz
+> `Lancamento`. É o primeiro momento em que servidores reais geram
+> valores reais no Arminda.
+
+#### Adicionado — Backend
+
+- **feat(apps.calculo):** `apps/calculo/dependencias.py` — análise
+  estática de dependências entre rubricas:
+  - `extrair_dependencias(formula) → set[str]` lê a AST e devolve
+    códigos referenciados via `RUBRICA('X')`. Análise estática pura
+    (não avalia nada); ignora argumentos dinâmicos como
+    `RUBRICA(codigo_var)` (o avaliador trata em runtime).
+  - `ordenar_topologicamente([RubricaParaOrdenar(...)]) → list[str]`
+    implementa **Kahn's algorithm** com tie-breaker alfabético para
+    resultado determinístico.
+  - 2 erros novos com `code` estável: `DEPENDENCIA_CICLICA`,
+    `DEPENDENCIA_INEXISTENTE`.
+
+- **feat(apps.payroll.services):** `services/calculo.py` —
+  `calcular_folha(folha) → RelatorioCalculo`:
+  - Idempotente: re-rodar produz o mesmo estado (via
+    `update_or_create` em `(folha, vinculo, rubrica)`).
+  - Limpa órfãos: rubrica que era ativa e deixou de ser → lançamento
+    correspondente é removido.
+  - Atômico: tudo dentro de `transaction.atomic`; erro estrutural
+    (ciclo, dependência inexistente) aborta a transação inteira.
+  - Coleta erros sem parar o batch: cada par (vínculo, rubrica) é
+    isolado; falhas de fórmula viram `ErroLancamento` no relatório,
+    mas as outras rubricas seguem calculando.
+  - `construir_contexto(vinculo, competencia, rubricas_calculadas)`
+    monta `ContextoFolha` com 13 variáveis padrão (SALARIO_BASE,
+    IDADE, DEPENDENTES, etc.) — fonte de verdade dos nomes
+    disponíveis nas fórmulas.
+  - Atualiza `Folha.total_proventos`, `total_descontos`,
+    `total_liquido`; status `aberta` → `calculada` ao final.
+  - Constantes legais provisórias: `SALARIO_MINIMO_2026 = 1518.00`,
+    `HORAS_MES_44H = 220.00` (viram tabela legal na Onda 2.3).
+
+- **feat(apps.payroll):** Novos endpoints:
+  - `GET/POST/PATCH/DELETE /api/payroll/folhas/` — CRUD de folhas
+    (FolhaList/Detail/Write serializers).
+  - `POST /api/payroll/folhas/{id}/calcular/` — dispara o cálculo
+    e devolve `RelatorioCalculo` em JSON (contadores +
+    `ordem_rubricas` + lista de `erros`). Erros estruturais devolvem
+    HTTP 400 com `code`.
+  - `GET /api/payroll/lancamentos/` — consulta paginada (read-only;
+    lançamentos não se criam manualmente, vêm sempre do cálculo).
+  - Permissões: leitura para qualquer papel; `calcular` exige
+    financeiro/admin.
+  - Filtros: `competencia_de`, `competencia_ate`, `ano`, `mes`,
+    `tipo`, `status` em folhas; `folha`, `vinculo`, `servidor`,
+    `rubrica`, `rubrica__codigo` em lançamentos.
+
+- **test:** 34 testes novos:
+  - `apps/calculo/tests/test_dependencias.py` — 15 testes (extração
+    de RUBRICA, toposort, ciclo, dependência inexistente, duplicatas).
+  - `apps/payroll/tests/test_calculo_servico.py` — 11 testes
+    (caminho feliz com dependência, idempotência, limpeza de
+    órfãos, coleta de erros sem parar batch, vínculos
+    desligados/admitidos fora da competência, ciclo aborta,
+    rubrica sem fórmula é ignorada, informativa não entra em
+    totais).
+  - `apps/payroll/tests/test_folha_endpoint.py` — 10 testes (CRUD,
+    `/calcular/` caminho feliz, idempotência via endpoint, ciclo
+    → 400, RBAC, isolamento entre tenants).
+
+- **366 testes verde no total** (332 → 366, +34).
+
+#### Por quê
+
+- **Onda 2.1 entregou a DSL; sem 2.2 ela seria fan-art.** Calcular
+  uma folha real exige orquestração: quais vínculos? em que ordem?
+  o que fazer quando uma fórmula falha? Esta onda materializa todas
+  essas decisões.
+- **Idempotência é requisito.** Em produção, operador clica
+  "calcular" várias vezes (testando, corrigindo rubrica, refazendo).
+  Cada rodada precisa convergir para o mesmo estado — caso contrário
+  a folha vira lixeira de lançamentos duplicados.
+- **Coletar erros sem parar o batch** é o oposto de "fail fast" — em
+  folha de pagamento, queremos calcular o máximo possível e reportar
+  o que falhou. Operador olha o relatório, conserta a rubrica
+  problemática, recalcula. Se um único erro abortasse tudo, ninguém
+  conseguiria fechar folha.
+- **Toposort estável (alfabético entre livres)** garante que dois
+  cálculos da mesma folha produzem a mesma `ordem_rubricas` no
+  relatório — facilita debug.
+
+#### Impacto
+
+- Sem migrations (todos os modelos já existiam desde Bloco 1.2).
+- 1 arquivo novo em `apps.calculo` (`dependencias.py`).
+- 1 arquivo novo em `apps.payroll.services` (`calculo.py`).
+- ViewSets, serializers, filters e urls expandidos.
+- API nova: 3 endpoints (folhas CRUD, calcular action, lancamentos
+  read-only). Nenhum contrato existente foi alterado.
+- Suite completa verde (366 testes, ~50s).
+
+#### Próximos passos
+
+- **Onda 2.3 — Tabelas legais 2026.** Substitui as constantes
+  provisórias (`SALARIO_MINIMO_2026`, `HORAS_MES_44H`) por tabelas
+  versionadas no banco; `FAIXA_IRRF` e `FAIXA_INSS` deixam de ser
+  placeholders.
+- **Onda 2.5 — Holerite (PDF).** Usa os lançamentos da Onda 2.2 para
+  gerar o contracheque por servidor.
+- **Onda 2.6 — UI de folha.** Tela em React que dispara o cálculo,
+  mostra o relatório, lista lançamentos com filtros, exibe erros
+  estruturados.
+
+---
+
 ### Bloco 2.1 — Engine de cálculo: DSL de fórmulas para rubricas · 2026-05-12
 
 > Início do **Bloco 2 (engine de cálculo de folha)**. Esta onda entrega
