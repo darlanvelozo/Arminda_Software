@@ -35,6 +35,91 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### docs: MANAD no Bloco 4 + Sagres no Bloco 5 + ADR-0011 adaptadores · 2026-05-12
+
+> Ajuste de roadmap após dois aprendizados externos:
+>
+> 1. Conversa com Dr. Renzo sobre MANAD ("base de todas as folhas do
+>    Brasil, é obrigatório") + análise de arquivo MANAD 2020 real
+>    (FMAS de Canindé de São Francisco/SE — referência apenas, não
+>    commitado por conter dados pessoais).
+> 2. Necessidade de suportar **múltiplas prefeituras** com perfis
+>    fiscais diferentes (TCE-MA para uma, Sagres-PB para outra, etc.)
+>    sem deploy de código.
+>
+> Nenhuma mudança de produto neste commit — só documentação que orienta
+> os Blocos 4, 5 e 7 quando chegarem.
+
+#### Adicionado
+
+- **docs(roadmap):** Bloco 4 ganha **MANAD** como entrega nominal
+  (estava ausente), com critério de paridade bit-a-bit contra o
+  sistema legado. Pré-requisito explicitado: modelo `OrgaoEmissor`
+  por CNPJ (cada município tem N órgãos emissores).
+- **docs(roadmap):** Bloco 5 ganha **TCE-PB (Sagres Folha)** como
+  segundo adaptador prioritário (estava genericamente em "framework
+  extensível"). Critério novo: município ativa integrações no admin
+  sem deploy.
+- **docs(adr):** [ADR-0011 — Adaptadores externos configuráveis](docs/adr/0011-adaptadores-externos-configuraveis.md).
+  Decide:
+  - Modelo `IntegracaoExterna(municipio, orgao_emissor, tipo, ativo,
+    configuracao)` em `apps.core` (SHARED, public schema).
+  - Adapter Pattern em código (`apps/<bloco>/adapters/<tipo>.py`)
+    implementando interface comum (`gerar_remessa`, `validar`,
+    `enviar`, `consultar_status`).
+  - Modelo `OrgaoEmissor` em `apps.people` (TENANT) com CNPJ próprio
+    + relacionamento opcional com `UnidadeOrcamentaria`.
+  - Endpoint `GET /api/core/integracoes/ativas/` para frontend
+    montar menu dinamicamente — município sem TCE-PB literalmente
+    não vê o ícone.
+  - Credenciais cifradas com Fernet no JSON `configuracao`.
+  - Tipos pré-listados: eSocial, MANAD, SEFIP, CAGED, RAIS, DIRF,
+    DCTFWeb, TCE-MA, TCE-PB, TCE-SP (Audesp), expansível.
+- **docs(leiautes):** Nova pasta
+  [`docs/leiautes/manad/`](docs/leiautes/manad/) com `README.md`
+  detalhando o leiaute MANAD (registros 0000–9999, blocos K, encoding
+  WIN1252, exemplo de cada record desanonimizado). Material de
+  consulta para o Bloco 4. **Não commitamos** os 12 arquivos .txt
+  originais que serviram de aprendizado (contêm CPF/PIS/nomes de 159
+  servidores reais de Canindé/SE).
+- **docs(status-page):** entregas dos Blocos 4 e 5 expandidas com
+  os novos itens.
+- **docs(guia):** subseções de Bloco 4 e Bloco 5 detalhadas com a
+  nova lista de obrigações + nota sobre menu dinâmico. `LAST_UPDATED`
+  para 2026-05-12.
+
+#### Por quê
+
+- **Multi-município é requisito de produto.** Hoje o piloto é em
+  São Raimundo do Doca Bezerra/MA, mas o Arminda nasce para atender
+  N prefeituras brasileiras. Sem a decisão de arquitetura agora, o
+  primeiro adapter (eSocial no Bloco 4) seria implementado
+  monoliticamente e quebraria ao chegar a segunda prefeitura.
+- **MANAD é obrigatório por lei, não por preferência.** Mesmo que o
+  uso esteja diminuindo, a Receita pode pedir e o sistema tem que
+  saber gerar. O risco de descobrir isso no piloto seria caro.
+- **CNPJ por órgão emissor evita rework futuro.** Confirmado no
+  arquivo MANAD analisado: cada Fundo (Saúde, Assistência, etc.)
+  emite com seu próprio CNPJ. Se modelarmos "1 município = 1 CNPJ",
+  vamos ter que refatorar tudo quando bater na realidade.
+
+#### Impacto
+
+- Sem mudança de código de produto, sem migration, sem alteração
+  de contrato.
+- Documentação cresceu: 1 ADR nova (0011), 1 README de leiaute,
+  CHANGELOG e GuiaPage atualizados, ROADMAP e status.json revistos.
+- Nenhuma tag de versão é criada (segundo ADR-0010 §3, tags são por
+  entrega de produto — docs internas não geram tag).
+
+#### Próximos passos
+
+- **Bloco 2.1 — DSL de fórmulas para rubricas.** Começo agora —
+  é o item mais incerto do Bloco 2 e destrava o resto da engine
+  de cálculo.
+
+---
+
 ### Onda 1.4-bis: Unidade orçamentária (DEPDESPESA do SIP) · 2026-05-10
 
 > Extensão do importador para puxar a tabela `UNIDADE` do Fiorilli SIP

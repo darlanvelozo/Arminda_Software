@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-10",
+  "ultima_atualizacao": "2026-05-12",
   "bloco_atual": 1,
   "progresso_geral_pct": 48,
   "blocos": [
@@ -105,12 +105,14 @@
       "status": "previsto",
       "progresso_pct": 0,
       "entregas": [
-        "Envio de eventos eSocial",
+        "Envio de eventos eSocial (S-1000, S-1010, S-1020, S-1200, S-1210, S-2200, S-2299, S-2300, etc.)",
         "Geração de SEFIP",
         "Geração de CAGED",
         "Geração de RAIS e DIRF",
         "Informe de rendimentos do servidor",
-        "DCTFWeb"
+        "DCTFWeb",
+        "Geração de MANAD (auditoria Receita/INSS) — por CNPJ de cada órgão emissor",
+        "Modelo OrgaoEmissor por CNPJ (Prefeitura + Fundos + Câmara) — pré-requisito de eSocial e MANAD"
       ]
     },
     {
@@ -124,10 +126,12 @@
       "status": "previsto",
       "progresso_pct": 0,
       "entregas": [
-        "Adaptador para TCE-MA",
-        "Framework para novos TCEs",
+        "Adaptador para TCE-MA (SACOP/SIGFIS — município-piloto)",
+        "Adaptador para TCE-PB (Sagres Folha — segundo município)",
+        "Framework para novos TCEs (TCE-SP Audesp, TCE-PE, TCE-CE etc.)",
         "Geração e validação de remessas",
-        "Histórico de envios"
+        "Histórico de envios + reenvio com tracking",
+        "Configuração de integrações no admin (ADR-0011): cada município ativa as suas, sem deploy"
       ]
     },
     {
@@ -168,6 +172,12 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-12",
+      "tipo": "processo",
+      "titulo": "Roadmap ampliado: MANAD obrigatório + Sagres + adaptadores configuráveis",
+      "descricao": "Refinamos o planejamento dos Blocos 4 e 5 após dois aprendizados: o doutor confirmou que o MANAD (Manual Normativo de Arquivos Digitais da Receita/INSS) é base obrigatória de toda folha brasileira, e tivemos acesso a arquivos MANAD reais de 2020 de outro município que serviram de referência técnica. Para suportar diversas prefeituras com perfis fiscais diferentes (TCE-MA aqui, Sagres-PB ali), o sistema vai ter no admin Django uma tabela onde cada município configura quais integrações está ativa, sem deploy de código. O frontend monta o menu de obrigações dinamicamente. Tudo formalizado na ADR-0011. Nenhuma mudança de produto neste ajuste — só documentação para orientar os blocos quando chegarem."
+    },
     {
       "data": "2026-05-10",
       "tipo": "entrega",

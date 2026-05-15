@@ -105,11 +105,16 @@ A camada que ninguém vê mas que, se quebrar, derruba o produto.
 - DIRF
 - Informe de rendimentos do servidor
 - DCTFWeb
+- **MANAD** (Manual Normativo de Arquivos Digitais — IN SRP 86/2003 e atualizações; ainda exigido em fiscalizações pontuais da Receita/INSS). Geração dos blocos K (folha): K001/K050/K100/K150/K200/K250/K300/K990 + cabeçalhos 0xxx e bloco 9 de controle. Por CNPJ emissor (entidade fiscal), não por município.
+
+**Pré-requisito de modelo**
+- Entidade `OrgaoEmissor` (com CNPJ próprio) ligada a `UnidadeOrcamentaria` — uma prefeitura tem N órgãos emissores (Prefeitura, Fundo de Saúde, FMAS, Câmara). MANAD e eSocial são gerados **por órgão**, não pelo município inteiro.
 
 **Critério de aceitação**
 - Envio bem-sucedido em ambiente de produção restrito do governo
 - Reconciliação de retornos (sucesso/erro) automática
 - Reenvio com tracking de status
+- MANAD gerado idêntico ao do sistema legado em paridade bit-a-bit para 1 competência completa
 
 ---
 
@@ -118,14 +123,18 @@ A camada que ninguém vê mas que, se quebrar, derruba o produto.
 **Período estimado:** mês 8
 
 **Escopo**
-- Adaptador para o **TCE-MA** (estado da prefeitura piloto)
-- Framework de adaptadores extensível para outros TCEs
+- Adaptador para o **TCE-MA** (SACOP/SIGFIS — estado da prefeitura-piloto)
+- Adaptador para o **TCE-PB** (Sagres Folha) — alvo do segundo município
+- Framework de adaptadores extensível para outros TCEs (TCE-SP Audesp, TCE-PE, TCE-CE, etc.)
 - Geração e validação de arquivos no layout de cada TCE
-- Histórico de remessas
+- Histórico de remessas + reenvio
+- **Configuração no admin Django** (ADR-0011): cada município ativa as integrações que precisa via tabela `IntegracaoExterna` — o frontend monta o menu dinamicamente a partir dela. Nenhuma integração fica "fantasma" para município que não usa.
 
 **Critério de aceitação**
 - Geração de remessa do TCE-MA aceita sem rejeição estrutural
+- Geração de remessa do TCE-PB (Sagres) aceita sem rejeição estrutural
 - Documentação clara para adicionar novos TCEs (1 estado novo em ≤ 1 semana)
+- Município pode ativar/desativar integrações sem deploy de código
 
 ---
 

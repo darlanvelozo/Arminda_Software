@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-10";
+const LAST_UPDATED = "2026-05-12";
 
 interface TocItem {
   id: string;
@@ -661,13 +661,13 @@ function SectionEmConstrucao() {
           icon={FileText}
           title="Bloco 4 — Obrigações federais"
           period="Outubro – Novembro/2026"
-          desc="eSocial, SEFIP, CAGED, RAIS, DIRF, informe de rendimentos, DCTFWeb. Habilita a área de Relatórios."
+          desc="eSocial (S-1000…S-2400), SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD (auditoria Receita/INSS) e informe de rendimentos. Tudo gerado por CNPJ do órgão emissor (Prefeitura, Fundo de Saúde, Fundo de Assistência, Câmara) — não pelo município como um todo."
         />
         <RoadmapItem
           icon={FileText}
           title="Bloco 5 — Tribunal de Contas"
           period="Dezembro/2026"
-          desc="Adaptador para TCE-MA (primeiro), framework para outros TCEs, geração e validação de remessas, histórico de envios."
+          desc="Adaptadores TCE-MA (SACOP/SIGFIS) e TCE-PB (Sagres Folha), framework extensível para outros estados, geração e validação de remessas, histórico de envios. Cada município ativa só as integrações que precisa pelo admin (ADR-0011) — o menu do frontend monta-se dinamicamente."
         />
         <RoadmapItem
           icon={Users}
