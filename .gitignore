@@ -103,3 +103,6 @@ tmp/
 notas/
 scratch/
 TODO.local.md
+
+# Demo branch — logs runtime do start-demo.sh
+.demo-logs/
