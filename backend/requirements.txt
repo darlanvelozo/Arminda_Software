@@ -55,3 +55,6 @@ ruff==0.8.4
 # Debug
 django-extensions==3.2.3
 ipython==8.30.0
+
+# Servidor WSGI para a demo 24/7 (ver start-demo.sh)
+gunicorn==23.0.0
