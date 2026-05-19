@@ -35,6 +35,110 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 2.3 — Tabelas legais 2024/2025/2026: INSS e IRRF reais · 2026-05-17
+
+> Terceira onda do **Bloco 2 (engine de cálculo)**. Substitui as aproximações
+> da Onda 2.2 (INSS 11% flat, IRRF simplificado) por **faixas progressivas
+> reais** conforme legislação federal, com vigência por competência e
+> atualização via admin Django (sem deploy).
+
+#### Adicionado — Backend
+
+- **feat(apps.core):** Modelo `TabelaLegal` em `apps.core` (SHARED, public)
+  com campos:
+  - `tipo` (`salario_minimo` | `inss` | `irrf` | `deducao_dependente_irrf`)
+  - `vigencia_inicio` (date, obrigatório), `vigencia_fim` (date, opcional)
+  - `valores` (JSONField com estrutura específica por tipo)
+  - `referencia_legal` (texto livre — Decreto/Lei/MP de origem)
+  - Constraint único: `(tipo, vigencia_inicio)`.
+
+- **feat(apps.calculo.tabelas):** Serviço de resolução por competência:
+  - `salario_minimo(comp)`, `inss(base, comp)`, `irrf(base, deps, comp)`,
+    `deducao_dependente_irrf(comp)`.
+  - Filtra a TabelaLegal com `vigencia_inicio <= comp` e (`vigencia_fim is
+    null` OR `vigencia_fim >= comp`), pega a mais recente.
+  - Cacheado por `functools.lru_cache(maxsize=256)`.
+  - Erros tipados: `TabelaLegalAusenteError` (code `TABELA_LEGAL_AUSENTE`),
+    `TabelaLegalInvalidaError` (code `TABELA_LEGAL_INVALIDA`).
+
+- **feat(apps.calculo.formula.funcoes):** `FAIXA_INSS(base)` e
+  `FAIXA_IRRF(base, deps)` viraram builtins **dinâmicas** (igual `RUBRICA`)
+  — recebem a competência via factory `make_fn_faixa_*(competencia)`
+  acionada pelo avaliador. Adeus placeholders `NotImplementedError`.
+
+- **feat(apps.calculo.formula.contexto):** `ContextoFolha` ganhou campo
+  `competencia: date | None` — preenchido pelo `construir_contexto()` do
+  serviço de cálculo. Fallback: primeiro dia do mês corrente da máquina
+  (compatível com `/avaliar/` standalone).
+
+- **feat(apps.payroll.services.calculo):** `construir_contexto()` lê
+  `SALARIO_MINIMO` da tabela vigente (em vez de constante hardcoded). Se
+  a tabela não existir, cai no fallback `SALARIO_MINIMO_FALLBACK = 1518`.
+
+- **feat(apps.core.signals):** post_save / post_delete de `TabelaLegal`
+  chamam `_invalidar_cache()` — alteração via admin reflete no próximo
+  cálculo sem reiniciar processo.
+
+- **feat(apps.core.admin):** `TabelaLegalAdmin` com fieldsets, filtros
+  por tipo, date_hierarchy por vigencia_inicio, search por
+  referência_legal/observações.
+
+- **data migration:** `0004_seed_tabelas_legais_2024_2026.py` — 9 tabelas
+  oficiais com `update_or_create` (idempotente):
+  - **Salário mínimo:** 2024 (R$ 1.412), 2025 (R$ 1.518), 2026 (R$ 1.518).
+  - **Dedução por dependente IRRF:** R$ 189,59 (Lei 14.663/2023).
+  - **INSS:** 3 vigências (2024, 2025, 2026), 4 faixas progressivas + teto.
+  - **IRRF:** 2 vigências (2024-02 a 2025-04, depois 2025-05+) — a mudança
+    é a faixa de isenção pela Lei 14.848/2024 (R$ 2.259,20 → R$ 2.428,80).
+
+- **test:** 24 novos em `apps/calculo/tests/test_tabelas.py`:
+  - Salário mínimo por exercício, erro quando ausente.
+  - INSS 1518 (1ª faixa), 2000 (2ª), 4000 (3ª), 8000 (4ª), acima do teto.
+  - IRRF dentro da isenção, 5 faixas, com dependentes, dependentes que
+    derrubam pra isenção.
+  - Vigência correta: IRRF antes vs depois de mai/2025; INSS 2024 vs 2026.
+  - Cada valor de teste vem com **comentário mostrando a aritmética** e a
+    referência à fonte oficial.
+
+- **390 testes verde no total** (366 → 390, +24).
+
+#### Por quê
+
+- **A folha real precisa bater nos centavos.** O Dr. Renzo e qualquer
+  cliente vão validar contra a calculadora oficial da Receita ou o
+  Fiorilli antigo. Aproximações funcionam pra demonstração, não pra
+  fechar competência.
+- **Tabelas legais mudam todo ano** (decreto novo do salário-mínimo,
+  reajuste de teto INSS, MP de IRRF). Cravar no código quebra a cada
+  virada de exercício. Modelo + admin desacopla operação de deploy.
+- **Vigência por competência preserva histórico.** Recalcular janeiro/2025
+  precisa usar a tabela de 2025, não a de 2026. Resolução por data faz
+  isso de graça.
+- **Cache invalidado por signal** é correto operacionalmente: time
+  cadastra nova tabela no admin no dia 1º de janeiro, próximo cálculo
+  pega — sem reboot, sem deploy.
+
+#### Impacto
+
+- 1 modelo novo em SHARED, 2 migrations.
+- 4 funções públicas novas (`apps.calculo.tabelas`).
+- 2 builtins DSL agora funcionais (`FAIXA_INSS`, `FAIXA_IRRF`).
+- API/contrato inalterado — qualquer fórmula que ainda use INSS 11%
+  hardcoded continua funcionando; quem quiser pode migrar pra
+  `FAIXA_INSS(RUBRICA('SAL_BASE'))`.
+- Sem migrations TENANT (tabelas legais são federais → ficam em public).
+
+#### Próximos passos
+
+- **Onda 2.4 — Incidências FGTS + previdência municipal própria.** FGTS
+  é 8% federal (vai pra TabelaLegal). Previdência municipal varia por
+  município → modelo TENANT separado com alíquota configurável.
+- **Onda 2.5 — Holerite (PDF).** Usa os lançamentos da folha + tabelas
+  legais (mostra "INSS R$ X (alíquota efetiva Y%)" no holerite).
+- **Onda 2.6 — Tela operacional de Folha.**
+
+---
+
 ### Bloco 2.2 — Cálculo mensal ordinário: do servidor ao Lançamento · 2026-05-14
 
 > Segunda onda do **Bloco 2 (engine de cálculo de folha)**. Em cima da

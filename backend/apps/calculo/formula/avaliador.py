@@ -23,6 +23,8 @@ from apps.calculo.formula.errors import (
 from apps.calculo.formula.funcoes import (
     BUILTINS_STATIC,
     NOMES_PERMITIDOS,
+    make_fn_faixa_inss,
+    make_fn_faixa_irrf,
     make_fn_rubrica,
 )
 from apps.calculo.formula.parser import compilar
@@ -35,13 +37,19 @@ def _construir_namespace(ctx: ContextoFolha) -> dict[str, Any]:
     Inclui:
     - `_D = Decimal` — função interna que converte literais do parser
       (todo `Constant` numérico vira `_D("0.10")` durante o transform).
-    - Builtins estáticos (SE, MAX, MIN, ABS, ARRED, FAIXA_*).
-    - `RUBRICA` injetado dinamicamente com o dict da competência atual.
+    - Builtins estáticos (SE, MAX, MIN, ABS, ARRED).
+    - `RUBRICA(codigo)` injetado dinamicamente com o dict da competência.
+    - `FAIXA_INSS(base)` e `FAIXA_IRRF(base, deps)` bound à `ctx.competencia`.
     - Variáveis do contexto (SALARIO_BASE, IDADE, etc.).
     """
+    from datetime import date as _date
+
     namespace: dict[str, Any] = {"_D": Decimal}
     namespace.update(BUILTINS_STATIC)
     namespace["RUBRICA"] = make_fn_rubrica(ctx.rubricas_calculadas)
+    competencia = ctx.competencia or _date.today().replace(day=1)
+    namespace["FAIXA_INSS"] = make_fn_faixa_inss(competencia)
+    namespace["FAIXA_IRRF"] = make_fn_faixa_irrf(competencia)
     namespace.update(ctx.como_namespace())
     return namespace
 

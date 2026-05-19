@@ -15,6 +15,7 @@ avaliação.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
@@ -28,10 +29,16 @@ class ContextoFolha:
         variaveis: dict de variáveis disponíveis (SALARIO_BASE, IDADE, ...).
         rubricas_calculadas: rubricas já avaliadas nesta competência —
             acessadas via função `RUBRICA("codigo")`.
+        competencia: data da competência (primeiro dia do mês). Usada
+            pelas funções FAIXA_INSS / FAIXA_IRRF para resolver a
+            tabela legal vigente. Opcional — quando ausente, essas
+            funções caem para a competência atual da máquina (útil em
+            chamadas avulsas do endpoint /avaliar/).
     """
 
     variaveis: dict[str, Any] = field(default_factory=dict)
     rubricas_calculadas: dict[str, Decimal] = field(default_factory=dict)
+    competencia: date | None = None
 
     def como_namespace(self) -> dict[str, Any]:
         """Retorna um dict pronto para servir de namespace local em `eval`."""

@@ -103,3 +103,7 @@ tmp/
 notas/
 scratch/
 TODO.local.md
+
+# ---------- Runtime da branch demo (caso a árvore tenha sido usada lá) ----------
+.demo-logs/
+.demo-run/

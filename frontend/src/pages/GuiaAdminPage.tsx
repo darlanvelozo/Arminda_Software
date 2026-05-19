@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-15";
+const LAST_UPDATED = "2026-05-17";
 
 interface TocItem {
   id: string;
@@ -63,6 +63,7 @@ const TOC: TocItem[] = [
   { id: "auth-rbac", label: "Auth + RBAC", icon: ShieldCheck },
   { id: "dsl", label: "DSL de fórmulas (Bloco 2)", icon: FileCode },
   { id: "calculo", label: "Cálculo de folha (Onda 2.2)", icon: Workflow },
+  { id: "tabelas-legais", label: "Tabelas legais (Onda 2.3)", icon: Tag },
   { id: "testes", label: "Testes (back + front)", icon: TestTube2 },
   { id: "versionamento", label: "Versionamento (ADR-0010)", icon: Tag },
   { id: "validacao", label: "Rotina de validação integral", icon: Activity },
@@ -92,7 +93,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">Onda 2.2 + validação integral</Badge>
+            <Badge variant="info">Onda 2.3 ✓ (tabelas legais 2024–2026)</Badge>
           </span>
         </p>
       </header>
@@ -126,6 +127,7 @@ export default function GuiaAdminPage() {
           <SectionAuthRBAC />
           <SectionDSL />
           <SectionCalculo />
+          <SectionTabelasLegais />
           <SectionTestes />
           <SectionVersionamento />
           <SectionValidacao />
@@ -160,9 +162,10 @@ function SectionPanorama() {
         (versionamento ADR-0010).
       </p>
       <p>
-        Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1) e
-        cálculo mensal (Onda 2.2) já no ar, próximas ondas: tabelas legais,
-        holerite, tela de folha.
+        Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1),
+        cálculo mensal (Onda 2.2) e tabelas legais 2024–2026 com INSS/IRRF
+        reais (Onda 2.3) já no ar. Próximas ondas: incidências FGTS/
+        previdência municipal, holerite, tela de folha.
       </p>
     </Section>
   );
@@ -520,6 +523,96 @@ function SectionCalculo() {
     </Section>
   );
 }
+
+function SectionTabelasLegais() {
+  return (
+    <Section id="tabelas-legais" icon={Tag} title="Tabelas legais (Onda 2.3)">
+      <p>
+        Modelo:{" "}
+        <code className="text-xs bg-muted px-1 rounded">apps.core.TabelaLegal</code>{" "}
+        (SHARED, schema public). Federal — uma fonte de verdade para todos os
+        tenants. Tipos:{" "}
+        <code className="bg-muted px-1 rounded">salario_minimo</code>,{" "}
+        <code className="bg-muted px-1 rounded">inss</code>,{" "}
+        <code className="bg-muted px-1 rounded">irrf</code>,{" "}
+        <code className="bg-muted px-1 rounded">deducao_dependente_irrf</code>.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Resolução por competência</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">apps.calculo.tabelas</code>{" "}
+        expõe:{" "}
+        <code className="bg-muted px-1 rounded">salario_minimo(data)</code>,{" "}
+        <code className="bg-muted px-1 rounded">inss(base, data)</code>,{" "}
+        <code className="bg-muted px-1 rounded">irrf(base, deps, data)</code>,{" "}
+        <code className="bg-muted px-1 rounded">deducao_dependente_irrf(data)</code>.
+        Cada chamada filtra por
+        <code className="bg-muted px-1 rounded"> vigencia_inicio &lt;= data</code>
+        e (
+        <code className="bg-muted px-1 rounded">vigencia_fim is null</code> ou{" "}
+        <code className="bg-muted px-1 rounded">vigencia_fim &gt;= data</code>).
+        Cacheado com{" "}
+        <code className="bg-muted px-1 rounded">lru_cache(maxsize=256)</code>.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Cache invalidado por signal</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">apps/core/signals.py</code>{" "}
+        escuta <code className="bg-muted px-1 rounded">post_save</code> e{" "}
+        <code className="bg-muted px-1 rounded">post_delete</code> de{" "}
+        <code className="bg-muted px-1 rounded">TabelaLegal</code> e chama{" "}
+        <code className="bg-muted px-1 rounded">_invalidar_cache()</code>. Salvar
+        pelo admin Django reflete no próximo cálculo de folha — sem reiniciar
+        o processo.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">DSL: ligação com as funções</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">FAIXA_INSS</code> e{" "}
+        <code className="text-xs bg-muted px-1 rounded">FAIXA_IRRF</code> são
+        builtins dinâmicas (igual{" "}
+        <code className="bg-muted px-1 rounded">RUBRICA</code>) — recebem a
+        competência pelo avaliador, que pega de{" "}
+        <code className="bg-muted px-1 rounded">ContextoFolha.competencia</code>{" "}
+        (preenchida por{" "}
+        <code className="bg-muted px-1 rounded">construir_contexto()</code>{" "}
+        no serviço de cálculo).
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Onde atualizar a cada exercício</h3>
+      <ol className="list-decimal pl-5 space-y-1 text-xs">
+        <li>
+          Admin Django:{" "}
+          <code className="bg-muted px-1 rounded">/admin/core/tabelalegal/</code>
+        </li>
+        <li>
+          &quot;Adicionar Tabela Legal&quot; → escolher tipo, definir{" "}
+          <code className="bg-muted px-1 rounded">vigencia_inicio</code>, colar
+          JSON em <code className="bg-muted px-1 rounded">valores</code>.
+        </li>
+        <li>
+          (Opcional) fechar a vigência anterior preenchendo{" "}
+          <code className="bg-muted px-1 rounded">vigencia_fim</code> com o
+          último dia da tabela antiga.
+        </li>
+        <li>
+          Próximo cálculo de folha usa a nova tabela automaticamente.
+        </li>
+      </ol>
+
+      <Callout variant="info">
+        Seed inicial em{" "}
+        <code className="text-xs bg-muted px-1 rounded">
+          apps/core/migrations/0004_seed_tabelas_legais_2024_2026.py
+        </code>
+        . Para municípios novos basta rodar{" "}
+        <code className="text-xs bg-muted px-1 rounded">manage.py migrate</code>{" "}
+        — as 9 tabelas vigentes ficam disponíveis.
+      </Callout>
+    </Section>
+  );
+}
+
 
 function SectionTestes() {
   return (

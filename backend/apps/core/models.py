@@ -213,3 +213,88 @@ class ConfiguracaoGlobal(models.Model):
 
     def __str__(self) -> str:
         return self.chave
+
+
+# ============================================================
+# Tabelas legais (Onda 2.3)
+# ============================================================
+
+
+class TipoTabelaLegal(models.TextChoices):
+    """Tipos de tabela legal nacional usados no cálculo de folha."""
+
+    SALARIO_MINIMO = "salario_minimo", "Salário mínimo"
+    INSS = "inss", "Faixas INSS"
+    IRRF = "irrf", "Faixas IRRF"
+    DEDUCAO_DEPENDENTE_IRRF = "deducao_dependente_irrf", "Dedução por dependente (IRRF)"
+
+
+class TabelaLegal(models.Model):
+    """
+    Tabelas legais nacionais com vigência (Onda 2.3).
+
+    Vive em SHARED (public) porque salário mínimo, INSS e IRRF são
+    federais — uma fonte de verdade para todos os municípios. Cada
+    município pode ter, eventualmente, tabelas próprias (previdência
+    municipal) no Bloco 2.4 — essas vão para um modelo TENANT separado.
+
+    Campo `valores` é JSON com estrutura específica por tipo:
+
+    - `salario_minimo`: `{"valor": "1518.00"}`
+    - `deducao_dependente_irrf`: `{"valor": "189.59"}`
+    - `inss`: `{"faixas": [
+          {"ate": "1518.00", "aliquota": "0.075"},
+          {"ate": "2793.88", "aliquota": "0.09"},
+          {"ate": "4190.83", "aliquota": "0.12"},
+          {"ate": "8157.41", "aliquota": "0.14"}
+      ], "teto": "8157.41"}`
+    - `irrf`: `{"faixas": [
+          {"ate": "2428.80", "aliquota": "0",      "deducao": "0"},
+          {"ate": "2826.65", "aliquota": "0.075",  "deducao": "182.16"},
+          {"ate": "3751.05", "aliquota": "0.15",   "deducao": "394.16"},
+          {"ate": "4664.68", "aliquota": "0.225",  "deducao": "675.49"},
+          {"ate": null,      "aliquota": "0.275",  "deducao": "908.73"}
+      ]}`
+
+    Vigência:
+    - `vigencia_inicio` é obrigatório.
+    - `vigencia_fim` é opcional; quando null, a tabela continua valendo
+      até ser substituída por uma versão mais nova.
+
+    Resolução por competência: pega a tabela do mesmo `tipo` com
+    `vigencia_inicio <= competencia` e (`vigencia_fim is null` ou
+    `vigencia_fim >= competencia`).
+    """
+
+    tipo = models.CharField(max_length=40, choices=TipoTabelaLegal.choices)
+    vigencia_inicio = models.DateField(help_text="Primeiro dia em que a tabela vigora.")
+    vigencia_fim = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Último dia de vigência (null = continua valendo).",
+    )
+    valores = models.JSONField(help_text="Estrutura específica por tipo — ver TabelaLegal.")
+    referencia_legal = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Lei/Decreto/Portaria de origem (ex.: 'Lei 14.663/2023').",
+    )
+    observacoes = models.TextField(blank=True)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["tipo", "-vigencia_inicio"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["tipo", "vigencia_inicio"],
+                name="tabela_legal_unica_por_tipo_e_vigencia",
+            ),
+        ]
+        verbose_name = "tabela legal"
+        verbose_name_plural = "tabelas legais"
+
+    def __str__(self) -> str:
+        fim = self.vigencia_fim.isoformat() if self.vigencia_fim else "atual"
+        return f"{self.get_tipo_display()} · {self.vigencia_inicio.isoformat()} → {fim}"
