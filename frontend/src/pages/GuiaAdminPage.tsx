@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-17";
+const LAST_UPDATED = "2026-05-18";
 
 interface TocItem {
   id: string;
@@ -64,6 +64,7 @@ const TOC: TocItem[] = [
   { id: "dsl", label: "DSL de fórmulas (Bloco 2)", icon: FileCode },
   { id: "calculo", label: "Cálculo de folha (Onda 2.2)", icon: Workflow },
   { id: "tabelas-legais", label: "Tabelas legais (Onda 2.3)", icon: Tag },
+  { id: "tela-folha", label: "Tela operacional Folha (Onda 2.6)", icon: Workflow },
   { id: "testes", label: "Testes (back + front)", icon: TestTube2 },
   { id: "versionamento", label: "Versionamento (ADR-0010)", icon: Tag },
   { id: "validacao", label: "Rotina de validação integral", icon: Activity },
@@ -93,7 +94,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">Onda 2.3 ✓ (tabelas legais 2024–2026)</Badge>
+            <Badge variant="info">Onda 2.6 ✓ (tela operacional de Folha)</Badge>
           </span>
         </p>
       </header>
@@ -128,6 +129,7 @@ export default function GuiaAdminPage() {
           <SectionDSL />
           <SectionCalculo />
           <SectionTabelasLegais />
+          <SectionTelaFolha />
           <SectionTestes />
           <SectionVersionamento />
           <SectionValidacao />
@@ -163,9 +165,10 @@ function SectionPanorama() {
       </p>
       <p>
         Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1),
-        cálculo mensal (Onda 2.2) e tabelas legais 2024–2026 com INSS/IRRF
-        reais (Onda 2.3) já no ar. Próximas ondas: incidências FGTS/
-        previdência municipal, holerite, tela de folha.
+        cálculo mensal (2.2), tabelas legais reais (2.3) e tela operacional
+        de Folha (2.6 ✓) já no ar. Adiantamos a Onda 2.6 pra ter algo
+        visual demonstrável; a Onda 2.4 (FGTS/previdência) e a 2.5
+        (holerite PDF) continuam pendentes mas não bloqueiam apresentação.
       </p>
     </Section>
   );
@@ -608,6 +611,94 @@ function SectionTabelasLegais() {
         . Para municípios novos basta rodar{" "}
         <code className="text-xs bg-muted px-1 rounded">manage.py migrate</code>{" "}
         — as 9 tabelas vigentes ficam disponíveis.
+      </Callout>
+    </Section>
+  );
+}
+
+
+function SectionTelaFolha() {
+  return (
+    <Section id="tela-folha" icon={Workflow} title="Tela operacional de Folha (Onda 2.6)">
+      <p>
+        Rota{" "}
+        <code className="text-xs bg-muted px-1 rounded">/folha</code> (lista
+        paginada com filtros por ano/mês/tipo/status) +{" "}
+        <code className="text-xs bg-muted px-1 rounded">/folha/:id</code>{" "}
+        (detalhe com botão Calcular/Recalcular). Adiantamos esta onda em
+        relação ao roadmap pra ter algo visualmente demonstrável.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Arquivos novos</h3>
+      <ul className="list-disc pl-5 space-y-1 text-xs">
+        <li>
+          <code className="bg-muted px-1 rounded">pages/folha/FolhasListPage.tsx</code> —
+          lista, cria, calcular inline, deletar.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">pages/folha/FolhaDetailPage.tsx</code> —
+          cards de totais, botão Calcular, relatório do último cálculo,
+          tabs Lançamentos / Erros / Informações.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">pages/folha/FolhaFormSheet.tsx</code> —
+          slide-from-right para criar/editar folha.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">lib/queries/folhas.ts</code> —{" "}
+          <code className="bg-muted px-1 rounded">useFolhasList</code>,{" "}
+          <code className="bg-muted px-1 rounded">useFolha</code>,{" "}
+          <code className="bg-muted px-1 rounded">useCalcularFolha</code>,{" "}
+          <code className="bg-muted px-1 rounded">useLancamentosList</code>,
+          etc.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">components/ui/textarea.tsx</code> —
+          componente UI básico que não existia.
+        </li>
+      </ul>
+
+      <h3 className="text-base font-semibold mt-4">Tipos e contrato</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">types/index.ts</code>{" "}
+        ganhou{" "}
+        <code className="bg-muted px-1 rounded">Folha</code>,{" "}
+        <code className="bg-muted px-1 rounded">FolhaDetail</code>,{" "}
+        <code className="bg-muted px-1 rounded">Lancamento</code> (gerados via{" "}
+        <code className="bg-muted px-1 rounded">npm run gen:types</code>) +{" "}
+        <code className="bg-muted px-1 rounded">RelatorioCalculo</code> e{" "}
+        <code className="bg-muted px-1 rounded">ErroLancamento</code> (tipos manuais
+        — drf-spectacular ainda não tipa o response de @action).
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">UX do recalcular</h3>
+      <ul className="list-disc pl-5 space-y-1 text-xs">
+        <li>
+          Folha <strong>aberta</strong> → botão diz &quot;Calcular folha&quot;,
+          confirmação explica idempotência.
+        </li>
+        <li>
+          Folha <strong>calculada/conferida</strong> → botão diz &quot;Recalcular&quot;,
+          confirmação avisa que valores atualizam e órfãos são removidos.
+        </li>
+        <li>
+          Folha <strong>fechada</strong> → botão desabilitado.
+        </li>
+        <li>
+          Após cada cálculo o relatório fica num card destacado (no topo,
+          em memória — descartado ao trocar de tela) com contadores
+          (criados/atualizados/removidos/erros) e ordem topológica das
+          rubricas calculadas (collapsível).
+        </li>
+      </ul>
+
+      <Callout variant="info">
+        Cache do TanStack Query invalidado pelo hook{" "}
+        <code className="text-xs bg-muted px-1 rounded">useCalcularFolha</code>:
+        ao concluir o cálculo, invalida tanto{" "}
+        <code className="text-xs bg-muted px-1 rounded">folhasKey</code> quanto{" "}
+        <code className="text-xs bg-muted px-1 rounded">lancamentosKey</code> —
+        os totais e a tabela atualizam sozinhos.
       </Callout>
     </Section>
   );

@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-17";
+const LAST_UPDATED = "2026-05-18";
 
 interface TocItem {
   id: string;
@@ -83,7 +83,7 @@ export default function GuiaPage() {
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
           <span className="ml-1 inline-flex items-center gap-2">
             <Badge variant="success">Bloco 1 entregue</Badge>
-            <Badge variant="info">Bloco 2 em andamento (Onda 2.3 ✓)</Badge>
+            <Badge variant="info">Bloco 2 em andamento (Onda 2.6 ✓ — tela de Folha)</Badge>
           </span>
         </p>
       </header>
@@ -598,8 +598,11 @@ function SectionFolha() {
     <Section id="folha" icon={Wallet} title="Folha de pagamento">
       <p>
         O <strong>cálculo da folha mensal</strong> está disponível desde a Onda 2.2
-        (mai/2026). Ainda não há tela operacional — a interface de Folha entra na
-        Onda 2.6. Por enquanto, o cálculo é disparado por API.
+        e agora tem <strong>tela operacional completa</strong> (Onda 2.6 ✓ em
+        mai/2026). Em <Link to="/folha" className="underline">/folha</Link> você
+        lista, cria, calcula e inspeciona competências. Cada folha tem três
+        cards de totais (proventos / descontos / líquido) e tabs com lançamentos
+        e erros estruturados.
       </p>
 
       <h3 className="text-base font-semibold mt-4">Como o cálculo funciona</h3>
@@ -726,9 +729,9 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
           desc="Onda 2.5 — gera contracheque a partir dos lançamentos da folha calculada."
         />
         <FlowItem
-          status="em-construcao"
+          status="ok"
           title="Tela operacional de Folha"
-          desc="Onda 2.6 — abrir competência, lançamentos com filtros, disparar cálculo, ver erros estruturados, conferir totais, fechar."
+          desc="Onda 2.6 ✓ — /folha lista as competências; cada uma tem detalhe com botão Calcular/Recalcular (idempotente), relatório do último cálculo, lançamentos paginados com filtro por servidor e rubrica, aba de erros estruturados."
         />
       </ul>
 
@@ -811,7 +814,7 @@ function SectionEmConstrucao() {
           icon={Wallet}
           title="Bloco 2 — Engine de cálculo de folha"
           period="Maio – Agosto/2026 (em andamento)"
-          desc="DSL de fórmulas (Onda 2.1 ✓), cálculo mensal ordinário (Onda 2.2 ✓), tabelas legais 2024/2025/2026 com INSS/IRRF reais e salário-mínimo dinâmico por competência (Onda 2.3 ✓). Próximas: incidências FGTS e previdência municipal (2.4), holerite em PDF (2.5), tela operacional de Folha (2.6), paridade contra Fiorilli (2.7)."
+          desc="DSL de fórmulas (2.1 ✓), cálculo mensal (2.2 ✓), tabelas legais 2024–2026 reais (2.3 ✓), tela operacional de Folha com lista, detalhe, calcular e tabs de lançamentos (2.6 ✓). Próximas: incidências FGTS e previdência municipal (2.4), holerite em PDF (2.5), paridade contra Fiorilli (2.7)."
         />
         <RoadmapItem
           icon={Wallet}

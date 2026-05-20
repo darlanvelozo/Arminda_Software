@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-17",
+  "ultima_atualizacao": "2026-05-18",
   "bloco_atual": 2,
   "progresso_geral_pct": 52,
   "blocos": [
@@ -67,14 +67,14 @@
       "data_fim_prevista": "2026-08-31",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 42,
+      "progresso_pct": 56,
       "entregas": [
         "✅ Linguagem de fórmulas configurável (DSL via Python AST whitelist, ADR-0012) — Onda 2.1",
         "✅ Cálculo de folha mensal ordinária (toposort de rubricas + serviço idempotente + endpoint /calcular/) — Onda 2.2",
         "✅ Tabelas legais 2024/2025/2026 (FAIXA_IRRF e FAIXA_INSS reais + salário mínimo dinâmico + admin Django para virar exercício sem deploy) — Onda 2.3",
         "Incidências (FGTS, previdência municipal própria) — Onda 2.4",
         "Geração de holerite (PDF + JSON) — Onda 2.5",
-        "Tela /folha operacional — Onda 2.6",
+        "✅ Tela /folha operacional (lista, criar, calcular/recalcular com confirmação, relatório do último cálculo, tabs de lançamentos e erros) — Onda 2.6",
         "Testes de paridade contra Fiorilli — Onda 2.7"
       ]
     },
@@ -174,6 +174,13 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-18",
+      "tipo": "entrega",
+      "titulo": "Tela operacional de Folha no ar: o cálculo ganhou interface (Onda 2.6)",
+      "resumo_executivo": "Agora dá pra apresentar a folha por completo: o operador entra em /folha, vê todas as competências numa lista com totais, clica numa folha, vê os cards de proventos/descontos/líquido e aperta \"Calcular\" — o sistema processa, mostra um relatório (quantos vínculos, lançamentos criados/atualizados/removidos, ordem das rubricas) e lista todos os lançamentos por servidor com filtros. Antecipamos esta onda na ordem do roadmap pra ter algo visualmente demonstrável ao Dr. Renzo.",
+      "descricao": "Antecipação estratégica da Onda 2.6 (originalmente após 2.4 FGTS e 2.5 holerite PDF). Entrega: FolhasListPage (lista paginada com filtros por ano/mês/tipo/status), FolhaDetailPage (3 cards de totais, botão Calcular/Recalcular com confirmação UX adequada ao status, relatório do último cálculo em card destacado com ordem topológica das rubricas, tabs Lançamentos/Erros/Informações), FolhaFormSheet (slide-from-right para criar/editar — competência imutável após criação por causa do constraint UNIQUE). Novos hooks TanStack Query em lib/queries/folhas.ts (useFolhasList, useFolha, useCreateFolha, useUpdateFolha, useDeleteFolha, useCalcularFolha, useLancamentosList) com invalidação correta entre as queries quando o cálculo conclui. Tipos atualizados via npm run gen:types (Folha, FolhaDetail, FolhaWrite, Lancamento) + 2 tipos manuais (RelatorioCalculo, ErroLancamento) porque o response do @action ainda não é tipado pelo drf-spectacular. Novo componente UI Textarea. Validação: tsc 0 erros, ESLint 0 erros, vitest 10/10, build prod em 3.94s. Screenshot headless via CDP confirma renderização correta — lista mostra 3 folhas com totais reais (~R$ 123 mil líquido/mês para 23 servidores), detalhe mostra 264 lançamentos por folha com badges coloridos por tipo de rubrica. Sidebar Folha deixou de ser \"em construção\". Próximas: Onda 2.4 (FGTS + previdência municipal), Onda 2.5 (holerite PDF)."
+    },
     {
       "data": "2026-05-17",
       "tipo": "entrega",

@@ -162,6 +162,180 @@ export interface paths {
         patch: operations["core_usuarios_partial_update"];
         trace?: never;
     };
+    "/api/payroll/folhas/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de folhas + endpoint `/calcular/` que dispara o cálculo
+         *     mensal usando o engine (apps.calculo).
+         *
+         *     Permissões:
+         *     - list/retrieve/lancamentos: leitura (qualquer papel).
+         *     - create/update/destroy: financeiro/admin/staff.
+         *     - calcular: financeiro/admin/staff (é uma operação de escrita).
+         */
+        get: operations["payroll_folhas_list"];
+        put?: never;
+        /**
+         * @description CRUD de folhas + endpoint `/calcular/` que dispara o cálculo
+         *     mensal usando o engine (apps.calculo).
+         *
+         *     Permissões:
+         *     - list/retrieve/lancamentos: leitura (qualquer papel).
+         *     - create/update/destroy: financeiro/admin/staff.
+         *     - calcular: financeiro/admin/staff (é uma operação de escrita).
+         */
+        post: operations["payroll_folhas_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/folhas/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de folhas + endpoint `/calcular/` que dispara o cálculo
+         *     mensal usando o engine (apps.calculo).
+         *
+         *     Permissões:
+         *     - list/retrieve/lancamentos: leitura (qualquer papel).
+         *     - create/update/destroy: financeiro/admin/staff.
+         *     - calcular: financeiro/admin/staff (é uma operação de escrita).
+         */
+        get: operations["payroll_folhas_retrieve"];
+        /**
+         * @description CRUD de folhas + endpoint `/calcular/` que dispara o cálculo
+         *     mensal usando o engine (apps.calculo).
+         *
+         *     Permissões:
+         *     - list/retrieve/lancamentos: leitura (qualquer papel).
+         *     - create/update/destroy: financeiro/admin/staff.
+         *     - calcular: financeiro/admin/staff (é uma operação de escrita).
+         */
+        put: operations["payroll_folhas_update"];
+        post?: never;
+        /**
+         * @description CRUD de folhas + endpoint `/calcular/` que dispara o cálculo
+         *     mensal usando o engine (apps.calculo).
+         *
+         *     Permissões:
+         *     - list/retrieve/lancamentos: leitura (qualquer papel).
+         *     - create/update/destroy: financeiro/admin/staff.
+         *     - calcular: financeiro/admin/staff (é uma operação de escrita).
+         */
+        delete: operations["payroll_folhas_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * @description CRUD de folhas + endpoint `/calcular/` que dispara o cálculo
+         *     mensal usando o engine (apps.calculo).
+         *
+         *     Permissões:
+         *     - list/retrieve/lancamentos: leitura (qualquer papel).
+         *     - create/update/destroy: financeiro/admin/staff.
+         *     - calcular: financeiro/admin/staff (é uma operação de escrita).
+         */
+        patch: operations["payroll_folhas_partial_update"];
+        trace?: never;
+    };
+    "/api/payroll/folhas/{id}/calcular/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description POST /api/payroll/folhas/{id}/calcular/
+         *
+         *     Executa o cálculo mensal para a competência da folha. Idempotente:
+         *     re-rodar atualiza valores em vez de duplicar. Lançamentos órfãos
+         *     (rubrica que deixou de ser ativa) são removidos.
+         *
+         *     Resposta (200):
+         *         {
+         *           "folha_id": 1,
+         *           "competencia": "2026-05-01",
+         *           "vinculos_processados": 517,
+         *           "rubricas_processadas": 8,
+         *           "lancamentos_criados": 4136,
+         *           "lancamentos_atualizados": 0,
+         *           "lancamentos_removidos": 0,
+         *           "ordem_rubricas": ["SAL_BASE", "INSS", "IRRF", ...],
+         *           "erros": [{"vinculo_id":..., "matricula":..., "rubrica_codigo":...,
+         *                      "code": "FORMULA_VARIAVEL_AUSENTE", "mensagem":...}]
+         *         }
+         *
+         *     Erros estruturais (HTTP 400):
+         *         {"detail": "...", "code": "DEPENDENCIA_CICLICA"}
+         */
+        post: operations["payroll_folhas_calcular_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/lancamentos/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Consulta de lançamentos de folha. Leitura apenas — lançamentos são
+         *     produzidos pelo cálculo da folha, nunca criados manualmente.
+         *
+         *     Para gerar um lançamento "eventual" (fora do cálculo), use uma
+         *     rubrica com fórmula que receba o valor via contexto — o próprio
+         *     cálculo da folha vai produzir o lançamento.
+         */
+        get: operations["payroll_lancamentos_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/lancamentos/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Consulta de lançamentos de folha. Leitura apenas — lançamentos são
+         *     produzidos pelo cálculo da folha, nunca criados manualmente.
+         *
+         *     Para gerar um lançamento "eventual" (fora do cálculo), use uma
+         *     rubrica com fórmula que receba o valor via contexto — o próprio
+         *     cálculo da folha vai produzir o lançamento.
+         */
+        get: operations["payroll_lancamentos_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payroll/rubricas/": {
         parameters: {
             query?: never;
@@ -170,18 +344,18 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         * @description CRUD de rubricas + endpoint `/avaliar/` para testar fórmula DSL.
          *
-         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-         *     aqui aceitamos como TextField sem interpretacao.
+         *     Engine de cálculo (apps.calculo) implementa a DSL via subset seguro
+         *     de Python validado por AST whitelist — ver ADR-0012.
          */
         get: operations["payroll_rubricas_list"];
         put?: never;
         /**
-         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         * @description CRUD de rubricas + endpoint `/avaliar/` para testar fórmula DSL.
          *
-         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-         *     aqui aceitamos como TextField sem interpretacao.
+         *     Engine de cálculo (apps.calculo) implementa a DSL via subset seguro
+         *     de Python validado por AST whitelist — ver ADR-0012.
          */
         post: operations["payroll_rubricas_create"];
         delete?: never;
@@ -198,36 +372,75 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         * @description CRUD de rubricas + endpoint `/avaliar/` para testar fórmula DSL.
          *
-         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-         *     aqui aceitamos como TextField sem interpretacao.
+         *     Engine de cálculo (apps.calculo) implementa a DSL via subset seguro
+         *     de Python validado por AST whitelist — ver ADR-0012.
          */
         get: operations["payroll_rubricas_retrieve"];
         /**
-         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         * @description CRUD de rubricas + endpoint `/avaliar/` para testar fórmula DSL.
          *
-         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-         *     aqui aceitamos como TextField sem interpretacao.
+         *     Engine de cálculo (apps.calculo) implementa a DSL via subset seguro
+         *     de Python validado por AST whitelist — ver ADR-0012.
          */
         put: operations["payroll_rubricas_update"];
         post?: never;
         /**
-         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         * @description CRUD de rubricas + endpoint `/avaliar/` para testar fórmula DSL.
          *
-         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-         *     aqui aceitamos como TextField sem interpretacao.
+         *     Engine de cálculo (apps.calculo) implementa a DSL via subset seguro
+         *     de Python validado por AST whitelist — ver ADR-0012.
          */
         delete: operations["payroll_rubricas_destroy"];
         options?: never;
         head?: never;
         /**
-         * @description CRUD de rubricas (provento, desconto, informativa) do tenant atual.
+         * @description CRUD de rubricas + endpoint `/avaliar/` para testar fórmula DSL.
          *
-         *     DSL de calculo (campo `formula`) sera implementada no Bloco 2;
-         *     aqui aceitamos como TextField sem interpretacao.
+         *     Engine de cálculo (apps.calculo) implementa a DSL via subset seguro
+         *     de Python validado por AST whitelist — ver ADR-0012.
          */
         patch: operations["payroll_rubricas_partial_update"];
+        trace?: never;
+    };
+    "/api/payroll/rubricas/{id}/avaliar/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description POST /api/payroll/rubricas/{id}/avaliar/
+         *
+         *     Avalia a fórmula da rubrica com um contexto fornecido pelo cliente.
+         *
+         *     Body:
+         *         {
+         *           "contexto": {
+         *             "SALARIO_BASE": "1320.00",
+         *             "IDADE": 35,
+         *             "DEPENDENTES": 2
+         *           },
+         *           "rubricas_calculadas": {              # opcional
+         *             "SAL_BASE": "1320.00"
+         *           }
+         *         }
+         *
+         *     Resposta:
+         *         { "valor": "132.00", "formula": "SALARIO_BASE * 0.10" }
+         *
+         *     Erros (HTTP 400):
+         *         { "detail": "...", "code": "FORMULA_VARIAVEL_AUSENTE" }
+         */
+        post: operations["payroll_rubricas_avaliar_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/people/cargos/": {
@@ -683,6 +896,90 @@ export interface components {
          * @enum {string}
          */
         EstadoCivilEnum: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel";
+        /**
+         * @description Detalhe completo. Lançamentos consultados em endpoint separado para
+         *     permitir paginação e filtros.
+         */
+        FolhaDetail: {
+            readonly id: number;
+            /**
+             * Format: date
+             * @description Primeiro dia do mes de referencia
+             */
+            readonly competencia: string;
+            /** @default mensal */
+            readonly tipo: components["schemas"]["TipoD83Enum"];
+            readonly tipo_display: string;
+            readonly status: components["schemas"]["StatusEnum"];
+            readonly status_display: string;
+            /** Format: decimal */
+            readonly total_proventos: string;
+            /** Format: decimal */
+            readonly total_descontos: string;
+            /** Format: decimal */
+            readonly total_liquido: string;
+            readonly lancamentos_count: number;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+            readonly observacoes: string;
+            /** Format: date-time */
+            readonly criado_em: string;
+        };
+        /** @description Listagem enxuta de folhas. */
+        FolhaList: {
+            readonly id: number;
+            /**
+             * Format: date
+             * @description Primeiro dia do mes de referencia
+             */
+            readonly competencia: string;
+            /** @default mensal */
+            readonly tipo: components["schemas"]["TipoD83Enum"];
+            readonly tipo_display: string;
+            readonly status: components["schemas"]["StatusEnum"];
+            readonly status_display: string;
+            /** Format: decimal */
+            readonly total_proventos: string;
+            /** Format: decimal */
+            readonly total_descontos: string;
+            /** Format: decimal */
+            readonly total_liquido: string;
+            readonly lancamentos_count: number;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+        };
+        /** @description Criar/editar folha (não calcula — `calcular` é action separada). */
+        FolhaWrite: {
+            readonly id: number;
+            /**
+             * Format: date
+             * @description Primeiro dia do mes de referencia
+             */
+            competencia: string;
+            /** @default mensal */
+            tipo: components["schemas"]["TipoD83Enum"];
+            observacoes?: string;
+        };
+        /** @description Lançamento individual + dados básicos do servidor/rubrica. */
+        Lancamento: {
+            readonly id: number;
+            readonly folha: number;
+            readonly servidor: number;
+            readonly servidor_matricula: string;
+            readonly servidor_nome: string;
+            readonly vinculo: number;
+            readonly rubrica: number;
+            readonly rubrica_codigo: string;
+            readonly rubrica_nome: string;
+            readonly rubrica_tipo: string;
+            /**
+             * Format: decimal
+             * @description Quantidade, percentual ou dias
+             */
+            readonly referencia: string;
+            /** Format: decimal */
+            readonly valor: string;
+        };
         /** @description Versao completa com resumo do pai. */
         LotacaoDetail: {
             readonly id: number;
@@ -809,6 +1106,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["DocumentoList"][];
         };
+        PaginatedFolhaListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["FolhaList"][];
+        };
+        PaginatedLancamentoList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Lancamento"][];
+        };
         PaginatedLotacaoListList: {
             /** @example 123 */
             count: number;
@@ -930,6 +1257,18 @@ export interface components {
             descricao?: string;
             /** Format: uri */
             arquivo?: string;
+        };
+        /** @description Criar/editar folha (não calcula — `calcular` é action separada). */
+        PatchedFolhaWrite: {
+            readonly id?: number;
+            /**
+             * Format: date
+             * @description Primeiro dia do mes de referencia
+             */
+            competencia?: string;
+            /** @default mensal */
+            tipo: components["schemas"]["TipoD83Enum"];
+            observacoes?: string;
         };
         /** @description Versao para create/update. */
         PatchedLotacaoWrite: {
@@ -1134,6 +1473,14 @@ export interface components {
          */
         SexoEnum: "M" | "F";
         /**
+         * @description * `aberta` - Aberta
+         *     * `calculada` - Calculada
+         *     * `conferida` - Conferida
+         *     * `fechada` - Fechada
+         * @enum {string}
+         */
+        StatusEnum: "aberta" | "calculada" | "conferida" | "fechada";
+        /**
          * @description * `provento` - Provento
          *     * `desconto` - Desconto
          *     * `informativa` - Informativa
@@ -1151,6 +1498,16 @@ export interface components {
          * @enum {string}
          */
         TipoC3eEnum: "rg" | "cpf" | "titulo_eleitor" | "carteira_trabalho" | "certificado" | "comprovante_residencia" | "outro";
+        /**
+         * @description * `mensal` - Mensal
+         *     * `13_primeira` - 13o - 1a parcela
+         *     * `13_segunda` - 13o - 2a parcela
+         *     * `ferias` - Ferias
+         *     * `rescisao` - Rescisao
+         *     * `complementar` - Complementar
+         * @enum {string}
+         */
+        TipoD83Enum: "mensal" | "13_primeira" | "13_segunda" | "ferias" | "rescisao" | "complementar";
         TokenRefresh: {
             readonly access: string;
             refresh: string;
@@ -1555,6 +1912,259 @@ export interface operations {
             };
         };
     };
+    payroll_folhas_list: {
+        parameters: {
+            query?: {
+                ano?: number;
+                competencia?: string;
+                competencia_ate?: string;
+                competencia_de?: string;
+                mes?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `aberta` - Aberta
+                 *     * `calculada` - Calculada
+                 *     * `conferida` - Conferida
+                 *     * `fechada` - Fechada
+                 */
+                status?: "aberta" | "calculada" | "conferida" | "fechada";
+                /**
+                 * @description * `mensal` - Mensal
+                 *     * `13_primeira` - 13o - 1a parcela
+                 *     * `13_segunda` - 13o - 2a parcela
+                 *     * `ferias` - Ferias
+                 *     * `rescisao` - Rescisao
+                 *     * `complementar` - Complementar
+                 */
+                tipo?: "13_primeira" | "13_segunda" | "complementar" | "ferias" | "mensal" | "rescisao";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedFolhaListList"];
+                };
+            };
+        };
+    };
+    payroll_folhas_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolhaWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["FolhaWrite"];
+                "multipart/form-data": components["schemas"]["FolhaWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaWrite"];
+                };
+            };
+        };
+    };
+    payroll_folhas_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaDetail"];
+                };
+            };
+        };
+    };
+    payroll_folhas_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolhaWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["FolhaWrite"];
+                "multipart/form-data": components["schemas"]["FolhaWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaWrite"];
+                };
+            };
+        };
+    };
+    payroll_folhas_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    payroll_folhas_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedFolhaWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedFolhaWrite"];
+                "multipart/form-data": components["schemas"]["PatchedFolhaWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaWrite"];
+                };
+            };
+        };
+    };
+    payroll_folhas_calcular_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["FolhaDetail"];
+                "application/x-www-form-urlencoded": components["schemas"]["FolhaDetail"];
+                "multipart/form-data": components["schemas"]["FolhaDetail"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaDetail"];
+                };
+            };
+        };
+    };
+    payroll_lancamentos_list: {
+        parameters: {
+            query?: {
+                folha?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                rubrica?: number;
+                rubrica_codigo?: string;
+                /** @description A search term. */
+                search?: string;
+                servidor?: number;
+                servidor_nome?: string;
+                vinculo?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLancamentoList"];
+                };
+            };
+        };
+    };
+    payroll_lancamentos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this lancamento. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Lancamento"];
+                };
+            };
+        };
+    };
     payroll_rubricas_list: {
         parameters: {
             query?: {
@@ -1713,6 +2323,34 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RubricaWrite"];
+                };
+            };
+        };
+    };
+    payroll_rubricas_avaliar_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this rubrica. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RubricaDetail"];
+                "application/x-www-form-urlencoded": components["schemas"]["RubricaDetail"];
+                "multipart/form-data": components["schemas"]["RubricaDetail"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RubricaDetail"];
                 };
             };
         };

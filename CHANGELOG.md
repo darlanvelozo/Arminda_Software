@@ -35,6 +35,96 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 2.6 — Tela operacional de Folha (antecipada) · 2026-05-18
+
+> **Antecipação** da Onda 2.6 (originalmente após 2.4 e 2.5) para ter
+> algo visualmente demonstrável ao Dr. Renzo. As Ondas 2.4 (FGTS +
+> previdência municipal) e 2.5 (holerite PDF) continuam pendentes, mas
+> não bloqueiam apresentação — INSS/IRRF reais já vieram na 2.3, FGTS
+> hoje pode ser modelado com uma rubrica DSL com fórmula fixa.
+
+#### Adicionado — Frontend
+
+- **feat(pages/folha):** Três páginas novas:
+  - `FolhasListPage.tsx` — `/folha`. Lista paginada (20 por página)
+    com filtros por ano / mês / tipo / status. Cada linha exibe
+    competência, tipo, status badge, proventos, descontos, líquido e
+    contagem de lançamentos. Menu de ação por linha: Calcular, Editar,
+    Remover (com confirmação). Botão "Nova folha".
+  - `FolhaDetailPage.tsx` — `/folha/:id`. Header com tipo + competência
+    formatada em PT-BR ("Mensal — março de 2026") + badge de status +
+    botão Calcular/Recalcular (UX adapta confirmação ao status atual).
+    Três cards de totais. Card de "último cálculo" (relatório em
+    memória, descartável) com contadores e ordem topológica das
+    rubricas. Tabs: Lançamentos (com filtros por nome de servidor e
+    código de rubrica, paginação 50/página), Erros (lista os
+    `ErroLancamento` do último cálculo com `code` e mensagem),
+    Informações (observações + datas).
+  - `FolhaFormSheet.tsx` — slide-from-right para criar/editar. Validação
+    Zod: competência precisa ser primeiro dia do mês. Edição desabilita
+    o campo competência (constraint UNIQUE `(competencia, tipo)`).
+
+- **feat(lib/queries/folhas):** Sete hooks TanStack Query novos:
+  `useFolhasList`, `useFolha`, `useCreateFolha`, `useUpdateFolha`,
+  `useDeleteFolha`, `useCalcularFolha`, `useLancamentosList`. O hook de
+  cálculo invalida tanto `folhasKey` quanto `lancamentosKey` —
+  totais e tabela atualizam sem refresh manual.
+
+- **feat(types):** Tipos `Folha`, `FolhaDetail`, `FolhaWrite`,
+  `Lancamento` (gerados via `npm run gen:types` a partir do OpenAPI
+  schema). Mais 2 tipos manuais — `RelatorioCalculo` e `ErroLancamento`
+  — porque drf-spectacular não tipa response de `@action`.
+
+- **feat(components/ui):** Novo componente `Textarea`.
+
+- **feat(App.tsx):** Rotas `/folha` e `/folha/:id` substituem o
+  placeholder `EmConstrucaoPage`.
+
+#### Por quê
+
+- **Apresentação ao Dr. Renzo:** ele queria ver o produto, não a API.
+  Ter a página de Folha completa antecipa muito o valor demonstrável,
+  ainda que 2.4 e 2.5 fiquem para depois.
+- **UX do recalcular precisa ser cuidadosa.** Operador pode rodar
+  cálculo várias vezes (ajustando rubrica, conferindo); a confirmação
+  precisa explicar que é idempotente (não duplica) e que lançamentos
+  órfãos são removidos. Folhas fechadas têm botão desabilitado.
+- **Relatório em memória, não persistido.** Os contadores
+  criados/atualizados/removidos só fazem sentido para a última execução;
+  guardar histórico de cálculos cabe num modelo separado (não entra
+  agora).
+
+#### Impacto
+
+- 4 arquivos novos em `frontend/src/`, ~900 LOC de TSX.
+- Sem mudança no backend — todos os endpoints já estavam prontos
+  desde a Onda 2.2.
+- Bundle: chunk lazy `FolhasListPage` ~12 KB gzip, `FolhaDetailPage`
+  ~16 KB gzip. Não afeta o bundle inicial.
+
+#### Validação
+
+- `tsc --noEmit`: 0 erros.
+- `npm run lint`: 0 erros (6 warnings HMR inócuos).
+- `vitest run`: 10/10.
+- `npm run build`: 3.94s.
+- Screenshot headless via Chrome DevTools Protocol confirma:
+  - Lista mostra 3 folhas (mar/abr/mai 2026) com totais reais.
+  - Detalhe da folha de março mostra 264 lançamentos com badges
+    coloridos por tipo (provento verde, desconto vermelho,
+    informativa azul).
+  - Sidebar "Folha" deixou de ser "em construção".
+
+#### Próximos passos
+
+- **Onda 2.4 — FGTS + previdência municipal.** FGTS é 8% federal
+  → vai pra `TabelaLegal`. Previdência municipal varia por município
+  → modelo TENANT com alíquota configurável.
+- **Onda 2.5 — Holerite PDF.** Tela já tem todos os dados; falta o
+  template PDF a partir do `Lancamento`.
+
+---
+
 ### Bloco 2.3 — Tabelas legais 2024/2025/2026: INSS e IRRF reais · 2026-05-17
 
 > Terceira onda do **Bloco 2 (engine de cálculo)**. Substitui as aproximações
