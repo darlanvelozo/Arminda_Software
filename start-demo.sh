@@ -2,7 +2,7 @@
 #
 # start-demo.sh — sobe a demo do Arminda em modo "production-like" no notebook.
 #
-# Esta branch (demo) é uma fotografia da v0.6.1-demo com dados curados pra
+# Esta branch (demo) é uma fotografia da v0.8.0-demo com dados curados pra
 # apresentação a stakeholders. Não tem hot-reload, não tem auto-deploy.
 #
 # Estrutura:
@@ -218,7 +218,7 @@ cmd_start() {
   # ---------- Resumo ----------
   echo ""
   echo "═══════════════════════════════════════════════════"
-  echo "  🟢 Demo Arminda — v0.6.1-demo"
+  echo "  🟢 Demo Arminda — v0.8.0-demo"
   echo "═══════════════════════════════════════════════════"
   [[ -n "$public_url" ]] && echo "  URL pública: $public_url"
   echo "  URL local:   http://localhost:${DEMO_PORT_FRONTEND}"

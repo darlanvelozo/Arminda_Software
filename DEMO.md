@@ -1,8 +1,11 @@
 # Arminda — branch `demo`
 
-> **Snapshot da v0.6.1 (Bloco 2.2) com dados curados para apresentação a
-> stakeholders.** Esta branch é congelada — o desenvolvimento contínuo
-> roda na `main` sem qualquer interferência aqui.
+> **Snapshot da v0.8.0 (Bloco 2.3 + 2.6) com dados curados para
+> apresentação a stakeholders.** Esta branch atualiza periodicamente
+> com mergeback da `main`; o desenvolvimento contínuo roda na `main`
+> sem interferência.
+>
+> Última atualização: 2026-05-20.
 
 ---
 
@@ -250,7 +253,7 @@ Arminda_Software/
 ├── DEMO.md                 ⭐ este documento
 ├── frontend/vite.config.ts proxy /api → 8000 no preview
 ├── backend/requirements.txt + gunicorn
-└── (todo o resto = main na v0.6.1)
+└── (todo o resto = main na v0.8.0)
 ```
 
 Arquivos com `⭐` são exclusivos desta branch — não existem na `main`.
@@ -260,7 +263,7 @@ Arquivos com `⭐` são exclusivos desta branch — não existem na `main`.
 ## 7. Tag de versão
 
 ```bash
-git checkout v0.6.1-demo     # snapshot exato desta demo
+git checkout v0.8.0-demo     # snapshot exato desta demo
 ```
 
 Quando atualizar a demo no futuro:
