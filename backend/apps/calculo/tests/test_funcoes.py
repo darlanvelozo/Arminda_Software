@@ -19,11 +19,11 @@ from apps.calculo.formula.errors import (
 from apps.calculo.formula.funcoes import (
     fn_abs,
     fn_arred,
-    fn_faixa_inss,
-    fn_faixa_irrf,
     fn_max,
     fn_min,
     fn_se,
+    make_fn_faixa_inss,
+    make_fn_faixa_irrf,
     make_fn_rubrica,
 )
 
@@ -118,13 +118,20 @@ class TestFnRubrica:
             fn(123)
 
 
-class TestPlaceholdersOnda23:
-    """Funções FAIXA_* são placeholders até a Onda 2.3."""
+@pytest.mark.django_db
+class TestFaixaOnda23:
+    """FAIXA_INSS e FAIXA_IRRF (Onda 2.3) — testes mais profundos em test_tabelas.py."""
 
-    def test_faixa_irrf_levanta_not_implemented(self):
-        with pytest.raises(NotImplementedError, match="2.3"):
-            fn_faixa_irrf(Decimal("1000"), "2026")
+    def test_make_faixa_inss_bound_a_competencia(self):
+        from datetime import date
 
-    def test_faixa_inss_levanta_not_implemented(self):
-        with pytest.raises(NotImplementedError, match="2.3"):
-            fn_faixa_inss(Decimal("1000"), "2026")
+        fn = make_fn_faixa_inss(date(2026, 5, 1))
+        # 1518 × 7.5% = 113.85
+        assert fn(Decimal("1518.00")) == Decimal("113.85")
+
+    def test_make_faixa_irrf_bound_a_competencia(self):
+        from datetime import date
+
+        fn = make_fn_faixa_irrf(date(2026, 5, 1))
+        # 4000 × 22.5% − 675.49 = 224.51 (sem dependentes)
+        assert fn(Decimal("4000.00"), 0) == Decimal("224.51")

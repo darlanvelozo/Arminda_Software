@@ -5,7 +5,14 @@ from __future__ import annotations
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .models import ConfiguracaoGlobal, Domain, Municipio, User, UsuarioMunicipioPapel
+from .models import (
+    ConfiguracaoGlobal,
+    Domain,
+    Municipio,
+    TabelaLegal,
+    User,
+    UsuarioMunicipioPapel,
+)
 
 admin.site.site_header = "Arminda — Administracao"
 admin.site.site_title = "Arminda Admin"
@@ -92,3 +99,29 @@ class UsuarioMunicipioPapelAdmin(admin.ModelAdmin):
 class ConfiguracaoGlobalAdmin(admin.ModelAdmin):
     list_display = ("chave", "descricao")
     search_fields = ("chave", "descricao")
+
+
+@admin.register(TabelaLegal)
+class TabelaLegalAdmin(admin.ModelAdmin):
+    """Gestão de tabelas legais nacionais (Onda 2.3).
+
+    A cada virada de exercício fiscal (ou MP nova), o time
+    operacional cadastra a nova vigência via este admin — sem deploy.
+    """
+
+    list_display = (
+        "tipo",
+        "vigencia_inicio",
+        "vigencia_fim",
+        "referencia_legal",
+        "atualizado_em",
+    )
+    list_filter = ("tipo",)
+    date_hierarchy = "vigencia_inicio"
+    search_fields = ("referencia_legal", "observacoes")
+    readonly_fields = ("criado_em", "atualizado_em")
+    fieldsets = (
+        (None, {"fields": ("tipo", ("vigencia_inicio", "vigencia_fim"))}),
+        ("Conteúdo", {"fields": ("valores", "referencia_legal", "observacoes")}),
+        ("Auditoria", {"fields": ("criado_em", "atualizado_em")}),
+    )

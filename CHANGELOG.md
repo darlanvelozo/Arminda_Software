@@ -35,6 +35,200 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Bloco 2.6 — Tela operacional de Folha (antecipada) · 2026-05-18
+
+> **Antecipação** da Onda 2.6 (originalmente após 2.4 e 2.5) para ter
+> algo visualmente demonstrável ao Dr. Renzo. As Ondas 2.4 (FGTS +
+> previdência municipal) e 2.5 (holerite PDF) continuam pendentes, mas
+> não bloqueiam apresentação — INSS/IRRF reais já vieram na 2.3, FGTS
+> hoje pode ser modelado com uma rubrica DSL com fórmula fixa.
+
+#### Adicionado — Frontend
+
+- **feat(pages/folha):** Três páginas novas:
+  - `FolhasListPage.tsx` — `/folha`. Lista paginada (20 por página)
+    com filtros por ano / mês / tipo / status. Cada linha exibe
+    competência, tipo, status badge, proventos, descontos, líquido e
+    contagem de lançamentos. Menu de ação por linha: Calcular, Editar,
+    Remover (com confirmação). Botão "Nova folha".
+  - `FolhaDetailPage.tsx` — `/folha/:id`. Header com tipo + competência
+    formatada em PT-BR ("Mensal — março de 2026") + badge de status +
+    botão Calcular/Recalcular (UX adapta confirmação ao status atual).
+    Três cards de totais. Card de "último cálculo" (relatório em
+    memória, descartável) com contadores e ordem topológica das
+    rubricas. Tabs: Lançamentos (com filtros por nome de servidor e
+    código de rubrica, paginação 50/página), Erros (lista os
+    `ErroLancamento` do último cálculo com `code` e mensagem),
+    Informações (observações + datas).
+  - `FolhaFormSheet.tsx` — slide-from-right para criar/editar. Validação
+    Zod: competência precisa ser primeiro dia do mês. Edição desabilita
+    o campo competência (constraint UNIQUE `(competencia, tipo)`).
+
+- **feat(lib/queries/folhas):** Sete hooks TanStack Query novos:
+  `useFolhasList`, `useFolha`, `useCreateFolha`, `useUpdateFolha`,
+  `useDeleteFolha`, `useCalcularFolha`, `useLancamentosList`. O hook de
+  cálculo invalida tanto `folhasKey` quanto `lancamentosKey` —
+  totais e tabela atualizam sem refresh manual.
+
+- **feat(types):** Tipos `Folha`, `FolhaDetail`, `FolhaWrite`,
+  `Lancamento` (gerados via `npm run gen:types` a partir do OpenAPI
+  schema). Mais 2 tipos manuais — `RelatorioCalculo` e `ErroLancamento`
+  — porque drf-spectacular não tipa response de `@action`.
+
+- **feat(components/ui):** Novo componente `Textarea`.
+
+- **feat(App.tsx):** Rotas `/folha` e `/folha/:id` substituem o
+  placeholder `EmConstrucaoPage`.
+
+#### Por quê
+
+- **Apresentação ao Dr. Renzo:** ele queria ver o produto, não a API.
+  Ter a página de Folha completa antecipa muito o valor demonstrável,
+  ainda que 2.4 e 2.5 fiquem para depois.
+- **UX do recalcular precisa ser cuidadosa.** Operador pode rodar
+  cálculo várias vezes (ajustando rubrica, conferindo); a confirmação
+  precisa explicar que é idempotente (não duplica) e que lançamentos
+  órfãos são removidos. Folhas fechadas têm botão desabilitado.
+- **Relatório em memória, não persistido.** Os contadores
+  criados/atualizados/removidos só fazem sentido para a última execução;
+  guardar histórico de cálculos cabe num modelo separado (não entra
+  agora).
+
+#### Impacto
+
+- 4 arquivos novos em `frontend/src/`, ~900 LOC de TSX.
+- Sem mudança no backend — todos os endpoints já estavam prontos
+  desde a Onda 2.2.
+- Bundle: chunk lazy `FolhasListPage` ~12 KB gzip, `FolhaDetailPage`
+  ~16 KB gzip. Não afeta o bundle inicial.
+
+#### Validação
+
+- `tsc --noEmit`: 0 erros.
+- `npm run lint`: 0 erros (6 warnings HMR inócuos).
+- `vitest run`: 10/10.
+- `npm run build`: 3.94s.
+- Screenshot headless via Chrome DevTools Protocol confirma:
+  - Lista mostra 3 folhas (mar/abr/mai 2026) com totais reais.
+  - Detalhe da folha de março mostra 264 lançamentos com badges
+    coloridos por tipo (provento verde, desconto vermelho,
+    informativa azul).
+  - Sidebar "Folha" deixou de ser "em construção".
+
+#### Próximos passos
+
+- **Onda 2.4 — FGTS + previdência municipal.** FGTS é 8% federal
+  → vai pra `TabelaLegal`. Previdência municipal varia por município
+  → modelo TENANT com alíquota configurável.
+- **Onda 2.5 — Holerite PDF.** Tela já tem todos os dados; falta o
+  template PDF a partir do `Lancamento`.
+
+---
+
+### Bloco 2.3 — Tabelas legais 2024/2025/2026: INSS e IRRF reais · 2026-05-17
+
+> Terceira onda do **Bloco 2 (engine de cálculo)**. Substitui as aproximações
+> da Onda 2.2 (INSS 11% flat, IRRF simplificado) por **faixas progressivas
+> reais** conforme legislação federal, com vigência por competência e
+> atualização via admin Django (sem deploy).
+
+#### Adicionado — Backend
+
+- **feat(apps.core):** Modelo `TabelaLegal` em `apps.core` (SHARED, public)
+  com campos:
+  - `tipo` (`salario_minimo` | `inss` | `irrf` | `deducao_dependente_irrf`)
+  - `vigencia_inicio` (date, obrigatório), `vigencia_fim` (date, opcional)
+  - `valores` (JSONField com estrutura específica por tipo)
+  - `referencia_legal` (texto livre — Decreto/Lei/MP de origem)
+  - Constraint único: `(tipo, vigencia_inicio)`.
+
+- **feat(apps.calculo.tabelas):** Serviço de resolução por competência:
+  - `salario_minimo(comp)`, `inss(base, comp)`, `irrf(base, deps, comp)`,
+    `deducao_dependente_irrf(comp)`.
+  - Filtra a TabelaLegal com `vigencia_inicio <= comp` e (`vigencia_fim is
+    null` OR `vigencia_fim >= comp`), pega a mais recente.
+  - Cacheado por `functools.lru_cache(maxsize=256)`.
+  - Erros tipados: `TabelaLegalAusenteError` (code `TABELA_LEGAL_AUSENTE`),
+    `TabelaLegalInvalidaError` (code `TABELA_LEGAL_INVALIDA`).
+
+- **feat(apps.calculo.formula.funcoes):** `FAIXA_INSS(base)` e
+  `FAIXA_IRRF(base, deps)` viraram builtins **dinâmicas** (igual `RUBRICA`)
+  — recebem a competência via factory `make_fn_faixa_*(competencia)`
+  acionada pelo avaliador. Adeus placeholders `NotImplementedError`.
+
+- **feat(apps.calculo.formula.contexto):** `ContextoFolha` ganhou campo
+  `competencia: date | None` — preenchido pelo `construir_contexto()` do
+  serviço de cálculo. Fallback: primeiro dia do mês corrente da máquina
+  (compatível com `/avaliar/` standalone).
+
+- **feat(apps.payroll.services.calculo):** `construir_contexto()` lê
+  `SALARIO_MINIMO` da tabela vigente (em vez de constante hardcoded). Se
+  a tabela não existir, cai no fallback `SALARIO_MINIMO_FALLBACK = 1518`.
+
+- **feat(apps.core.signals):** post_save / post_delete de `TabelaLegal`
+  chamam `_invalidar_cache()` — alteração via admin reflete no próximo
+  cálculo sem reiniciar processo.
+
+- **feat(apps.core.admin):** `TabelaLegalAdmin` com fieldsets, filtros
+  por tipo, date_hierarchy por vigencia_inicio, search por
+  referência_legal/observações.
+
+- **data migration:** `0004_seed_tabelas_legais_2024_2026.py` — 9 tabelas
+  oficiais com `update_or_create` (idempotente):
+  - **Salário mínimo:** 2024 (R$ 1.412), 2025 (R$ 1.518), 2026 (R$ 1.518).
+  - **Dedução por dependente IRRF:** R$ 189,59 (Lei 14.663/2023).
+  - **INSS:** 3 vigências (2024, 2025, 2026), 4 faixas progressivas + teto.
+  - **IRRF:** 2 vigências (2024-02 a 2025-04, depois 2025-05+) — a mudança
+    é a faixa de isenção pela Lei 14.848/2024 (R$ 2.259,20 → R$ 2.428,80).
+
+- **test:** 24 novos em `apps/calculo/tests/test_tabelas.py`:
+  - Salário mínimo por exercício, erro quando ausente.
+  - INSS 1518 (1ª faixa), 2000 (2ª), 4000 (3ª), 8000 (4ª), acima do teto.
+  - IRRF dentro da isenção, 5 faixas, com dependentes, dependentes que
+    derrubam pra isenção.
+  - Vigência correta: IRRF antes vs depois de mai/2025; INSS 2024 vs 2026.
+  - Cada valor de teste vem com **comentário mostrando a aritmética** e a
+    referência à fonte oficial.
+
+- **390 testes verde no total** (366 → 390, +24).
+
+#### Por quê
+
+- **A folha real precisa bater nos centavos.** O Dr. Renzo e qualquer
+  cliente vão validar contra a calculadora oficial da Receita ou o
+  Fiorilli antigo. Aproximações funcionam pra demonstração, não pra
+  fechar competência.
+- **Tabelas legais mudam todo ano** (decreto novo do salário-mínimo,
+  reajuste de teto INSS, MP de IRRF). Cravar no código quebra a cada
+  virada de exercício. Modelo + admin desacopla operação de deploy.
+- **Vigência por competência preserva histórico.** Recalcular janeiro/2025
+  precisa usar a tabela de 2025, não a de 2026. Resolução por data faz
+  isso de graça.
+- **Cache invalidado por signal** é correto operacionalmente: time
+  cadastra nova tabela no admin no dia 1º de janeiro, próximo cálculo
+  pega — sem reboot, sem deploy.
+
+#### Impacto
+
+- 1 modelo novo em SHARED, 2 migrations.
+- 4 funções públicas novas (`apps.calculo.tabelas`).
+- 2 builtins DSL agora funcionais (`FAIXA_INSS`, `FAIXA_IRRF`).
+- API/contrato inalterado — qualquer fórmula que ainda use INSS 11%
+  hardcoded continua funcionando; quem quiser pode migrar pra
+  `FAIXA_INSS(RUBRICA('SAL_BASE'))`.
+- Sem migrations TENANT (tabelas legais são federais → ficam em public).
+
+#### Próximos passos
+
+- **Onda 2.4 — Incidências FGTS + previdência municipal própria.** FGTS
+  é 8% federal (vai pra TabelaLegal). Previdência municipal varia por
+  município → modelo TENANT separado com alíquota configurável.
+- **Onda 2.5 — Holerite (PDF).** Usa os lançamentos da folha + tabelas
+  legais (mostra "INSS R$ X (alíquota efetiva Y%)" no holerite).
+- **Onda 2.6 — Tela operacional de Folha.**
+
+---
+
 ### Bloco 2.2 — Cálculo mensal ordinário: do servidor ao Lançamento · 2026-05-14
 
 > Segunda onda do **Bloco 2 (engine de cálculo de folha)**. Em cima da

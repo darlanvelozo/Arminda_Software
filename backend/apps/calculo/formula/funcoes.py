@@ -1,10 +1,11 @@
 """
-Funções builtin disponíveis dentro de uma fórmula DSL (Bloco 2.1).
+Funções builtin disponíveis dentro de uma fórmula DSL (Bloco 2.1 + Onda 2.3).
 
 Cada função recebe argumentos posicionais (não aceita kwargs) e retorna
-um Decimal (exceto onde explicitamente diferente). As funções de
-tabela legal (FAIXA_IRRF, FAIXA_INSS) ficam para Onda 2.3 quando
-chegarem as tabelas 2026.
+um Decimal (exceto onde explicitamente diferente).
+
+FAIXA_INSS e FAIXA_IRRF entraram na Onda 2.3 — leem `apps.core.TabelaLegal`
+via `apps.calculo.tabelas`, resolvendo pela competência da folha.
 
 Toda função nova exige:
 1. Implementação aqui.
@@ -17,6 +18,7 @@ Adicionar função SEM teste explícito é violação do CONTEXT.md.
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
@@ -111,22 +113,32 @@ def make_fn_rubrica(rubricas_calculadas: dict[str, Decimal]) -> Callable[[str], 
     return fn_rubrica
 
 
-# Funções de tabela legal — placeholders para Onda 2.3.
-# Quando as tabelas chegarem (apps.payroll.TabelaLegal), estas funções
-# consultarão a tabela ativa do município/ano.
-
-def fn_faixa_irrf(_base: Any, _ano: Any = None) -> Decimal:
-    """FAIXA_IRRF(base, ano) — Onda 2.3. Por enquanto, levanta NotImplementedError."""
-    raise NotImplementedError(
-        "FAIXA_IRRF entra na Onda 2.3 junto com as tabelas legais 2026."
-    )
+# Funções de tabela legal — Onda 2.3.
+# Vivem em `apps.calculo.tabelas` e leem `apps.core.TabelaLegal`.
+# Recebem a competência via factory (igual RUBRICA recebe rubricas_calculadas).
 
 
-def fn_faixa_inss(_base: Any, _ano: Any = None) -> Decimal:
-    """FAIXA_INSS(base, ano) — Onda 2.3."""
-    raise NotImplementedError(
-        "FAIXA_INSS entra na Onda 2.3 junto com as tabelas legais 2026."
-    )
+def make_fn_faixa_inss(competencia: date) -> Callable[..., Decimal]:
+    """Cria FAIXA_INSS(base) bound à competência da folha."""
+    from apps.calculo import tabelas
+
+    def fn_faixa_inss(base: Any) -> Decimal:
+        base_d = _to_decimal(base, nome_arg="FAIXA_INSS base")
+        return tabelas.inss(base_d, competencia)
+
+    return fn_faixa_inss
+
+
+def make_fn_faixa_irrf(competencia: date) -> Callable[..., Decimal]:
+    """Cria FAIXA_IRRF(base, dependentes) bound à competência."""
+    from apps.calculo import tabelas
+
+    def fn_faixa_irrf(base: Any, dependentes: Any = 0) -> Decimal:
+        base_d = _to_decimal(base, nome_arg="FAIXA_IRRF base")
+        deps_int = int(_to_decimal(dependentes, nome_arg="FAIXA_IRRF dependentes"))
+        return tabelas.irrf(base_d, deps_int, competencia)
+
+    return fn_faixa_irrf
 
 
 # ============================================================
@@ -144,11 +156,10 @@ BUILTINS_STATIC: dict[str, Callable[..., Any]] = {
     "MIN": fn_min,
     "ABS": fn_abs,
     "ARRED": fn_arred,
-    "FAIXA_IRRF": fn_faixa_irrf,
-    "FAIXA_INSS": fn_faixa_inss,
 }
 
-# Nome reservado que será injetado dinamicamente
-BUILTINS_DINAMICAS: frozenset[str] = frozenset({"RUBRICA"})
+# Nomes reservados que são injetados dinamicamente (dependem do contexto
+# da competência sendo calculada).
+BUILTINS_DINAMICAS: frozenset[str] = frozenset({"RUBRICA", "FAIXA_INSS", "FAIXA_IRRF"})
 
 NOMES_PERMITIDOS: frozenset[str] = frozenset(BUILTINS_STATIC) | BUILTINS_DINAMICAS

@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-15";
+const LAST_UPDATED = "2026-05-18";
 
 interface TocItem {
   id: string;
@@ -63,6 +63,8 @@ const TOC: TocItem[] = [
   { id: "auth-rbac", label: "Auth + RBAC", icon: ShieldCheck },
   { id: "dsl", label: "DSL de fórmulas (Bloco 2)", icon: FileCode },
   { id: "calculo", label: "Cálculo de folha (Onda 2.2)", icon: Workflow },
+  { id: "tabelas-legais", label: "Tabelas legais (Onda 2.3)", icon: Tag },
+  { id: "tela-folha", label: "Tela operacional Folha (Onda 2.6)", icon: Workflow },
   { id: "testes", label: "Testes (back + front)", icon: TestTube2 },
   { id: "versionamento", label: "Versionamento (ADR-0010)", icon: Tag },
   { id: "validacao", label: "Rotina de validação integral", icon: Activity },
@@ -92,7 +94,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">Onda 2.2 + validação integral</Badge>
+            <Badge variant="info">Onda 2.6 ✓ (tela operacional de Folha)</Badge>
           </span>
         </p>
       </header>
@@ -126,6 +128,8 @@ export default function GuiaAdminPage() {
           <SectionAuthRBAC />
           <SectionDSL />
           <SectionCalculo />
+          <SectionTabelasLegais />
+          <SectionTelaFolha />
           <SectionTestes />
           <SectionVersionamento />
           <SectionValidacao />
@@ -160,9 +164,11 @@ function SectionPanorama() {
         (versionamento ADR-0010).
       </p>
       <p>
-        Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1) e
-        cálculo mensal (Onda 2.2) já no ar, próximas ondas: tabelas legais,
-        holerite, tela de folha.
+        Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1),
+        cálculo mensal (2.2), tabelas legais reais (2.3) e tela operacional
+        de Folha (2.6 ✓) já no ar. Adiantamos a Onda 2.6 pra ter algo
+        visual demonstrável; a Onda 2.4 (FGTS/previdência) e a 2.5
+        (holerite PDF) continuam pendentes mas não bloqueiam apresentação.
       </p>
     </Section>
   );
@@ -520,6 +526,184 @@ function SectionCalculo() {
     </Section>
   );
 }
+
+function SectionTabelasLegais() {
+  return (
+    <Section id="tabelas-legais" icon={Tag} title="Tabelas legais (Onda 2.3)">
+      <p>
+        Modelo:{" "}
+        <code className="text-xs bg-muted px-1 rounded">apps.core.TabelaLegal</code>{" "}
+        (SHARED, schema public). Federal — uma fonte de verdade para todos os
+        tenants. Tipos:{" "}
+        <code className="bg-muted px-1 rounded">salario_minimo</code>,{" "}
+        <code className="bg-muted px-1 rounded">inss</code>,{" "}
+        <code className="bg-muted px-1 rounded">irrf</code>,{" "}
+        <code className="bg-muted px-1 rounded">deducao_dependente_irrf</code>.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Resolução por competência</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">apps.calculo.tabelas</code>{" "}
+        expõe:{" "}
+        <code className="bg-muted px-1 rounded">salario_minimo(data)</code>,{" "}
+        <code className="bg-muted px-1 rounded">inss(base, data)</code>,{" "}
+        <code className="bg-muted px-1 rounded">irrf(base, deps, data)</code>,{" "}
+        <code className="bg-muted px-1 rounded">deducao_dependente_irrf(data)</code>.
+        Cada chamada filtra por
+        <code className="bg-muted px-1 rounded"> vigencia_inicio &lt;= data</code>
+        e (
+        <code className="bg-muted px-1 rounded">vigencia_fim is null</code> ou{" "}
+        <code className="bg-muted px-1 rounded">vigencia_fim &gt;= data</code>).
+        Cacheado com{" "}
+        <code className="bg-muted px-1 rounded">lru_cache(maxsize=256)</code>.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Cache invalidado por signal</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">apps/core/signals.py</code>{" "}
+        escuta <code className="bg-muted px-1 rounded">post_save</code> e{" "}
+        <code className="bg-muted px-1 rounded">post_delete</code> de{" "}
+        <code className="bg-muted px-1 rounded">TabelaLegal</code> e chama{" "}
+        <code className="bg-muted px-1 rounded">_invalidar_cache()</code>. Salvar
+        pelo admin Django reflete no próximo cálculo de folha — sem reiniciar
+        o processo.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">DSL: ligação com as funções</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">FAIXA_INSS</code> e{" "}
+        <code className="text-xs bg-muted px-1 rounded">FAIXA_IRRF</code> são
+        builtins dinâmicas (igual{" "}
+        <code className="bg-muted px-1 rounded">RUBRICA</code>) — recebem a
+        competência pelo avaliador, que pega de{" "}
+        <code className="bg-muted px-1 rounded">ContextoFolha.competencia</code>{" "}
+        (preenchida por{" "}
+        <code className="bg-muted px-1 rounded">construir_contexto()</code>{" "}
+        no serviço de cálculo).
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Onde atualizar a cada exercício</h3>
+      <ol className="list-decimal pl-5 space-y-1 text-xs">
+        <li>
+          Admin Django:{" "}
+          <code className="bg-muted px-1 rounded">/admin/core/tabelalegal/</code>
+        </li>
+        <li>
+          &quot;Adicionar Tabela Legal&quot; → escolher tipo, definir{" "}
+          <code className="bg-muted px-1 rounded">vigencia_inicio</code>, colar
+          JSON em <code className="bg-muted px-1 rounded">valores</code>.
+        </li>
+        <li>
+          (Opcional) fechar a vigência anterior preenchendo{" "}
+          <code className="bg-muted px-1 rounded">vigencia_fim</code> com o
+          último dia da tabela antiga.
+        </li>
+        <li>
+          Próximo cálculo de folha usa a nova tabela automaticamente.
+        </li>
+      </ol>
+
+      <Callout variant="info">
+        Seed inicial em{" "}
+        <code className="text-xs bg-muted px-1 rounded">
+          apps/core/migrations/0004_seed_tabelas_legais_2024_2026.py
+        </code>
+        . Para municípios novos basta rodar{" "}
+        <code className="text-xs bg-muted px-1 rounded">manage.py migrate</code>{" "}
+        — as 9 tabelas vigentes ficam disponíveis.
+      </Callout>
+    </Section>
+  );
+}
+
+
+function SectionTelaFolha() {
+  return (
+    <Section id="tela-folha" icon={Workflow} title="Tela operacional de Folha (Onda 2.6)">
+      <p>
+        Rota{" "}
+        <code className="text-xs bg-muted px-1 rounded">/folha</code> (lista
+        paginada com filtros por ano/mês/tipo/status) +{" "}
+        <code className="text-xs bg-muted px-1 rounded">/folha/:id</code>{" "}
+        (detalhe com botão Calcular/Recalcular). Adiantamos esta onda em
+        relação ao roadmap pra ter algo visualmente demonstrável.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Arquivos novos</h3>
+      <ul className="list-disc pl-5 space-y-1 text-xs">
+        <li>
+          <code className="bg-muted px-1 rounded">pages/folha/FolhasListPage.tsx</code> —
+          lista, cria, calcular inline, deletar.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">pages/folha/FolhaDetailPage.tsx</code> —
+          cards de totais, botão Calcular, relatório do último cálculo,
+          tabs Lançamentos / Erros / Informações.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">pages/folha/FolhaFormSheet.tsx</code> —
+          slide-from-right para criar/editar folha.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">lib/queries/folhas.ts</code> —{" "}
+          <code className="bg-muted px-1 rounded">useFolhasList</code>,{" "}
+          <code className="bg-muted px-1 rounded">useFolha</code>,{" "}
+          <code className="bg-muted px-1 rounded">useCalcularFolha</code>,{" "}
+          <code className="bg-muted px-1 rounded">useLancamentosList</code>,
+          etc.
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">components/ui/textarea.tsx</code> —
+          componente UI básico que não existia.
+        </li>
+      </ul>
+
+      <h3 className="text-base font-semibold mt-4">Tipos e contrato</h3>
+      <p>
+        <code className="text-xs bg-muted px-1 rounded">types/index.ts</code>{" "}
+        ganhou{" "}
+        <code className="bg-muted px-1 rounded">Folha</code>,{" "}
+        <code className="bg-muted px-1 rounded">FolhaDetail</code>,{" "}
+        <code className="bg-muted px-1 rounded">Lancamento</code> (gerados via{" "}
+        <code className="bg-muted px-1 rounded">npm run gen:types</code>) +{" "}
+        <code className="bg-muted px-1 rounded">RelatorioCalculo</code> e{" "}
+        <code className="bg-muted px-1 rounded">ErroLancamento</code> (tipos manuais
+        — drf-spectacular ainda não tipa o response de @action).
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">UX do recalcular</h3>
+      <ul className="list-disc pl-5 space-y-1 text-xs">
+        <li>
+          Folha <strong>aberta</strong> → botão diz &quot;Calcular folha&quot;,
+          confirmação explica idempotência.
+        </li>
+        <li>
+          Folha <strong>calculada/conferida</strong> → botão diz &quot;Recalcular&quot;,
+          confirmação avisa que valores atualizam e órfãos são removidos.
+        </li>
+        <li>
+          Folha <strong>fechada</strong> → botão desabilitado.
+        </li>
+        <li>
+          Após cada cálculo o relatório fica num card destacado (no topo,
+          em memória — descartado ao trocar de tela) com contadores
+          (criados/atualizados/removidos/erros) e ordem topológica das
+          rubricas calculadas (collapsível).
+        </li>
+      </ul>
+
+      <Callout variant="info">
+        Cache do TanStack Query invalidado pelo hook{" "}
+        <code className="text-xs bg-muted px-1 rounded">useCalcularFolha</code>:
+        ao concluir o cálculo, invalida tanto{" "}
+        <code className="text-xs bg-muted px-1 rounded">folhasKey</code> quanto{" "}
+        <code className="text-xs bg-muted px-1 rounded">lancamentosKey</code> —
+        os totais e a tabela atualizam sozinhos.
+      </Callout>
+    </Section>
+  );
+}
+
 
 function SectionTestes() {
   return (

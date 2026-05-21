@@ -104,6 +104,6 @@ notas/
 scratch/
 TODO.local.md
 
-# Demo branch — runtime do start-demo.sh
+# ---------- Runtime da branch demo (start-demo.sh) ----------
 .demo-logs/
 .demo-run/

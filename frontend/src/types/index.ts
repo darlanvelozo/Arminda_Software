@@ -53,6 +53,38 @@ export type Rubrica = components["schemas"]["RubricaList"];
 export type RubricaDetail = components["schemas"]["RubricaDetail"];
 export type RubricaWrite = components["schemas"]["RubricaWrite"];
 
+// Folha + Lancamento (Onda 2.2 + tela operacional na Onda 2.6)
+export type Folha = components["schemas"]["FolhaList"];
+export type FolhaDetail = components["schemas"]["FolhaDetail"];
+export type FolhaWrite = components["schemas"]["FolhaWrite"];
+export type Lancamento = components["schemas"]["Lancamento"];
+
+/**
+ * Resposta do POST /api/payroll/folhas/{id}/calcular/.
+ *
+ * drf-spectacular não tipa o response do @action; descrevemos aqui — a
+ * fonte da verdade é `apps/payroll/views.py:FolhaViewSet.calcular`.
+ */
+export interface RelatorioCalculo {
+  folha_id: number;
+  competencia: string; // ISO YYYY-MM-DD
+  vinculos_processados: number;
+  rubricas_processadas: number;
+  lancamentos_criados: number;
+  lancamentos_atualizados: number;
+  lancamentos_removidos: number;
+  ordem_rubricas: string[];
+  erros: ErroLancamento[];
+}
+
+export interface ErroLancamento {
+  vinculo_id: number;
+  matricula: string;
+  rubrica_codigo: string;
+  code: string;
+  mensagem: string;
+}
+
 // ============================================================
 // Auth (TokenObtainPair acumula request+response em drf-spectacular)
 // ============================================================

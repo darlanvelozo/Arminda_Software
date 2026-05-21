@@ -33,9 +33,10 @@ from apps.calculo.formula.errors import FormulaError
 from apps.payroll.models import Folha, Lancamento, Rubrica, TipoRubrica
 from apps.people.models import Dependente, VinculoFuncional
 
-# Salário mínimo nacional 2026 (referência inicial; vai virar
-# `ConfiguracaoGlobal` ou tabela legal sobrescrevível na Onda 2.3).
-SALARIO_MINIMO_2026 = Decimal("1518.00")
+# Fallback do salário-mínimo caso a TabelaLegal não tenha sido seedada.
+# A partir da Onda 2.3, o valor real vem de `apps.calculo.tabelas.salario_minimo`
+# resolvido pela competência da folha.
+SALARIO_MINIMO_FALLBACK = Decimal("1518.00")
 
 # Horas-mês padrão de jornada 40h/semana (4.345 semanas × 40h).
 # Para jornadas diferentes (20h, 30h, 44h), proporcional.
@@ -120,6 +121,16 @@ def construir_contexto(
 
     salario_base = Decimal(vinculo.salario_base or 0)
 
+    # SALARIO_MINIMO dinâmico via TabelaLegal (Onda 2.3). Se não houver
+    # tabela cadastrada para a competência, cai para o fallback de 2025.
+    from apps.calculo.tabelas import TabelaLegalAusenteError
+    from apps.calculo.tabelas import salario_minimo as _sal_min
+
+    try:
+        sal_min = _sal_min(competencia)
+    except TabelaLegalAusenteError:
+        sal_min = SALARIO_MINIMO_FALLBACK
+
     variaveis: dict[str, Decimal | int] = {
         "SALARIO_BASE": salario_base,
         "CARGA_HORARIA": Decimal(vinculo.carga_horaria or 0),
@@ -133,7 +144,7 @@ def construir_contexto(
         "DEPENDENTES": Decimal(deps_ir),
         "DEPENDENTES_SALFAM": Decimal(deps_salfam),
         "TEMPO_SERVICO_ANOS": Decimal(_tempo_servico_anos(vinculo.data_admissao, competencia)),
-        "SALARIO_MINIMO": SALARIO_MINIMO_2026,
+        "SALARIO_MINIMO": sal_min,
         "COMPETENCIA_ANO": competencia.year,
         "COMPETENCIA_MES": competencia.month,
     }
@@ -141,6 +152,7 @@ def construir_contexto(
     return ContextoFolha(
         variaveis=variaveis,
         rubricas_calculadas=rubricas_calculadas or {},
+        competencia=competencia,
     )
 
 
