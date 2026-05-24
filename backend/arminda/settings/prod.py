@@ -18,6 +18,10 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 # ============================================================
 # Segurança HTTPS
 # ============================================================
+# Quando o tráfego chega via proxy reverso (Nginx) que termina TLS,
+# o Django vê o request como HTTP. O header X-Forwarded-Proto avisa
+# que o cliente externo veio via HTTPS. SECURE_SSL_REDIRECT continua
+# fazendo redirect 80 → 443 sob esse header.
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = True
@@ -28,10 +32,29 @@ SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ============================================================
+# CSRF — origens confiáveis (via env, com fallback aceitando os
+# domínios do Arminda em produção)
+# ============================================================
+CSRF_TRUSTED_ORIGINS = env.list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    default=[
+        "https://arminda.site",
+        "https://www.arminda.site",
+    ],
+)
+
+# ============================================================
 # CORS — só origens explicitamente permitidas
 # ============================================================
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS")
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "https://arminda.site",
+        "https://www.arminda.site",
+    ],
+)
+CORS_ALLOW_CREDENTIALS = True
 
 # ============================================================
 # Logging para produção

@@ -1,0 +1,50 @@
+[Unit]
+Description=Arminda Backend (Django + Gunicorn)
+Documentation=https://github.com/darlanvelozo/Arminda_Software
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=arminda
+Group=arminda
+WorkingDirectory=/opt/arminda/backend
+EnvironmentFile=/opt/arminda/backend/.env
+
+# Gunicorn ouvindo em 127.0.0.1:8001 (loopback — Nginx termina TLS na 443).
+# 2 workers + 2 threads = 4 conexões simultâneas, suficiente pra uma VPS
+# de 1 vCPU. Aumentar quando a carga justificar.
+# --access-logfile e --error-logfile com `-` mandam pra stdout/stderr,
+# que o journald captura.
+ExecStart=/opt/arminda/backend/.venv/bin/gunicorn \
+    arminda.wsgi:application \
+    --bind 127.0.0.1:8001 \
+    --workers 2 \
+    --threads 2 \
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile - \
+    --log-level info
+
+# Reinício resiliente
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=5
+
+# Hardening (Ubuntu 24.04 systemd suporta tudo isso)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/arminda /var/log
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+# Limites
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

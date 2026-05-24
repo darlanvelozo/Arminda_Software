@@ -35,6 +35,100 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### chore(deploy): infraestrutura para produção (arminda.site) · 2026-05-24
+
+> Primeira versão **deployável em produção**. Não adiciona feature de
+> produto — só prepara o repo pra subir numa VPS de forma idempotente
+> e auditável. Marca o ponto **v0.8.1** ("deployável").
+
+#### Adicionado — Backend
+
+- **fix(settings/prod):** `CSRF_TRUSTED_ORIGINS` configurável via env
+  (com fallback aceitando `https://arminda.site` + `https://www.arminda.site`).
+  Sem isso, qualquer POST no admin via Nginx HTTPS falhava com
+  `CSRF verification failed`.
+- **fix(settings/prod):** `CORS_ALLOWED_ORIGINS` ganhou defaults
+  apontando para os domínios oficiais. Com `CORS_ALLOW_CREDENTIALS=True`
+  pra o frontend SPA mandar cookies/headers do JWT corretamente.
+- **feat(urls):** alias público `GET /api/health/` reutilizando
+  `health_check`. Razão: Nginx encaminha `/api/*` para o backend; um
+  monitor externo que bate em `https://arminda.site/api/health/` cai
+  no gunicorn sem mexer em outras rotas.
+- **feat(requirements):** + `gunicorn==23.0.0`. Mesmo binário que a
+  branch demo já usa.
+
+#### Adicionado — deploy/ (novo diretório)
+
+- **`deploy/setup-producao.sh`** — bootstrap idempotente para uma VPS
+  Ubuntu 24.04. Cria usuário OS `arminda`, role + database
+  PostgreSQL, virtualenv, aplica migrations, gera `.env` (modo 600,
+  com `SECRET_KEY` e senha do banco aleatórias via `openssl rand`),
+  instala systemd unit, instala vhost Nginx. Flags `--skip-system`
+  e `--skip-nginx` para reaplicar pedaços.
+- **`deploy/deploy.sh`** — release contínuo. `git pull` + `pip install`
+  + `migrate` + `collectstatic` + `systemctl restart` + healthcheck.
+  Falha explícita se o restart não voltar.
+- **`deploy/systemd/arminda-backend.service`** — unit do gunicorn
+  ouvindo em `127.0.0.1:8001` (loopback — Nginx termina TLS). Hardening
+  via `NoNewPrivileges`, `ProtectSystem=full`, `ProtectHome=read-only`,
+  `ReadWritePaths` restrito a `/opt/arminda` e `/var/log`,
+  `RestrictAddressFamilies` só `AF_UNIX/AF_INET/AF_INET6`. Reinício
+  resiliente (`Restart=on-failure`, `StartLimitBurst=5`).
+- **`deploy/nginx/arminda.site.conf`** — vhost com upstream gunicorn,
+  SPA fallback no `index.html` (frontend Vite), `/api/` e `/admin/`
+  via proxy, `/static/` com cache imutável, `/media/`, gzip
+  configurado, `client_max_body_size 12M` (uploads de documentos).
+  Sem TLS — certbot adiciona em runtime.
+- **`deploy/env/backend.env.example`** e **`frontend.env.production.example`**
+  — templates sem segredos. Documentam todas as envs necessárias
+  com comentários sobre o que cada uma faz.
+- **`deploy/README.md`** — mapa do diretório.
+
+#### Adicionado — Documentação
+
+- **`docs/DEPLOY_PRODUCAO.md`** — runbook operacional completo:
+  arquitetura, pré-requisitos da VPS, passos do setup, configuração
+  HTTPS via Certbot, rotina de release contínuo, rollback rápido,
+  comandos do dia-a-dia (logs, status, backup, conferir SSL),
+  convivência com outras aplicações no mesmo host, limitações
+  conhecidas da v0.8.1 e backlog de monitoramento para Bloco 6.
+- **`/guia-admin`** ganhou:
+  - Badge "v0.8.1 — primeira versão em produção".
+  - Seção `Ambientes & deploy` atualizada com URL pública e instruções
+    de release.
+
+#### Por quê
+
+- **Sem isso, qualquer release exige memória do desenvolvedor.** Com
+  `setup-producao.sh` + `deploy.sh` versionados, qualquer máquina
+  nova entra em produção igual; releases ficam reproduzíveis e
+  auditáveis (`git blame` no script mostra quando algo mudou).
+- **Convivência com outras aplicações** no mesmo VPS força isolamento
+  explícito (porta diferente, banco diferente, vhost diferente). O
+  setup escolheu porta `8001` justamente porque `8000` está
+  reservada para a aplicação `biazul` que já roda lá.
+- **Healthcheck `/api/health/`** habilita monitoramento externo
+  (UptimeRobot, BetterStack, ou Nginx upstream check) sem expor
+  endpoint autenticado.
+
+#### Impacto
+
+- Sem mudança de produto. Sem migration. Sem teste novo.
+- `+gunicorn` no `requirements.txt` — agora o backend tem servidor
+  WSGI de produção embutido no projeto.
+- Repositório pronto para `git push` direto para produção via
+  `deploy.sh`.
+
+#### Próximos passos
+
+- **GitHub Action de deploy** (CD): no push para `main`, rodar
+  `ssh arminda-vps -- 'sudo /opt/arminda/deploy/deploy.sh'`. Hoje é
+  manual.
+- **Backup automatizado** do Postgres (cron + `pg_dump -Fc` rotacionado).
+- **Healthcheck externo** apontando para `https://arminda.site/api/health/`.
+
+---
+
 ### Bloco 2.6 — Tela operacional de Folha (antecipada) · 2026-05-18
 
 > **Antecipação** da Onda 2.6 (originalmente após 2.4 e 2.5) para ter

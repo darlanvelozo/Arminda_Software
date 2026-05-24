@@ -23,6 +23,11 @@ venv/
 env/
 ENV/
 
+# Permite o diretório deploy/env/ (com templates *.env.example),
+# que conflitava com o filtro 'env/' acima.
+!deploy/env/
+!deploy/env/**
+
 # Django
 *.log
 local_settings.py

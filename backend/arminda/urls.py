@@ -60,7 +60,7 @@ def status_page(_request):
         {
             "status": "ok" if all_ok else "degraded",
             "service": "arminda",
-            "version": "0.2.0-dev",
+            "version": "v0.8.1",
             "uptime": f"{hours}h {minutes}m {seconds}s",
             "uptime_seconds": uptime_seconds,
             "checks": checks,
@@ -72,6 +72,9 @@ urlpatterns = [
     # Public
     path("admin/", admin.site.urls),
     path("health/", health_check, name="health"),
+    # Alias sob /api/ — útil quando o Nginx encaminha só /api para o
+    # backend (a probe externa bate em https://arminda.site/api/health/).
+    path("api/health/", health_check, name="api-health"),
     path("status/", status_page, name="status"),
     # Auth (publica — login)
     path("api/auth/", include("apps.core.auth.urls")),

@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-18";
+const LAST_UPDATED = "2026-05-24";
 
 interface TocItem {
   id: string;
@@ -94,7 +94,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">Onda 2.6 ✓ (tela operacional de Folha)</Badge>
+            <Badge variant="info">v0.8.1 — primeira versão em produção</Badge>
           </span>
         </p>
       </header>
@@ -997,10 +997,61 @@ function SectionAmbientes() {
           .
         </li>
         <li>
-          <strong>Produção (futura)</strong>: definida no Bloco 6 (operação piloto).
-          Provavelmente container + Postgres gerenciado + Caddy/Nginx.
+          <strong>Produção</strong>:{" "}
+          <a
+            href="https://arminda.site"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            arminda.site
+          </a>{" "}
+          desde v0.8.1 (mai/2026). VPS Hostinger Ubuntu 24.04 com Nginx
+          (TLS via Let's Encrypt), gunicorn loopback :8001, PostgreSQL 16
+          compartilhado. Convive com a aplicação <code className="bg-muted px-1 rounded">biazul</code>{" "}
+          na mesma máquina — bancos e vhosts separados.
         </li>
       </ul>
+
+      <h3 className="text-base font-semibold mt-4">Como entregar uma release</h3>
+      <ol className="list-decimal pl-5 space-y-1 text-xs">
+        <li>
+          Rodar a rotina de validação integral local (ver seção
+          &quot;Rotina de validação integral&quot;).
+        </li>
+        <li>
+          <code className="bg-muted px-1 rounded">git push origin main</code>.
+        </li>
+        <li>
+          Na VPS:{" "}
+          <code className="bg-muted px-1 rounded">
+            ssh arminda-vps && sudo /opt/arminda/deploy/deploy.sh
+          </code>
+          . O script faz <code className="bg-muted px-1 rounded">git pull</code>,{" "}
+          <code className="bg-muted px-1 rounded">pip install</code>,{" "}
+          <code className="bg-muted px-1 rounded">migrate</code>,{" "}
+          <code className="bg-muted px-1 rounded">collectstatic</code>,{" "}
+          <code className="bg-muted px-1 rounded">systemctl restart arminda-backend</code>{" "}
+          e checa <code className="bg-muted px-1 rounded">/api/health/</code> no final.
+        </li>
+        <li>
+          Se o frontend mudou: localmente{" "}
+          <code className="bg-muted px-1 rounded">npm run build</code> +{" "}
+          <code className="bg-muted px-1 rounded">
+            rsync -avz --delete dist/ arminda-vps:/opt/arminda/frontend-dist/
+          </code>
+          .
+        </li>
+      </ol>
+
+      <h3 className="text-base font-semibold mt-4">Documentação técnica de prod</h3>
+      <p className="text-xs">
+        Runbook completo em{" "}
+        <code className="bg-muted px-1 rounded">docs/DEPLOY_PRODUCAO.md</code> e
+        configurações em{" "}
+        <code className="bg-muted px-1 rounded">deploy/</code> (setup-producao.sh,
+        deploy.sh, systemd unit, vhost Nginx, env templates).
+      </p>
     </Section>
   );
 }
