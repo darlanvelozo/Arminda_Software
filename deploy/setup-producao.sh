@@ -139,14 +139,16 @@ sudo -u "$ARMINDA_USER" .venv/bin/pip install -q -U pip wheel
 sudo -u "$ARMINDA_USER" .venv/bin/pip install -q -r requirements.txt
 ok "requirements instaladas"
 
-# .env (não sobrescreve se já existe)
-if [[ ! -f .env ]]; then
+# .env fica na RAIZ do projeto (ARMINDA_HOME), não em backend/.
+# Convenção do settings/base.py: read_env(BASE_DIR.parent / ".env").
+ENV_FILE="$ARMINDA_HOME/.env"
+if [[ ! -f "$ENV_FILE" ]]; then
   DB_PASS_FROM_FILE=$(cat /tmp/.arminda_db_pass 2>/dev/null || true)
   if [[ -z "$DB_PASS_FROM_FILE" ]]; then
-    echo "  ✗ Não encontrei a senha do banco. Edite $ARMINDA_HOME/backend/.env manualmente."
+    echo "  ✗ Não encontrei a senha do banco. Edite $ENV_FILE manualmente."
     DB_PASS_FROM_FILE="EDITE_AQUI"
   fi
-  cat > .env <<EOF
+  cat > "$ENV_FILE" <<EOF
 DJANGO_SETTINGS_MODULE=arminda.settings.prod
 DJANGO_SECRET_KEY=$(openssl rand -hex 32)
 DJANGO_DEBUG=False
@@ -155,12 +157,12 @@ DJANGO_CSRF_TRUSTED_ORIGINS=https://$ARMINDA_DOMAIN,https://www.$ARMINDA_DOMAIN
 CORS_ALLOWED_ORIGINS=https://$ARMINDA_DOMAIN,https://www.$ARMINDA_DOMAIN
 DATABASE_URL=postgres://$ARMINDA_USER:$DB_PASS_FROM_FILE@127.0.0.1:5432/$ARMINDA_DB
 EOF
-  chown "$ARMINDA_USER:$ARMINDA_USER" .env
-  chmod 600 .env
-  ok ".env criado (modo 600)"
+  chown "$ARMINDA_USER:$ARMINDA_USER" "$ENV_FILE"
+  chmod 600 "$ENV_FILE"
+  ok ".env criado em $ENV_FILE (modo 600)"
   rm -f /tmp/.arminda_db_pass
 else
-  ok ".env já existe (preservado)"
+  ok ".env já existe em $ENV_FILE (preservado)"
 fi
 
 # Migrations + collectstatic

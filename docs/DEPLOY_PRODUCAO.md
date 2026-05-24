@@ -151,7 +151,7 @@ Esse script é **idempotente** (pode rodar várias vezes). Ele:
 2. Cria usuário OS `arminda` (sem login por senha, com chave SSH
    herdada do root).
 3. Cria role PostgreSQL `arminda` e database `arminda_prod`. Senha do
-   banco é **gerada e gravada em `/opt/arminda/backend/.env`**
+   banco é **gerada e gravada em `/opt/arminda/.env`**
    (modo 600, owner `arminda:arminda`).
 4. Cria virtualenv em `/opt/arminda/backend/.venv` e instala
    `requirements.txt`.

@@ -9,7 +9,7 @@ Type=simple
 User=arminda
 Group=arminda
 WorkingDirectory=/opt/arminda/backend
-EnvironmentFile=/opt/arminda/backend/.env
+EnvironmentFile=/opt/arminda/.env
 
 # Gunicorn ouvindo em 127.0.0.1:8001 (loopback — Nginx termina TLS na 443).
 # 2 workers + 2 threads = 4 conexões simultâneas, suficiente pra uma VPS

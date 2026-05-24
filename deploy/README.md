@@ -49,7 +49,7 @@ rsync -avz --delete dist/ arminda-vps:/opt/arminda/frontend-dist/
 
 ## O que **não** está aqui
 
-- **Segredos** (senha do banco, SECRET_KEY) — gerados na hora do `setup`, ficam só em `/opt/arminda/backend/.env` na VPS.
+- **Segredos** (senha do banco, SECRET_KEY) — gerados na hora do `setup`, ficam só em `/opt/arminda/.env` na VPS (raiz do projeto, lido por `settings/base.py`).
 - **Build do frontend** (`dist/`) — sempre regerado localmente, nunca commitado.
 - **Certificado SSL** — gerado pelo Certbot, fora do repo.
 
