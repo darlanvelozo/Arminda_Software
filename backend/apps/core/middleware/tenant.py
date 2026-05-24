@@ -22,6 +22,7 @@ class TenantHeaderOrHostMiddleware(TenantMainMiddleware):
     PUBLIC_PATH_PREFIXES: tuple[str, ...] = (
         "/admin/",
         "/health/",
+        "/api/health/",  # alias público sob /api/ — Nginx encaminha p/ backend
         "/status/",
         "/api/auth/",
         "/api/schema/",
