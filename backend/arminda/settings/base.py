@@ -119,17 +119,28 @@ WSGI_APPLICATION = "arminda.wsgi.application"
 
 # ============================================================
 # Banco de dados — engine do django-tenants (ADR-0006)
+#
+# Aceita `DATABASE_URL` (padrão 12-factor, usado em produção) ou as
+# variáveis separadas POSTGRES_* (preservadas para compat com dev local
+# e docker-compose). Quando ambas estão presentes, DATABASE_URL ganha.
 # ============================================================
-DATABASES = {
-    "default": {
-        "ENGINE": "django_tenants.postgresql_backend",
-        "NAME": env("POSTGRES_DB", default="arminda"),
-        "USER": env("POSTGRES_USER", default="arminda"),
-        "PASSWORD": env("POSTGRES_PASSWORD", default="arminda_dev_password"),
-        "HOST": env("POSTGRES_HOST", default="localhost"),
-        "PORT": env("POSTGRES_PORT", default="5432"),
+_DATABASE_URL = env("DATABASE_URL", default="")
+if _DATABASE_URL:
+    DATABASES = {"default": env.db_url_config(_DATABASE_URL)}
+    # django-environ devolve ENGINE=django.db.backends.postgresql.
+    # Sobrescrevemos para o backend multi-tenant (ADR-0006).
+    DATABASES["default"]["ENGINE"] = "django_tenants.postgresql_backend"
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django_tenants.postgresql_backend",
+            "NAME": env("POSTGRES_DB", default="arminda"),
+            "USER": env("POSTGRES_USER", default="arminda"),
+            "PASSWORD": env("POSTGRES_PASSWORD", default="arminda_dev_password"),
+            "HOST": env("POSTGRES_HOST", default="localhost"),
+            "PORT": env("POSTGRES_PORT", default="5432"),
+        }
     }
-}
 
 DATABASE_ROUTERS = ("django_tenants.routers.TenantSyncRouter",)
 
