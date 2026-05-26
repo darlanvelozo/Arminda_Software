@@ -176,6 +176,13 @@
   "changelog": [
     {
       "data": "2026-05-24",
+      "tipo": "processo",
+      "titulo": "Relatório Quinzenal #2 publicado (09/05 → 24/05/2026)",
+      "resumo_executivo": "Quinze dias intensos no Bloco 2 (engine de cálculo): linguagem de fórmulas configurável, cálculo mensal de folha funcionando, INSS e IRRF reais (conferidos contra a calculadora oficial da Receita), tela visual de Folha pronta e — o mais importante — o sistema saiu do laptop e entrou em produção permanente em arminda.site, com HTTPS válido e acessível 24/7. Bloco 2 em 56%, adiantado em ~2 meses.",
+      "descricao": "Segundo relatório quinzenal de acompanhamento do desenvolvimento. Cobre o período de 09/05 a 24/05/2026, com 10 marcos entregues (Ondas 1.4-bis, 2.1, 2.2, 2.3, 2.6 + validação integral + guias vivos + limpeza de textos + deploy v0.8.1) e 3 novas ADRs (0010, 0011, 0012). 390 testes verde (era 248 no relatório anterior), 86% de cobertura, 8 releases tagueadas no GitHub. Marcos críticos: cálculo de folha com tabelas legais oficiais (INSS/IRRF para 2024/2025/2026), tela operacional /folha antecipada na ordem do roadmap, e infraestrutura de produção idempotente (setup-producao.sh + systemd + Nginx + Certbot). Relatório completo em status-page/relatorios/2026-05-24-quinzenal-02.html."
+    },
+    {
+      "data": "2026-05-24",
       "tipo": "marco",
       "titulo": "Infraestrutura de produção pronta — arminda.site no ar (v0.8.1)",
       "resumo_executivo": "O sistema saiu do laptop e entrou em produção: arminda.site está no ar, com HTTPS via Let's Encrypt, banco PostgreSQL dedicado e serviço com reinício automático em caso de falha. A partir de agora, cada nova versão sobe com um único comando (sem ter que lembrar de migration, reinício ou cache), e qualquer máquina nova consegue replicar o ambiente do zero rodando um script. Nenhuma funcionalidade nova foi adicionada nesta etapa — é a base pra começarmos a fazer apresentações ao vivo, receber feedback em tempo real e medir uso real.",
@@ -344,6 +351,11 @@
     }
   ],
   "relatorios": [
+    {
+      "data": "2026-05-24",
+      "titulo": "Relatório Quinzenal #2 — Segunda quinzena (09/05 a 24/05)",
+      "url": "relatorios/2026-05-24-quinzenal-02.html"
+    },
     {
       "data": "2026-05-08",
       "titulo": "Relatório Quinzenal #1 — Primeira quinzena (27/04 a 08/05)",

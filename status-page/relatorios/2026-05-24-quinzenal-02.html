@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Relatório quinzenal de desenvolvimento do Arminda — segunda quinzena (09/05 a 24/05/2026)." />
+    <meta name="robots" content="noindex" />
+    <title>Arminda — Relatório Quinzenal #2 (09/05 – 24/05/2026)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+
+    <style>
+      .doc {
+        max-width: 820px;
+        margin: 64px auto;
+        padding: 0 24px;
+      }
+      .doc h1 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+      }
+      .doc .meta {
+        color: var(--cor-texto-fraco, #6b6b73);
+        font-size: 14px;
+        margin: 0 0 40px;
+      }
+      .doc h2 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(22px, 3vw, 30px);
+        font-weight: 600;
+        margin: 56px 0 16px;
+        letter-spacing: -0.015em;
+      }
+      .doc h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 32px 0 12px;
+      }
+      .doc p {
+        font-size: 16px;
+        line-height: 1.7;
+        margin: 12px 0;
+      }
+      .doc ul {
+        font-size: 16px;
+        line-height: 1.7;
+        padding-left: 22px;
+      }
+      .doc li {
+        margin: 6px 0;
+      }
+      .doc .resumo {
+        background: var(--cor-fundo-alt, #f7f6f3);
+        border-left: 3px solid var(--cor-marca, #2d3142);
+        padding: 20px 24px;
+        margin: 32px 0;
+        font-size: 15.5px;
+      }
+      .doc .tabela {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 32px;
+        font-size: 14.5px;
+      }
+      .doc .tabela th,
+      .doc .tabela td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--cor-borda, #e5e3dd);
+      }
+      .doc .tabela th {
+        font-weight: 600;
+        background: var(--cor-fundo-alt, #f7f6f3);
+      }
+      .doc .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin: 20px 0 40px;
+      }
+      .doc .kpi {
+        border: 1px solid var(--cor-borda, #e5e3dd);
+        border-radius: 6px;
+        padding: 16px 18px;
+      }
+      .doc .kpi-valor {
+        font-family: "Fraunces", serif;
+        font-size: 32px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .doc .kpi-label {
+        font-size: 12px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .doc .voltar {
+        display: inline-block;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        text-decoration: none;
+      }
+      .doc .voltar:hover {
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge-prod {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .doc footer {
+        margin: 80px 0 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--cor-borda, #e5e3dd);
+        font-size: 13px;
+        color: var(--cor-texto-fraco, #6b6b73);
+      }
+      .doc code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.92em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="doc">
+      <a href="../index.html#relatorios" class="voltar">← Acompanhamento do desenvolvimento</a>
+
+      <h1>Relatório Quinzenal #2</h1>
+      <p class="meta">
+        Período: <strong>09/05/2026 a 24/05/2026</strong> · Publicado em 24/05/2026 ·
+        <span class="badge">Bloco 2 — Engine de cálculo</span>
+        <span class="badge badge-prod">v0.8.1 em produção</span>
+      </p>
+
+      <div class="resumo">
+        <strong>Resumo executivo.</strong> A segunda quinzena fechou as quatro entregas
+        centrais do <strong>Bloco 2 (engine de cálculo de folha)</strong> — linguagem de
+        fórmulas, cálculo mensal ordinário, tabelas legais reais de INSS e IRRF, e a tela
+        operacional onde o operador efetivamente roda uma folha. Em paralelo, o sistema
+        saiu da fase "demo sob demanda no notebook" e entrou em <strong>produção
+        permanente em <code>https://arminda.site</code></strong>, com HTTPS válido e
+        dados de demonstração curados acessíveis 24/7. O Bloco 2 está em
+        <strong>56% concluído (4 de 7 ondas)</strong> — adiantado em cerca de
+        <strong>2 meses</strong> em relação ao cronograma original (que previa o
+        início desse bloco para julho/2026).
+      </div>
+
+      <h2>O que foi entregue</h2>
+
+      <h3>Para o usuário-operador</h3>
+      <ul>
+        <li>
+          <strong>Tela operacional de Folha</strong> em <code>/folha</code>: lista
+          paginada de competências com filtros por ano/mês/tipo/status, três cards de
+          totais (proventos / descontos / líquido), botão "Calcular/Recalcular"
+          idempotente com confirmação adequada ao status atual da folha, relatório do
+          último cálculo (vínculos processados, lançamentos criados/atualizados/removidos,
+          ordem topológica das rubricas) e tabs com lançamentos paginados filtráveis
+          por servidor e por rubrica + aba dedicada a erros estruturais.
+        </li>
+        <li>
+          <strong>Cálculo de INSS e IRRF reais</strong>: as faixas progressivas oficiais
+          de 2024, 2025 e 2026 foram cadastradas e validadas contra a calculadora
+          oficial da Receita Federal (centavo a centavo). A cada nova vigência
+          (decreto, MP), basta cadastrar a nova tabela no admin Django — sem
+          programador, sem deploy.
+        </li>
+        <li>
+          <strong>Linguagem de fórmulas configurável (DSL)</strong>: rubricas são
+          definidas com expressões legíveis (ex.: <code>RUBRICA('SAL_BASE') * 0.11</code>,
+          <code>SE(SALARIO_BASE &gt; 4000, 250, 100)</code>,
+          <code>FAIXA_INSS(SALARIO_BASE)</code>). 6 funções builtin + 13 variáveis padrão
+          + acesso a rubricas previamente calculadas, validadas por AST whitelist (sem
+          risco de injeção de código).
+        </li>
+        <li>
+          <strong>Guias de uso vivos dentro do próprio sistema</strong>: dois guias
+          embarcados, sempre atualizados a cada entrega. <code>/guia</code> é o manual
+          do operador (sem jargão técnico). <code>/guia-admin</code> é a visão de
+          desenvolvedor (arquitetura, deploy, rotinas) — só aparece para usuários com
+          papel <code>admin_municipio</code> ou staff Arminda.
+        </li>
+        <li>
+          <strong>Página de status pública com resumos executivos</strong>: cada entrega
+          do projeto agora tem uma versão de 1–2 frases em linguagem de gestor (visível
+          no card destacado) + detalhe técnico expansível abaixo. Histórico completo
+          em <a href="../index.html">arminda.darlanvelozo.com</a>.
+        </li>
+      </ul>
+
+      <h3>Para o município-piloto</h3>
+      <ul>
+        <li>
+          <strong>Unidade orçamentária (DEPDESPESA) importada e classificada</strong>:
+          o importador agora puxa a tabela <code>UNIDADE</code> do Fiorilli SIP — as
+          65 unidades orçamentárias do exercício fiscal do município são trazidas com
+          nome (ex.: Sec. Saúde, Fundo de Saúde, FUNDEB Educação, CRAS) e regime
+          (CONCURSADOS, COMISSIONADOS, CONTRATADOS). Cada vínculo recebe FK opcional
+          para a unidade correspondente, exibida com badge colorida no detalhe do
+          servidor. O smoke contra o banco real do município trouxe as 65 unidades
+          classificadas (21 administração, 19 educação, 13 saúde, 7 assistência,
+          5 outros) e cruzou 472 dos 1.503 vínculos ativos. Resolve a necessidade
+          de identificar a secretaria de cada servidor a partir do orçamento
+          empenhador, mesmo quando a lotação física diverge.
+        </li>
+        <li>
+          <strong>Folha calculável de ponta a ponta</strong>: a partir desta quinzena,
+          rodar uma folha mensal completa (com 23 servidores fictícios de exemplo)
+          leva alguns segundos, produz lançamentos auditáveis e respeita as
+          incidências legais reais. Toda a infraestrutura está em pé para os próximos
+          blocos (holerite, folhas especiais, eSocial).
+        </li>
+      </ul>
+
+      <h3>Para a operação do projeto</h3>
+      <ul>
+        <li>
+          <strong>Versão em produção em <code>arminda.site</code></strong>:
+          VPS Ubuntu 24.04 com Nginx servindo HTTPS via Let's Encrypt (renovação
+          automática), gunicorn (2 workers + 2 threads, com hardening systemd
+          completo: <code>NoNewPrivileges</code>, <code>ProtectSystem=full</code>,
+          <code>ReadWritePaths</code> restrito), PostgreSQL 16 dedicado, frontend
+          buildado servido como SPA estática. Convive lado a lado com outra aplicação
+          do desenvolvedor na mesma máquina (bancos e vhosts separados).
+        </li>
+        <li>
+          <strong>Infraestrutura idempotente versionada</strong> em <code>deploy/</code>:
+          <code>setup-producao.sh</code> bootstrapeia uma VPS nova do zero (usuário,
+          banco, venv, migrations, systemd, vhost) em um comando; <code>deploy.sh</code>
+          faz release contínuo com healthcheck obrigatório no fim. Runbook completo
+          em <code>docs/DEPLOY_PRODUCAO.md</code>.
+        </li>
+        <li>
+          <strong>Política de validação integral</strong>: antes de toda entrega,
+          rotina obrigatória de back+front+E2E+visual com resultado registrado como
+          entrada <code>validacao</code> na página de status pública. Garantia
+          auditável de que "o que está no ar passou pelo crivo".
+        </li>
+      </ul>
+
+      <h2>Indicadores técnicos</h2>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-valor">390</div>
+          <div class="kpi-label">testes backend verde</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">86%</div>
+          <div class="kpi-label">cobertura de código</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">10</div>
+          <div class="kpi-label">testes frontend verde</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">6</div>
+          <div class="kpi-label">apps Django</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">12</div>
+          <div class="kpi-label">ADRs publicadas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">8</div>
+          <div class="kpi-label">releases tagueadas</div>
+        </div>
+      </div>
+
+      <h2>Marcos da quinzena</h2>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Versão</th>
+            <th>Entrega</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10/05</td>
+            <td>v0.5.2</td>
+            <td>Onda 1.4-bis — Unidade orçamentária do empenho (DEPDESPESA do Fiorilli SIP)</td>
+          </tr>
+          <tr>
+            <td>12/05</td>
+            <td>v0.6.0</td>
+            <td>Bloco 2.1 — DSL de fórmulas para rubricas (engine de cálculo iniciada)</td>
+          </tr>
+          <tr>
+            <td>12/05</td>
+            <td>docs</td>
+            <td>Roadmap ampliado: MANAD no Bloco 4 + Sagres no Bloco 5 + ADR-0011 (adaptadores)</td>
+          </tr>
+          <tr>
+            <td>14/05</td>
+            <td>v0.6.1</td>
+            <td>Bloco 2.2 — Cálculo de folha mensal ordinária (toposort + idempotência)</td>
+          </tr>
+          <tr>
+            <td>14/05</td>
+            <td>validação</td>
+            <td>Rotina de validação integral pós-2.2 (366 testes verde, 86% cobertura)</td>
+          </tr>
+          <tr>
+            <td>15/05</td>
+            <td>docs</td>
+            <td>Guias vivos: <code>/guia</code> operacional + <code>/guia-admin</code> técnico (17 seções)</td>
+          </tr>
+          <tr>
+            <td>17/05</td>
+            <td>v0.7.0</td>
+            <td>Bloco 2.3 — Tabelas legais 2024/2025/2026 (INSS e IRRF reais)</td>
+          </tr>
+          <tr>
+            <td>18/05</td>
+            <td>v0.8.0</td>
+            <td>Bloco 2.6 (antecipada) — Tela operacional de Folha</td>
+          </tr>
+          <tr>
+            <td>20/05</td>
+            <td>docs</td>
+            <td>Limpeza dos textos do changelog público (regra: status fala da aplicação, não de terceiros)</td>
+          </tr>
+          <tr>
+            <td>24/05</td>
+            <td>v0.8.1</td>
+            <td>Infra de produção: arminda.site no ar, HTTPS, systemd, deploy idempotente</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Decisões técnicas registradas</h2>
+      <p>
+        Três novas ADRs (Architecture Decision Records) consolidadas nesta quinzena,
+        ampliando o conjunto de 9 para 12:
+      </p>
+      <ul>
+        <li>
+          <strong>ADR-0010</strong> — Política de versionamento e releases.
+          MAJOR.MINOR.PATCH adaptado ao roadmap por blocos/ondas. Tags sempre
+          anotadas. Docs-only não incrementam versão.
+        </li>
+        <li>
+          <strong>ADR-0011</strong> — Adaptadores externos configuráveis. Cada
+          município ativa suas próprias integrações (TCE, eSocial, MANAD, Sagres)
+          via admin Django, sem deploy. Pré-requisito modelado: <code>OrgaoEmissor</code>
+          por CNPJ.
+        </li>
+        <li>
+          <strong>ADR-0012</strong> — DSL de fórmulas via subset seguro de Python
+          (AST whitelist). Decimal puro, sem float. Cache de compilação. 7 códigos
+          de erro estáveis para a UI mostrar mensagens amigáveis.
+        </li>
+      </ul>
+
+      <h2>O que ficou pendente</h2>
+      <ul>
+        <li>
+          <strong>Análise do banco de Brejo</strong> (município novo, repassado durante
+          a quinzena pela equipe de operação). Backup descompactado e restaurado em
+          ambiente isolado; análise interrompida antes da conclusão para priorizar
+          o deploy. Os pontos identificados em relatório do Fiorilli (186 páginas
+          de campos faltantes para o e-Social) já alimentaram o planejamento da
+          próxima onda — "qualidade cadastral em lote".
+        </li>
+        <li>
+          <strong>Onda 2.4 — Incidências (FGTS + previdência municipal própria).</strong>
+          FGTS é alíquota federal (vai para <code>TabelaLegal</code>). Previdência
+          municipal varia por município, exigindo modelo TENANT separado com
+          alíquota configurável.
+        </li>
+        <li>
+          <strong>Onda 2.5 — Holerite em PDF</strong>. Os dados necessários já estão
+          todos no banco (lançamentos da folha + dados do servidor); falta o
+          template PDF.
+        </li>
+        <li>
+          <strong>Superuser do Django admin em produção</strong>: ambiente preparado,
+          mas a criação fica como passo manual do mantenedor (não automatizado
+          intencionalmente por segurança).
+        </li>
+      </ul>
+
+      <h2>Próxima quinzena (25/05 a 07/06)</h2>
+      <ul>
+        <li>
+          <strong>Onda 1.6 — Qualidade cadastral em lote</strong> (com prioridade
+          elevada após análise do município de Brejo). Filtros novos na lista de
+          servidores ("cadastro incompleto para e-Social"), seleção em massa,
+          ação de bulk edit, importador de planilha CSV/XLSX com chave por
+          matrícula ou CPF, e tela <code>/qualidade-cadastral</code> com health
+          score do tenant.
+        </li>
+        <li>
+          <strong>Onda 1.6a — Modelos faltantes do e-Social</strong>:
+          <code>Sindicato</code> (CNPJ + categoria), <code>Estabelecimento</code>
+          (unifica com <code>OrgaoEmissor</code> da ADR-0011) e campo
+          <code>tipo_logradouro</code> conforme tabela oficial. Antecipa
+          modelagem do Bloco 4.
+        </li>
+        <li>
+          <strong>Onda 2.4 — FGTS + previdência municipal</strong>.
+        </li>
+        <li>
+          <strong>Onda 2.5 — Holerite em PDF</strong>.
+        </li>
+        <li>
+          <strong>Backup automatizado do banco de produção</strong> (cron +
+          <code>pg_dump -Fc</code> rotacionado).
+        </li>
+        <li>
+          <strong>Healthcheck externo</strong> apontando para
+          <code>https://arminda.site/api/health/</code> (UptimeRobot ou similar).
+        </li>
+      </ul>
+
+      <h2>Saúde do projeto</h2>
+      <p>
+        A segunda quinzena consolidou o produto: o motor de cálculo está
+        operacional, a UI principal de folha está pronta, e o sistema deixou
+        de viver apenas no notebook do desenvolvedor para morar num servidor
+        próprio acessível pela internet. Toda mudança continua passando pela
+        rotina automatizada de validação (testes, lint, type-check, build,
+        smoke E2E, validação visual) antes de ser registrada como entrega
+        pública.
+      </p>
+      <p>
+        Quatro melhorias de processo entraram em produção junto com a infra:
+        (1) os resumos executivos de cada entrega ficaram em primeiro plano
+        no changelog público — qualquer pessoa lê em segundos o que mudou;
+        (2) os textos da página de status nunca mais citam pessoas externas
+        por nome ou papel — falam da aplicação; (3) a rotina de validação
+        integral é obrigatória antes de toda subida; (4) os dois guias vivos
+        (operador + desenvolvedor) precisam ser atualizados em toda entrega
+        — política registrada no próprio guia técnico.
+      </p>
+      <p>
+        Em números: <strong>cronograma adiantado em ~2 meses</strong>,
+        <strong>Bloco 2 em 56%</strong>, <strong>v0.8.1 em produção</strong>,
+        zero dívida técnica acumulada (ruff/django-check/pytest/tsc/eslint/
+        vitest todos verde), e três novas ADRs registrando as decisões
+        arquiteturais críticas da quinzena.
+      </p>
+      <p>
+        <strong>Próximo relatório quinzenal:</strong> previsto para 07/06/2026,
+        cobrindo a Onda 1.6 (qualidade cadastral em lote) e o restante do
+        Bloco 2.
+      </p>
+
+      <footer>
+        Arminda — Acompanhamento do desenvolvimento ·
+        <a href="../index.html">Voltar ao painel</a>
+      </footer>
+    </div>
+  </body>
+</html>
