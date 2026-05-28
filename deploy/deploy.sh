@@ -51,11 +51,11 @@ CURRENT=$(sudo -u "$ARMINDA_USER" git rev-parse --short HEAD)
 ok "HEAD: $CURRENT"
 
 step "pip install (rápido — só verifica delta)"
-sudo -u "$ARMINDA_USER" .venv/bin/pip install -q -r backend/requirements.txt
+cd backend
+sudo -u "$ARMINDA_USER" .venv/bin/pip install -q -r requirements.txt
 ok "ok"
 
 step "migrate"
-cd backend
 sudo -u "$ARMINDA_USER" .venv/bin/python manage.py migrate --noinput
 ok "ok"
 
@@ -78,8 +78,12 @@ else
 fi
 
 step "Healthcheck"
-HEALTH=$(curl -sf -m 5 "http://127.0.0.1:$ARMINDA_PORT/api/health/" || echo "FAIL")
-if [[ "$HEALTH" == *"\"status\":\"ok\""* ]]; then
+# X-Forwarded-Proto: https obrigatório porque SECURE_SSL_REDIRECT está
+# ativo em produção (o Nginx injeta esse header em requests reais).
+HEALTH=$(curl -sf -m 5 \
+  -H "X-Forwarded-Proto: https" \
+  "http://127.0.0.1:$ARMINDA_PORT/api/health/" || echo "FAIL")
+if [[ "$HEALTH" == *'"status"'*'"ok"'* ]]; then
   ok "/api/health/ → ok"
 else
   echo "  ✗ healthcheck falhou: $HEALTH"
