@@ -51,10 +51,25 @@ class ServidorFilter(django_filters.FilterSet):
     natureza_unidade = django_filters.CharFilter(
         field_name="vinculos__unidade_orcamentaria__natureza", distinct=True
     )
+    # Onda 1.6b: cadastro incompleto pra eSocial (qualquer campo obrigatório vazio)
+    cadastro_incompleto = django_filters.BooleanFilter(method="_filtrar_cadastro_incompleto")
 
     class Meta:
         model = Servidor
         fields = ["matricula", "nome", "ativo", "sexo"]
+
+    def _filtrar_cadastro_incompleto(self, queryset, name, value):
+        # Import local pra evitar ciclo com services importando models.
+        from apps.people.services.qualidade import filtrar_incompletos
+
+        if value is True:
+            return filtrar_incompletos(queryset)
+        if value is False:
+            ids_incompletos = list(
+                filtrar_incompletos(queryset).values_list("id", flat=True)
+            )
+            return queryset.exclude(id__in=ids_incompletos)
+        return queryset
 
 
 class VinculoFilter(django_filters.FilterSet):

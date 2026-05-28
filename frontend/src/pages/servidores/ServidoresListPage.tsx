@@ -10,6 +10,8 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  ClipboardCheck,
+  Pencil,
   Plus,
   Search,
   Users,
@@ -35,10 +37,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { extractDomainErrorMessage } from "@/lib/api";
+import { api, extractDomainErrorMessage } from "@/lib/api";
 import { NATUREZAS, REGIMES } from "@/lib/constants";
 import { useServidoresList, type ServidoresListParams } from "@/lib/queries/servidores";
 
+import { BulkEditDrawer } from "./BulkEditDrawer";
 import { ServidorAdmissaoSheet } from "./ServidorAdmissaoSheet";
 
 const PAGE_SIZE = 20;
@@ -52,6 +55,7 @@ type NaturezaFilter =
   | "educacao"
   | "assistencia_social"
   | "outros";
+type CadastroFilter = "todos" | "incompletos" | "completos";
 
 function useDebounced<T>(value: T, delayMs = 300): T {
   const [debounced, setDebounced] = useState(value);
@@ -79,14 +83,21 @@ export default function ServidoresListPage() {
   const [natureza, setNatureza] = useState<NaturezaFilter>(
     (searchParams.get("natureza") as NaturezaFilter) || "todos",
   );
+  const [cadastro, setCadastro] = useState<CadastroFilter>(
+    (searchParams.get("cadastro") as CadastroFilter) || "todos",
+  );
   const [orderBy, setOrderBy] = useState<"nome" | "matricula">("nome");
   const [orderDir, setOrderDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);
+  const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [vinculosAtivosIds, setVinculosAtivosIds] = useState<number[]>([]);
 
   const debouncedSearch = useDebounced(search);
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, status, vinculo, natureza, orderBy, orderDir]);
+    setSelecionados(new Set());
+  }, [debouncedSearch, status, vinculo, natureza, cadastro, orderBy, orderDir]);
 
   // Sincroniza filtros principais na URL para deep-link a partir do Dashboard
   useEffect(() => {
@@ -95,9 +106,11 @@ export default function ServidoresListPage() {
     else next.delete("regime");
     if (natureza !== "todos") next.set("natureza", natureza);
     else next.delete("natureza");
+    if (cadastro !== "todos") next.set("cadastro", cadastro);
+    else next.delete("cadastro");
     setSearchParams(next, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vinculo, natureza]);
+  }, [vinculo, natureza, cadastro]);
 
   const params: ServidoresListParams = useMemo(
     () => ({
@@ -105,10 +118,12 @@ export default function ServidoresListPage() {
       ativo: status === "todos" ? undefined : status === "ativos",
       regime: vinculo === "todos" ? undefined : vinculo,
       natureza: natureza === "todos" ? undefined : natureza,
+      cadastroIncompleto:
+        cadastro === "incompletos" ? true : cadastro === "completos" ? false : undefined,
       ordering: `${orderDir === "desc" ? "-" : ""}${orderBy}`,
       page,
     }),
-    [debouncedSearch, status, vinculo, natureza, orderBy, orderDir, page],
+    [debouncedSearch, status, vinculo, natureza, cadastro, orderBy, orderDir, page],
   );
 
   const { data, isLoading, isError, error, isFetching } = useServidoresList(params);
@@ -123,7 +138,58 @@ export default function ServidoresListPage() {
     }
   }
 
+  // Seleção em lote
+  const idsNaPagina = (data?.results || []).map((s) => s.id);
+  const todosSelecionadosNaPagina =
+    idsNaPagina.length > 0 && idsNaPagina.every((id) => selecionados.has(id));
+
+  function toggleSelecionado(id: number) {
+    setSelecionados((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelecionarPagina() {
+    setSelecionados((prev) => {
+      if (todosSelecionadosNaPagina) {
+        // Remove apenas os da página atual
+        const next = new Set(prev);
+        for (const id of idsNaPagina) next.delete(id);
+        return next;
+      }
+      return new Set([...prev, ...idsNaPagina]);
+    });
+  }
+
+  const servidoresSelecionados = (data?.results || [])
+    .filter((s) => selecionados.has(s.id))
+    .map((s) => ({ id: s.id, nome: s.nome, matricula: s.matricula }));
+
   const totalPages = data ? Math.max(1, Math.ceil(data.count / PAGE_SIZE)) : 1;
+
+  async function abrirBulkEdit() {
+    // Coleta vínculos ativos dos selecionados (necessário pro bulk de FKs).
+    // Em vez de pedir N detalhes, pedimos vínculos por ?servidor=<id>&ativo=true.
+    const ids = Array.from(selecionados);
+    const idsToFetch = ids.slice(0, 200); // proteção
+    try {
+      const responses = await Promise.all(
+        idsToFetch.map((id) =>
+          api.get<{ results: { id: number; ativo: boolean }[] }>("/people/vinculos/", {
+            params: { servidor: id, ativo: true, page_size: 10 },
+          }),
+        ),
+      );
+      const vinculoIds = responses.flatMap((r) => r.data.results.map((v) => v.id));
+      setVinculosAtivosIds(vinculoIds);
+    } catch {
+      setVinculosAtivosIds([]);
+    }
+    setBulkOpen(true);
+  }
 
   return (
     <div className="space-y-6">
@@ -190,12 +256,51 @@ export default function ServidoresListPage() {
             <SelectItem value="inativos">Apenas inativos</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={cadastro} onValueChange={(v) => setCadastro(v as CadastroFilter)}>
+          <SelectTrigger className="w-full sm:w-52">
+            <ClipboardCheck className="h-4 w-4 mr-1 opacity-70" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Cadastro: todos</SelectItem>
+            <SelectItem value="incompletos">Cadastro incompleto</SelectItem>
+            <SelectItem value="completos">Cadastro completo</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {selecionados.size > 0 && (
+        <div className="flex items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-2 text-sm">
+          <span className="text-foreground">
+            <strong className="tabular-nums">{selecionados.size}</strong> servidor
+            {selecionados.size === 1 ? "" : "es"} selecionado
+            {selecionados.size === 1 ? "" : "s"}.
+          </span>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setSelecionados(new Set())}>
+              Limpar seleção
+            </Button>
+            <Button size="sm" onClick={abrirBulkEdit}>
+              <Pencil className="h-4 w-4 mr-1" />
+              Editar em lote
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[40px]">
+                <input
+                  type="checkbox"
+                  aria-label="Selecionar todos da página"
+                  checked={todosSelecionadosNaPagina}
+                  onChange={toggleSelecionarPagina}
+                  className="h-4 w-4 cursor-pointer accent-primary"
+                />
+              </TableHead>
               <TableHead className="w-[140px]">
                 <button
                   type="button"
@@ -222,20 +327,20 @@ export default function ServidoresListPage() {
             {isLoading && <SkeletonRows />}
             {isError && (
               <TableRow>
-                <TableCell colSpan={4} className="py-12 text-center text-sm text-destructive">
+                <TableCell colSpan={5} className="py-12 text-center text-sm text-destructive">
                   {extractDomainErrorMessage(error) ?? "Falha ao carregar servidores."}
                 </TableCell>
               </TableRow>
             )}
             {!isLoading && !isError && data?.results.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="py-16 text-center">
+                <TableCell colSpan={5} className="py-16 text-center">
                   <div className="flex flex-col items-center gap-3 text-muted-foreground">
                     <Users className="h-8 w-8" />
                     <div>
                       <p className="font-medium text-foreground">Nenhum servidor encontrado.</p>
                       <p className="text-xs mt-1">
-                        {debouncedSearch || status !== "ativos"
+                        {debouncedSearch || status !== "ativos" || cadastro !== "todos"
                           ? "Tente ajustar os filtros."
                           : "Comece admitindo o primeiro servidor."}
                       </p>
@@ -244,32 +349,44 @@ export default function ServidoresListPage() {
                 </TableCell>
               </TableRow>
             )}
-            {data?.results.map((s) => (
-              <TableRow
-                key={s.id}
-                className="cursor-pointer"
-                onClick={() => navigate(`/servidores/${s.id}`)}
-              >
-                <TableCell className="font-mono text-xs tabular-nums">
-                  <Link
-                    to={`/servidores/${s.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="hover:underline"
-                  >
-                    {s.matricula}
-                  </Link>
-                </TableCell>
-                <TableCell className="font-medium">{s.nome}</TableCell>
-                <TableCell className="font-mono text-xs">{formatCpf(s.cpf)}</TableCell>
-                <TableCell>
-                  {s.ativo ? (
-                    <Badge variant="success">Ativo</Badge>
-                  ) : (
-                    <Badge variant="muted">Inativo</Badge>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+            {data?.results.map((s) => {
+              const selecionado = selecionados.has(s.id);
+              return (
+                <TableRow
+                  key={s.id}
+                  className={`cursor-pointer ${selecionado ? "bg-primary/5" : ""}`}
+                  onClick={() => navigate(`/servidores/${s.id}`)}
+                >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Selecionar ${s.nome}`}
+                      checked={selecionado}
+                      onChange={() => toggleSelecionado(s.id)}
+                      className="h-4 w-4 cursor-pointer accent-primary"
+                    />
+                  </TableCell>
+                  <TableCell className="font-mono text-xs tabular-nums">
+                    <Link
+                      to={`/servidores/${s.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="hover:underline"
+                    >
+                      {s.matricula}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="font-medium">{s.nome}</TableCell>
+                  <TableCell className="font-mono text-xs">{formatCpf(s.cpf)}</TableCell>
+                  <TableCell>
+                    {s.ativo ? (
+                      <Badge variant="success">Ativo</Badge>
+                    ) : (
+                      <Badge variant="muted">Inativo</Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
@@ -309,6 +426,14 @@ export default function ServidoresListPage() {
         onOpenChange={setAdmissaoOpen}
         onSuccess={(id) => navigate(`/servidores/${id}`)}
       />
+
+      <BulkEditDrawer
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        servidores={servidoresSelecionados}
+        vinculosAtivosIds={vinculosAtivosIds}
+        onSuccess={() => setSelecionados(new Set())}
+      />
     </div>
   );
 }
@@ -323,6 +448,9 @@ function SkeletonRows() {
     <>
       {Array.from({ length: 6 }).map((_, i) => (
         <TableRow key={`skel-${i}`}>
+          <TableCell>
+            <Skeleton className="h-4 w-4" />
+          </TableCell>
           <TableCell>
             <Skeleton className="h-4 w-24" />
           </TableCell>

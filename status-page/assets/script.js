@@ -138,18 +138,42 @@
       card.className = 'bloco-card card-' + bloco.status;
       card.id = 'bloco-' + bloco.numero;
 
-      var entregasHtml = (bloco.entregas || []).map(function (e) {
-        return '<li class="bloco-entrega">' + escapeHtml(e) + '</li>';
+      var entregas = bloco.entregas || [];
+      var entregasFeitas = 0;
+      var entregasHtml = entregas.map(function (e) {
+        var feito = false;
+        var texto = String(e || '');
+        // Aceita prefixos "✅ ", "✓ " ou "[x] " como marcador de "feito"
+        var match = texto.match(/^\s*(?:✅|✓|\[x\])\s+/i);
+        if (match) {
+          feito = true;
+          texto = texto.slice(match[0].length);
+          entregasFeitas++;
+        }
+        return '<li class="bloco-entrega" data-feito="' + (feito ? 'true' : 'false') + '">' +
+                 '<span class="bloco-entrega-icon" aria-hidden="true"></span>' +
+                 '<span class="bloco-entrega-texto">' + escapeHtml(texto) + '</span>' +
+               '</li>';
       }).join('');
 
+      var totalEntregas = entregas.length;
+      var resumoEntregas = totalEntregas > 0
+        ? entregasFeitas + ' de ' + totalEntregas + ' entregas'
+        : '';
+
       card.innerHTML =
-        '<div class="bloco-top">' +
-          '<span class="bloco-num">' + String(bloco.numero).padStart(2, '0') + '</span>' +
+        '<header class="bloco-header">' +
+          '<div class="bloco-header-left">' +
+            '<span class="bloco-num">' + String(bloco.numero).padStart(2, '0') + '</span>' +
+            '<div class="bloco-header-text">' +
+              '<h3 class="bloco-titulo">' + escapeHtml(bloco.titulo) + '</h3>' +
+              '<span class="bloco-periodo-text">' + escapeHtml(bloco.periodo) + '</span>' +
+            '</div>' +
+          '</div>' +
           '<span class="timeline-badge badge-' + bloco.status + '">' +
             escapeHtml(STATUS_LABEL[bloco.status] || '') +
           '</span>' +
-        '</div>' +
-        '<h3 class="bloco-titulo">' + escapeHtml(bloco.titulo) + '</h3>' +
+        '</header>' +
         '<p class="bloco-desc">' + escapeHtml(bloco.descricao) + '</p>' +
         '<div class="bloco-progress">' +
           '<div class="bloco-progress-header">' +
@@ -161,12 +185,14 @@
           '</div>' +
         '</div>' +
         (entregasHtml ?
-          '<div>' +
-            '<p class="bloco-entregas-label">Entregas previstas</p>' +
+          '<div class="bloco-entregas-wrap">' +
+            '<div class="bloco-entregas-head">' +
+              '<span class="bloco-entregas-label">Entregas</span>' +
+              (resumoEntregas ? '<span class="bloco-entregas-resumo">' + resumoEntregas + '</span>' : '') +
+            '</div>' +
             '<ul class="bloco-entregas">' + entregasHtml + '</ul>' +
           '</div>'
-          : '') +
-        '<span class="bloco-periodo-text">' + escapeHtml(bloco.periodo) + '</span>';
+          : '');
 
       container.appendChild(card);
     });

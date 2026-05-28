@@ -268,6 +268,9 @@ class ServidorDetailSerializer(serializers.ModelSerializer):
     estado_civil_display = serializers.CharField(
         source="get_estado_civil_display", read_only=True, default=""
     )
+    tipo_logradouro_display = serializers.CharField(
+        source="get_tipo_logradouro_display", read_only=True, default=""
+    )
 
     class Meta:
         model = Servidor
@@ -284,6 +287,8 @@ class ServidorDetailSerializer(serializers.ModelSerializer):
             "pis_pasep",
             "email",
             "telefone",
+            "tipo_logradouro",
+            "tipo_logradouro_display",
             "logradouro",
             "numero",
             "complemento",
@@ -291,6 +296,11 @@ class ServidorDetailSerializer(serializers.ModelSerializer):
             "cidade",
             "uf",
             "cep",
+            "nacionalidade",
+            "raca",
+            "nome_pai",
+            "nome_mae",
+            "instrucao",
             "ativo",
             "criado_em",
             "atualizado_em",
@@ -305,6 +315,7 @@ class ServidorDetailSerializer(serializers.ModelSerializer):
             "vinculos",
             "sexo_display",
             "estado_civil_display",
+            "tipo_logradouro_display",
         ]
 
 
@@ -324,6 +335,7 @@ class ServidorWriteSerializer(serializers.ModelSerializer):
             "pis_pasep",
             "email",
             "telefone",
+            "tipo_logradouro",
             "logradouro",
             "numero",
             "complemento",
@@ -331,6 +343,11 @@ class ServidorWriteSerializer(serializers.ModelSerializer):
             "cidade",
             "uf",
             "cep",
+            "nacionalidade",
+            "raca",
+            "nome_pai",
+            "nome_mae",
+            "instrucao",
             "ativo",
         ]
         read_only_fields = ["id"]

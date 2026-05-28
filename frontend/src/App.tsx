@@ -44,6 +44,10 @@ const GuiaPage = lazy(() => import("@/pages/GuiaPage"));
 const GuiaAdminPage = lazy(() => import("@/pages/GuiaAdminPage"));
 const FolhasListPage = lazy(() => import("@/pages/folha/FolhasListPage"));
 const FolhaDetailPage = lazy(() => import("@/pages/folha/FolhaDetailPage"));
+const QualidadeCadastralPage = lazy(
+  () => import("@/pages/qualidade/QualidadeCadastralPage"),
+);
+const ImportarPage = lazy(() => import("@/pages/importar/ImportarPage"));
 
 function PageFallback() {
   return (
@@ -98,6 +102,8 @@ function App() {
         <Route path="folha" element={lazyRoute(<FolhasListPage />)} />
         <Route path="folha/:id" element={lazyRoute(<FolhaDetailPage />)} />
         <Route path="rubricas" element={lazyRoute(<RubricasListPage />)} />
+        <Route path="qualidade-cadastral" element={lazyRoute(<QualidadeCadastralPage />)} />
+        <Route path="importar" element={lazyRoute(<ImportarPage />)} />
         <Route path="relatorios" element={<EmConstrucaoPage area="Relatórios" />} />
         <Route path="configuracoes" element={lazyRoute(<ConfiguracoesPage />)} />
         <Route path="guia" element={lazyRoute(<GuiaPage />)} />

@@ -83,7 +83,7 @@ export default function GuiaPage() {
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
           <span className="ml-1 inline-flex items-center gap-2">
             <Badge variant="success">Bloco 1 entregue</Badge>
-            <Badge variant="info">Onda 1.6a ✓ — cadastros pré-eSocial</Badge>
+            <Badge variant="info">Onda 1.6b ✓ — qualidade cadastral + bulk-edit + importador</Badge>
           </span>
         </p>
       </header>
@@ -511,6 +511,26 @@ function SectionServidores() {
           status="ok"
           title="Documentos digitalizados"
           desc="Aba 'Documentos' no detalhe do servidor. Upload (PDF/JPG/PNG até 10 MB) com tipo (RG, CPF, certificado, etc.) e descrição. Lista, download e exclusão."
+        />
+        <FlowItem
+          status="ok"
+          title="Filtrar cadastros incompletos para o eSocial"
+          desc="Na lista de servidores, o filtro 'Cadastro: incompletos' mostra apenas quem ainda tem campos pré-eSocial em branco (tipo de logradouro, raça, nome da mãe, PIS, órgão emissor do vínculo, etc.). Use junto com a busca para fechar pendências por área."
+        />
+        <FlowItem
+          status="ok"
+          title="Editar em lote"
+          desc="Selecione vários servidores com os checkboxes da lista (ou 'selecionar todos da página') e clique em 'Editar em lote'. Aplica os mesmos valores em todos de uma vez — útil quando uma secretaria inteira passa a usar o mesmo CEP/sindicato/órgão emissor. Campos deixados em branco não são alterados."
+        />
+        <FlowItem
+          status="ok"
+          title="Painel de qualidade cadastral"
+          desc="A tela /qualidade-cadastral mostra o health score do município (0-100), quantos servidores estão prontos pra S-2200 e qual campo está em branco em mais cadastros. Clique nos cards para filtrar a lista pelo que falta."
+        />
+        <FlowItem
+          status="ok"
+          title="Importar planilha de enriquecimento"
+          desc="Em /importar, anexe um CSV ou XLSX com matrícula/CPF + colunas de endereço, raça, nome da mãe, instrução, PIS etc. Pré-visualize (dry-run), confira o diff antes/depois e só então aplique. Colunas não reconhecidas são ignoradas sem erro."
         />
       </ul>
 

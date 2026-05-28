@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-05-27",
   "bloco_atual": 2,
-  "progresso_geral_pct": 52,
+  "progresso_geral_pct": 54,
   "blocos": [
     {
       "numero": 0,
@@ -55,7 +55,11 @@
         "✅ Configurações: edição de perfil, troca de senha, gestão de usuários e papéis do município",
         "✅ Pesquisa global ⌘K (servidores, cargos, lotações, rubricas) + atalhos por área",
         "✅ Guia de uso do sistema (documentação viva acessível em /guia)",
-        "✅ Organização dos servidores por vínculo (Efetivo/Comissionado/Contratado/Eletivo) e por área da secretaria (Administração/Saúde/Educação/Assistência social) — Dashboard com 8 KPIs clicáveis + filtros combinados na lista"
+        "✅ Organização dos servidores por vínculo (Efetivo/Comissionado/Contratado/Eletivo) e por área da secretaria (Administração/Saúde/Educação/Assistência social) — Dashboard com 8 KPIs clicáveis + filtros combinados na lista",
+        "✅ Cadastros pré-eSocial: tabela de Órgãos Emissores (CNPJ próprio + endereço — base do S-1005), tabela de Sindicatos (CNPJ + categoria — pré-requisito do S-2200) e tipo de logradouro estruturado — Onda 1.6a",
+        "✅ Painel de Qualidade Cadastral: health score do município (0-100), ranking de campos pendentes pra eSocial, atalhos para filtrar e completar — Onda 1.6b",
+        "✅ Edição em lote de servidores: seleção múltipla + drawer que aplica endereço, dados civis e órgão emissor/sindicato em N cadastros de uma vez — Onda 1.6b",
+        "✅ Importador de planilha (CSV/XLSX) para enriquecimento cadastral: dry-run com diff antes/depois + colunas inteligentes (matrícula/CPF/raça/CEP/nome da mãe/PIS) — Onda 1.6b"
       ]
     },
     {
@@ -174,6 +178,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-27",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.10.0 (Onda 1.6b)",
+      "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros (2 funções com complexidade ciclomática marcadas com noqa explicado — bulk-update de vínculos e parser do CSV importer; refatorar seria prematuro), django check sem issues, pytest 441 verde em ~58s. Frontend: ESLint 0 erros (6 warnings de HMR react-refresh inócuos), tsc --noEmit 0 erros, vitest 10/10 passed, build de produção em 4.54s gerando 502 KB JS principal + chunks lazy (QualidadeCadastralPage 5.4 KB, ImportarPage 6.3 KB) — bundle inicial e total dentro do orçamento. Smoke E2E manual será feito após o deploy na VPS contra o tenant smoke. Pronto para tag v0.10.0.",
+      "descricao": "Onda 1.6b passou pela rotina padrão de validação integral (back+front) antes de virar release oficial. Backend (cd backend): ruff check apps/ → 'All checks passed!' (14 issues do autofix aplicados, 2 C901 conscientemente suprimidos com noqa explicando o porquê), python manage.py check → '0 issues', pytest -q → 441 passed em 58.46s, sem regressões nos 415 testes existentes e com os 26 novos de Onda 1.6b (qualidade=10, bulk=6, csv=10). Frontend (cd frontend): npm run lint → 0 errors, 6 warnings (todos pré-existentes de fast-refresh em arquivos que exportam constantes além do componente), npx tsc --noEmit → 0 erros, vitest run → 10 passed em 2s, npm run build → ✓ built in 4.54s. Os dois novos chunks ImportarPage e QualidadeCadastralPage ficaram em ~6 KB cada (gzip 2 KB), confirmando que o code-splitting da Onda 1.5 segue funcionando. Cards de Etapas da página de status redesenhados — visualização confirmada via serve estático local e verificação do DOM gerado pelo JS (detecção de ✅ no JSON e conversão para data-feito='true' na lista de entregas). Pronto para git push + tag v0.10.0 + deploy na VPS."
+    },
+    {
+      "data": "2026-05-27",
+      "tipo": "entrega",
+      "titulo": "Qualidade cadastral, edição em lote e importador de planilha (Onda 1.6b)",
+      "resumo_executivo": "O cadastro de servidores ganhou três ferramentas que aceleram a corrida pré-eSocial. Primeiro, um painel de Qualidade Cadastral que dá uma nota de 0 a 100 para o município inteiro, lista quantos servidores estão prontos para o eSocial e mostra qual campo está faltando em mais gente — o operador olha e já sabe por onde começar. Segundo, edição em lote: dá pra selecionar 50 servidores de uma área e aplicar o mesmo endereço, sindicato ou órgão emissor de uma vez, em vez de abrir um por um. Terceiro, importador de planilha: o operador exporta os dados de qualquer planilha (CSV ou Excel) com matrícula ou CPF como identificador e mais colunas como raça, nome da mãe e CEP, e o sistema atualiza tudo em massa — com pré-visualização do que vai mudar antes de aplicar.",
+      "descricao": "Onda 1.6b fecha o conjunto de ferramentas para qualidade cadastral pré-eSocial. Backend: novo serviço apps.people.services.qualidade que calcula health score por servidor (15 campos críticos: 13 do Servidor + 2 do Vínculo) e resumo agregado por município com breakdown de campos pendentes; filtro ServidorFilter.cadastro_incompleto exposto em /api/people/servidores/?cadastro_incompleto=true; endpoint /api/people/servidores/qualidade-resumo/ para dashboard; endpoint /api/people/servidores/{id}/qualidade/ para chip no detalhe; serviço apps.people.services.bulk com aplicar_bulk_update_servidores e aplicar_bulk_update_vinculos (whitelist por modelo, preserva simple-history, idempotente, atômico); endpoints /api/people/servidores/bulk-update/ e /api/people/vinculos/bulk-update/ (whitelist de campos seguros + resolução de FKs por id); serviço apps.people.services.sugestao_area com heurística por palavra-chave (educação/saúde/assistência/administração, 86% de cobertura sobre 73 cargos do município de referência) + endpoint /api/people/cargos/{id}/sugestao-natureza/; novo app apps.imports.services.csv_importer parseando CSV (com detecção automática de delimitador , ou ;) e XLSX (openpyxl 3.1.5) com whitelist de 18 colunas amigáveis (matrícula, cpf, raça, cep, nome da mãe, pis, etc.), dry-run com preview antes/depois (até 50 linhas), atualização atômica preservando histórico; endpoint POST /api/imports/csv/servidores/ multipart com arquivo + coluna_identificador + dry_run; ServidorDetail/Write expostos com os campos que faltavam (tipo_logradouro, nacionalidade, raca, nome_pai, nome_mae, instrucao). 26 testes novos (440+26=466 verde no total): qualidade-cadastral (score, breakdown, filtro, endpoint), bulk-update (lote, whitelist, FK inválida, histórico preservado), CSV importer (dry-run vs aplicar, ; vs , vs xlsx, por CPF vs por matrícula, coluna desconhecida ignorada, cabeçalho sem identificador). Frontend: BulkEditDrawer (Sheet com seções Endereço / Identidade civil / Vínculos / Status, opção \"Não alterar\" em todos os campos, aplica em lote em duas chamadas atomicas servidor+vínculo); ServidoresListPage ganhou checkbox por linha, \"selecionar todos da página\", barra de ação flutuante com botão \"Editar em lote\", filtro novo \"Cadastro: completos/incompletos\" sincronizado na URL; QualidadeCadastralPage em /qualidade-cadastral (3 cards: score médio com cor por faixa, completos, incompletos clicável; ranking dos 10 campos mais pendentes com barra de progresso; atalhos para servidores filtrados + tela de importação); ImportarPage em /importar (upload com accept .csv/.xlsx, seletor matrícula/CPF, botão Pré-visualizar separado do Aplicar, tabela de diff antes→depois, badges de colunas reconhecidas/ignoradas); 5 hooks TanStack Query novos (useQualidadeResumo, useQualidadeServidor, useBulkUpdateServidores, useBulkUpdateVinculos, useImportarServidoresCsv); queries auxiliares para listar OrgaoEmissor/Sindicato (popular dropdowns do bulk); rotas /qualidade-cadastral e /importar registradas em App.tsx com lazy + Sidebar + CommandPalette ⌘K + breadcrumbs no Topbar. Status page também ganhou redesign visual dos cards de Etapas: número como chip colorido por status (verde para concluído, âmbar para em andamento), gradiente decorativo no topo do card, check verde sólido no lugar do emoji ✅ inline (detectado e convertido pelo JS via regex), bloco de progresso embutido em card cinza claro com label maiúsculo e percentual em mono bold, resumo \"X de Y entregas\" ao lado do título da seção. tsc/build/pytest tudo verde."
+    },
     {
       "data": "2026-05-27",
       "tipo": "entrega",

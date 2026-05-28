@@ -25,5 +25,5 @@ def test_status_endpoint(api_client):
     assert response.status_code == 200
     data = response.json()
     assert data["service"] == "arminda"
-    assert data["version"].startswith("0.")
+    assert data["version"].startswith("v0.")
     assert data["checks"]["database"]["status"] == "ok"

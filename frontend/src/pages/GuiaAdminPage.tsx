@@ -94,7 +94,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">Onda 1.6a ✓ — cadastros pré-eSocial</Badge>
+            <Badge variant="info">Onda 1.6b ✓ — qualidade cadastral + bulk-edit + importador</Badge>
           </span>
         </p>
       </header>
@@ -720,7 +720,7 @@ function SectionTestes() {
 source .venv/bin/activate
 ruff check apps/                              # lint
 python manage.py check                        # django
-python -m pytest apps/ -q                     # 366 tests, ~50s
+python -m pytest apps/ -q                     # 466 tests, ~60s
 python -m pytest --cov=apps --cov-report=term-missing apps/`}
       </pre>
 

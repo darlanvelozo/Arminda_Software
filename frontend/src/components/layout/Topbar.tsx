@@ -42,6 +42,8 @@ const SECTION_LABELS: Record<string, string> = {
   lotacoes: "Lotações",
   folha: "Folha",
   rubricas: "Rubricas",
+  "qualidade-cadastral": "Qualidade cadastral",
+  importar: "Importar",
   relatorios: "Relatórios",
   configuracoes: "Configurações",
   guia: "Guia de uso",

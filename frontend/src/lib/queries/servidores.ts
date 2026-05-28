@@ -42,8 +42,80 @@ export interface ServidoresListParams {
   lotacaoId?: number;
   regime?: string;
   natureza?: string;
+  cadastroIncompleto?: boolean;
   ordering?: string;
   page?: number;
+  pageSize?: number;
+}
+
+// ============================================================
+// Onda 1.6b — qualidade cadastral, bulk-update e importer CSV
+// ============================================================
+
+export interface QualidadeCampoFaltante {
+  campo: string;
+  label: string;
+}
+
+export interface QualidadeServidor {
+  servidor_id: number;
+  matricula: string;
+  nome: string;
+  total_campos: number;
+  campos_preenchidos: number;
+  campos_faltantes: QualidadeCampoFaltante[];
+  score: number;
+  completo: boolean;
+}
+
+export interface QualidadeBreakdownEntry {
+  campo: string;
+  label: string;
+  servidores_pendentes: number;
+}
+
+export interface QualidadeResumo {
+  total_servidores: number;
+  completos: number;
+  incompletos: number;
+  score_medio: number;
+  breakdown_campos_faltantes: QualidadeBreakdownEntry[];
+}
+
+export interface BulkUpdateResult {
+  atualizados: number;
+  ids_nao_encontrados: number[];
+  total_solicitado: number;
+}
+
+export interface BulkUpdateServidoresPayload {
+  servidor_ids: number[];
+  updates: Record<string, unknown>;
+}
+
+export interface BulkUpdateVinculosPayload {
+  vinculo_ids: number[];
+  updates: Record<string, unknown>;
+}
+
+export interface ImportCsvPreview {
+  linha: number;
+  identificador: string;
+  servidor_id: number | null;
+  antes: Record<string, unknown>;
+  depois: Record<string, unknown>;
+}
+
+export interface ImportCsvResultado {
+  total_linhas: number;
+  atualizados: number;
+  ignorados_servidor_nao_encontrado: number;
+  ignorados_sem_mudanca: number;
+  erros: { linha: number; mensagem: string }[];
+  preview: ImportCsvPreview[];
+  colunas_aceitas_mapeadas: string[];
+  colunas_ignoradas: string[];
+  dry_run?: boolean;
 }
 
 const BASE = "/people/servidores/";
@@ -66,10 +138,53 @@ async function fetchServidores(params: ServidoresListParams): Promise<Paginated<
       lotacao: params.lotacaoId,
       regime: params.regime || undefined,
       natureza: params.natureza || undefined,
+      cadastro_incompleto: params.cadastroIncompleto,
       ordering: params.ordering || undefined,
       page: params.page || undefined,
+      page_size: params.pageSize || undefined,
     },
   });
+  return data;
+}
+
+async function fetchQualidadeResumo(): Promise<QualidadeResumo> {
+  const { data } = await api.get<QualidadeResumo>(`${BASE}qualidade-resumo/`);
+  return data;
+}
+
+async function fetchQualidadeServidor(id: number): Promise<QualidadeServidor> {
+  const { data } = await api.get<QualidadeServidor>(`${BASE}${id}/qualidade/`);
+  return data;
+}
+
+async function bulkUpdateServidores(
+  payload: BulkUpdateServidoresPayload,
+): Promise<BulkUpdateResult> {
+  const { data } = await api.post<BulkUpdateResult>(`${BASE}bulk-update/`, payload);
+  return data;
+}
+
+async function bulkUpdateVinculos(
+  payload: BulkUpdateVinculosPayload,
+): Promise<BulkUpdateResult> {
+  const { data } = await api.post<BulkUpdateResult>(`/people/vinculos/bulk-update/`, payload);
+  return data;
+}
+
+async function importarServidoresCsv(args: {
+  file: File;
+  colunaIdentificador: "matricula" | "cpf";
+  dryRun: boolean;
+}): Promise<ImportCsvResultado> {
+  const form = new FormData();
+  form.append("arquivo", args.file);
+  form.append("coluna_identificador", args.colunaIdentificador);
+  form.append("dry_run", args.dryRun ? "true" : "false");
+  const { data } = await api.post<ImportCsvResultado>(
+    "/imports/csv/servidores/",
+    form,
+    { headers: { "Content-Type": "multipart/form-data" } },
+  );
   return data;
 }
 
@@ -172,6 +287,55 @@ export function useDesligarServidor() {
       id: number;
       payload: { data_desligamento: string; motivo?: string };
     }) => desligarServidor(id, payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: servidoresKey(activeTenant) }),
+  });
+}
+
+// ============================================================
+// Onda 1.6b — qualidade, bulk, importer
+// ============================================================
+
+export function useQualidadeResumo() {
+  const { activeTenant } = useAuth();
+  return useQuery({
+    queryKey: [...servidoresKey(activeTenant), "qualidade-resumo"] as const,
+    queryFn: fetchQualidadeResumo,
+    enabled: !!activeTenant,
+  });
+}
+
+export function useQualidadeServidor(id: number | null) {
+  const { activeTenant } = useAuth();
+  return useQuery({
+    queryKey: [...servidoresKey(activeTenant), "qualidade", id ?? 0] as const,
+    queryFn: () => fetchQualidadeServidor(id as number),
+    enabled: !!activeTenant && id !== null,
+  });
+}
+
+export function useBulkUpdateServidores() {
+  const { activeTenant } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: bulkUpdateServidores,
+    onSuccess: () => qc.invalidateQueries({ queryKey: servidoresKey(activeTenant) }),
+  });
+}
+
+export function useBulkUpdateVinculos() {
+  const { activeTenant } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: bulkUpdateVinculos,
+    onSuccess: () => qc.invalidateQueries({ queryKey: servidoresKey(activeTenant) }),
+  });
+}
+
+export function useImportarServidoresCsv() {
+  const { activeTenant } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: importarServidoresCsv,
     onSuccess: () => qc.invalidateQueries({ queryKey: servidoresKey(activeTenant) }),
   });
 }

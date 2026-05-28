@@ -35,6 +35,89 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 1.6b — Qualidade cadastral + bulk-edit + importador CSV · 2026-05-27
+
+> Segunda parte da Onda 1.6 (qualidade cadastral em lote). Coloca em
+> produção as ferramentas para o operador efetivamente preencher os
+> campos pré-eSocial — sem isso, a Onda 1.6a entregou só estrutura,
+> não usabilidade. Health score do município, edição em lote, importador
+> CSV/XLSX com dry-run, sugestão automática de área pelo nome do cargo.
+
+#### Adicionado — Backend
+
+- **feat(people.services.qualidade):** novo serviço que calcula health
+  score por servidor (15 campos críticos: 13 do `Servidor` + 2 do
+  `Vínculo` ativo). `avaliar_servidor()`, `avaliar_lote()`, `resumir()`
+  (agregado por município com breakdown ordenado de campos pendentes),
+  `filtrar_incompletos()` (queryset filter helper).
+- **feat(people.services.bulk):** `aplicar_bulk_update_servidores()` e
+  `aplicar_bulk_update_vinculos()`. Whitelist por modelo. Resolve FKs
+  por id antes da atualização. Preserva `simple-history` (chama
+  `.save()` por instância, não `.update()` em queryset). Atômico.
+- **feat(people.services.sugestao_area):** heurística por palavra-chave
+  para sugerir natureza (administração/saúde/educação/assistência) a
+  partir do nome do cargo. 14 regras priorizadas com confiança 70-95.
+  Cobertura 86% sobre os 73 cargos do município de referência.
+- **feat(imports.services.csv_importer):** importador genérico CSV/XLSX
+  para enriquecer cadastros existentes (não cria servidor novo). Detecta
+  delimitador `,` vs `;` automaticamente; suporta XLSX via openpyxl;
+  whitelist de 18 colunas amigáveis. Dry-run com preview antes/depois
+  (até 50 linhas). Identificador configurável: matrícula ou CPF.
+- **feat(people.filters):** filtro `cadastro_incompleto` em
+  `ServidorFilter` exposto como `?cadastro_incompleto=true|false`.
+- **feat(people.views):** `@action qualidade` no detalhe, `qualidade-resumo`
+  no list, `bulk-update` em ServidorViewSet e VinculoFuncionalViewSet,
+  `sugestao-natureza` em CargoViewSet.
+- **feat(imports.views + urls):** novo app HTTP com
+  `ImportadorCsvViewSet.servidores()` em `POST /api/imports/csv/servidores/`
+  (multipart com arquivo + coluna_identificador + dry_run).
+- **feat(people.serializers):** `ServidorDetail` e `ServidorWrite` agora
+  expõem `tipo_logradouro`, `nacionalidade`, `raca`, `nome_pai`,
+  `nome_mae`, `instrucao` (faltavam desde a Onda 1.6a).
+- **feat(requirements):** adicionado `openpyxl==3.1.5`.
+
+#### Adicionado — Frontend
+
+- **feat(pages/qualidade):** nova rota `/qualidade-cadastral`. Dashboard
+  com 3 cards (score médio com cor por faixa, completos, incompletos
+  clicável), ranking dos 10 campos mais pendentes, atalhos para lista
+  filtrada e tela de importação.
+- **feat(pages/importar):** nova rota `/importar`. Upload CSV/XLSX,
+  seletor matrícula/CPF, botão Pré-visualizar separado do Aplicar,
+  tabela de diff antes→depois, badges de colunas reconhecidas/ignoradas.
+- **feat(pages/servidores):** `BulkEditDrawer` (Sheet com seções
+  Endereço / Identidade civil / Vínculos / Status, "Não alterar" em
+  cada campo, dispara duas chamadas atômicas servidor+vínculo).
+- **feat(pages/servidores/ServidoresListPage):** checkbox por linha,
+  "selecionar todos da página", barra de ação flutuante "Editar em
+  lote" quando há seleção, filtro novo "Cadastro: completos/incompletos"
+  sincronizado na URL.
+- **feat(lib/queries):** 5 hooks novos (`useQualidadeResumo`,
+  `useQualidadeServidor`, `useBulkUpdateServidores`,
+  `useBulkUpdateVinculos`, `useImportarServidoresCsv`) + queries
+  auxiliares `useOrgaosEmissoresList` e `useSindicatosList`.
+- **feat(layout):** Sidebar + CommandPalette + Topbar registram as
+  novas rotas com ícones (`ShieldCheck`, `FileSpreadsheet`).
+- **feat(status-page):** redesign visual dos cards de Etapas. Número
+  como chip colorido por status, gradiente decorativo no topo, check
+  verde sólido (CSS puro) no lugar do emoji ✅ no texto, bloco de
+  progresso embutido com label maiúsculo + percentual em mono bold,
+  resumo "X de Y entregas" ao lado do label da seção.
+
+#### Testes
+
+- 26 testes novos (`test_qualidade_cadastral.py`, `test_bulk_update.py`,
+  `test_csv_importer.py`). Suíte completa: 440 → 466 verde.
+
+#### Próximos passos
+
+- Onda 2.4 — FGTS + previdência municipal própria.
+- Onda 2.5 — Holerite PDF.
+- Bloco 4 — ESocialAdapter (S-1005, S-2200) consumindo `OrgaoEmissor`,
+  `Sindicato` e os campos completados via Onda 1.6b.
+
+---
+
 ### Onda 1.6a — Cadastros pré-eSocial: OrgaoEmissor + Sindicato · 2026-05-27
 
 > Primeira parte da Onda 1.6 (qualidade cadastral em lote). Adiciona os

@@ -15,12 +15,14 @@ import {
   Briefcase,
   Building2,
   ChevronRight,
+  FileSpreadsheet,
   FileText,
   Home,
   Library,
   PanelLeft,
   RefreshCw,
   Settings,
+  ShieldCheck,
   Tag,
   Users,
   Wallet,
@@ -45,6 +47,8 @@ const ITENS: ItemNav[] = [
   { label: "Lotações", to: "/lotacoes", icon: Library },
   { label: "Folha", to: "/folha", icon: Wallet },
   { label: "Rubricas", to: "/rubricas", icon: Tag },
+  { label: "Qualidade cadastral", to: "/qualidade-cadastral", icon: ShieldCheck },
+  { label: "Importar", to: "/importar", icon: FileSpreadsheet },
   { label: "Relatórios", to: "/relatorios", icon: FileText },
 ];
 
