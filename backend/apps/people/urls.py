@@ -10,7 +10,9 @@ from apps.people.views import (
     DependenteViewSet,
     DocumentoViewSet,
     LotacaoViewSet,
+    OrgaoEmissorViewSet,
     ServidorViewSet,
+    SindicatoViewSet,
     VinculoFuncionalViewSet,
 )
 
@@ -23,5 +25,7 @@ router.register("servidores", ServidorViewSet, basename="servidor")
 router.register("vinculos", VinculoFuncionalViewSet, basename="vinculo")
 router.register("dependentes", DependenteViewSet, basename="dependente")
 router.register("documentos", DocumentoViewSet, basename="documento")
+router.register("orgaos-emissores", OrgaoEmissorViewSet, basename="orgao-emissor")
+router.register("sindicatos", SindicatoViewSet, basename="sindicato")
 
 urlpatterns = [path("", include(router.urls))]

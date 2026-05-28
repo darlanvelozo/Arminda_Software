@@ -35,6 +35,110 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 1.6a — Cadastros pré-eSocial: OrgaoEmissor + Sindicato · 2026-05-27
+
+> Primeira parte da Onda 1.6 (qualidade cadastral em lote). Adiciona os
+> dois modelos que faltavam para o S-2200 do eSocial — `OrgaoEmissor`
+> (entidade fiscal com CNPJ próprio) e `Sindicato` (categoria) — junto
+> com `tipo_logradouro` em `Servidor` (tabela oficial eSocial) e FKs
+> opcionais em `VinculoFuncional` e `UnidadeOrcamentaria`. Antecipa
+> modelagem que originalmente entraria no Bloco 4 (ADR-0011).
+
+#### Adicionado — Backend
+
+- **feat(core.validators):** `validar_cnpj()` com 14 dígitos, 2 dígitos
+  verificadores (pesos 5432987654321 e 65432987654321), rejeita
+  repetidos. Code estável `CNPJ_INVALIDO`. Aceita com/sem máscara,
+  retorna apenas dígitos.
+
+- **feat(people.models):** Novos modelos TENANT:
+  - `OrgaoEmissor` — entidade fiscal com CNPJ próprio. Campos:
+    `nome`, `sigla`, `cnpj` (unique), `eh_principal`, `cnae_principal`
+    (7 dígitos) e **endereço completo** próprio (`tipo_logradouro`,
+    `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf`,
+    `cep`, `telefone`, `email`). Tipicamente um município tem 3-5:
+    Prefeitura matriz, Câmara, Fundo de Saúde, FMAS, IPM. Base do
+    envio do **S-1005** no eSocial.
+  - `Sindicato` — representante de categoria. Campos: `nome`,
+    `cnpj` (unique), `codigo_sindical`, `categoria`,
+    `base_territorial`. Pré-requisito do campo
+    `vinculo/categoria/sindical` do **S-2200**.
+  - Ambos com `simple-history` para audit log.
+
+- **feat(people.models):** Enum `TipoLogradouro` (Rua/Avenida/Praça/
+  Travessa/Rodovia/Estrada/Viela/Alameda/Largo/Outro) conforme tabela
+  oficial do eSocial. Campo `tipo_logradouro` adicionado em `Servidor`
+  e `OrgaoEmissor` — exigido no S-2200 (`trabalhador/endereco/brasil/
+  tipoLograd`).
+
+- **feat(people.models):** FKs novos em `VinculoFuncional`:
+  - `orgao_emissor` (FK opcional, `PROTECT`) — qual CNPJ assina o
+    vínculo no eSocial.
+  - `sindicato` (FK opcional, `SET_NULL`) — categoria sindical.
+
+- **feat(people.models):** FK em `UnidadeOrcamentaria.orgao_emissor`
+  (`SET_NULL`) — cumpre o que a ADR-0011 já previa.
+
+- **feat(people.admin):** `OrgaoEmissorAdmin`, `SindicatoAdmin` e
+  `UnidadeOrcamentariaAdmin` registrados. Fieldsets do
+  `OrgaoEmissor` separam dados básicos / S-1005 / endereço.
+
+- **feat(people.serializers):** Triplo padrão List/Detail/Write para
+  `OrgaoEmissor` e `Sindicato` (consistente com Cargo/Lotacao/Servidor).
+  Validação manual de unique no `validate_cnpj` — o
+  `UniqueValidator` do DRF não roda contra o valor já normalizado
+  pelo `validar_cnpj`.
+
+- **feat(people.views + urls):** `OrgaoEmissorViewSet` e
+  `SindicatoViewSet` (ModelViewSet com RBAC), registrados em
+  `/api/people/orgaos-emissores/` e `/api/people/sindicatos/`.
+
+#### Adicionado — Frontend
+
+- **feat(types):** + `OrgaoEmissor`, `OrgaoEmissorDetail`,
+  `OrgaoEmissorWrite`, `Sindicato`, `SindicatoDetail`,
+  `SindicatoWrite` (regenerado via `npm run gen:types`).
+
+- **docs(/guia + /guia-admin):** badges atualizados para
+  "Onda 1.6a ✓ — cadastros pré-eSocial". `/guia-admin` agora lista
+  os modelos novos no resumo de people.
+
+#### Migrations
+
+- `apps/people/migrations/0009_historicalservidor_tipo_logradouro_and_more.py`
+  — campos novos + 2 modelos novos + 2 modelos históricos.
+
+#### Por quê
+
+- **Caso real do município de Brejo** mostrou 186 páginas de campos
+  faltantes no S-2200 do eSocial — inscrição do local de trabalho,
+  CNPJ do sindicato, tipo de logradouro. Sem modelar essas entidades,
+  o operador não tem onde preencher, e o gerador eSocial do Bloco 4
+  vai bater em estrutura vazia.
+- **Antecipar a modelagem** desbloqueia tanto a Onda 1.6b (bulk edit
+  + import CSV pra preencher em massa) quanto reduz o escopo do Bloco
+  4 quando ele chegar.
+- **`OrgaoEmissor` unifica** o `OrgaoEmissor` que a ADR-0011 já tinha
+  previsto, agora com os campos extras que o S-1005 exige (CNAE +
+  endereço próprio).
+
+#### Impacto
+
+- 2 modelos novos + 1 enum + 4 campos novos em modelos existentes.
+- 1 migration (sem data migration — todos os FKs são opcionais).
+- API ganhou 2 endpoints (`/orgaos-emissores/`, `/sindicatos/`).
+- +23 testes (390 → 413 verde, 86% cobertura mantida).
+
+#### Próximos passos
+
+- **Onda 1.6b** — Operação em lote (bulk edit, importador CSV/XLSX,
+  filtros "cadastro incompleto pra eSocial", tela /qualidade-cadastral
+  com health score).
+- **Telas frontend** dos dois cadastros novos (CRUD em `/orgaos-emissores`
+  e `/sindicatos`).
+
+---
+
 ### chore(deploy): infraestrutura para produção (arminda.site) · 2026-05-24
 
 > Primeira versão **deployável em produção**. Não adiciona feature de

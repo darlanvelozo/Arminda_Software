@@ -31,7 +31,9 @@ from apps.people.models import (
     Dependente,
     Documento,
     Lotacao,
+    OrgaoEmissor,
     Servidor,
+    Sindicato,
     VinculoFuncional,
 )
 from apps.people.serializers import (
@@ -50,9 +52,15 @@ from apps.people.serializers import (
     LotacaoDetailSerializer,
     LotacaoListSerializer,
     LotacaoWriteSerializer,
+    OrgaoEmissorDetailSerializer,
+    OrgaoEmissorListSerializer,
+    OrgaoEmissorWriteSerializer,
     ServidorDetailSerializer,
     ServidorListSerializer,
     ServidorWriteSerializer,
+    SindicatoDetailSerializer,
+    SindicatoListSerializer,
+    SindicatoWriteSerializer,
     TransferenciaInputSerializer,
     VinculoDetailSerializer,
     VinculoListSerializer,
@@ -284,3 +292,48 @@ class DocumentoViewSet(_PapelPorAcaoMixin, viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update"):
             return DocumentoWriteSerializer
         return DocumentoDetailSerializer
+
+
+# ============================================================
+# OrgaoEmissor — pré-eSocial S-1005 (Onda 1.6a)
+# ============================================================
+
+
+class OrgaoEmissorViewSet(_PapelPorAcaoMixin, viewsets.ModelViewSet):
+    """CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+
+    Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+    FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+    eSocial.
+    """
+
+    queryset = OrgaoEmissor.objects.all()
+    search_fields = ["nome", "sigla", "cnpj"]
+    ordering_fields = ["nome", "sigla", "criado_em"]
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrgaoEmissorListSerializer
+        if self.action in ("create", "update", "partial_update"):
+            return OrgaoEmissorWriteSerializer
+        return OrgaoEmissorDetailSerializer
+
+
+# ============================================================
+# Sindicato — pré-eSocial S-2200 (Onda 1.6a)
+# ============================================================
+
+
+class SindicatoViewSet(_PapelPorAcaoMixin, viewsets.ModelViewSet):
+    """CRUD de sindicatos representantes de categoria."""
+
+    queryset = Sindicato.objects.all()
+    search_fields = ["nome", "cnpj", "categoria", "codigo_sindical"]
+    ordering_fields = ["nome", "criado_em"]
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return SindicatoListSerializer
+        if self.action in ("create", "update", "partial_update"):
+            return SindicatoWriteSerializer
+        return SindicatoDetailSerializer

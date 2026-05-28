@@ -73,6 +73,21 @@ class TipoDocumento(models.TextChoices):
     OUTRO = "outro", "Outro"
 
 
+class TipoLogradouro(models.TextChoices):
+    """Tipo de logradouro conforme tabela do eSocial S-2200 (Onda 1.6a)."""
+
+    RUA = "rua", "Rua"
+    AVENIDA = "avenida", "Avenida"
+    PRACA = "praca", "Praça"
+    TRAVESSA = "travessa", "Travessa"
+    RODOVIA = "rodovia", "Rodovia"
+    ESTRADA = "estrada", "Estrada"
+    VIELA = "viela", "Viela"
+    ALAMEDA = "alameda", "Alameda"
+    LARGO = "largo", "Largo"
+    OUTRO = "outro", "Outro"
+
+
 # ============================================================
 # Cargo
 # ============================================================
@@ -146,6 +161,16 @@ class UnidadeOrcamentaria(TimeStampedModel):
         choices=NaturezaLotacao.choices,
         default=NaturezaLotacao.OUTROS,
     )
+    # ADR-0011: cada unidade orçamentária pode ser empenhada por um órgão
+    # emissor (CNPJ próprio). Tornado realidade na Onda 1.6a.
+    orgao_emissor = models.ForeignKey(
+        "people.OrgaoEmissor",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="unidades_orcamentarias",
+        help_text="CNPJ que assina os empenhos desta unidade orçamentária.",
+    )
     ativo = models.BooleanField(default=True)
 
     history = HistoricalRecords(excluded_fields=["atualizado_em"])
@@ -214,7 +239,10 @@ class Servidor(TimeStampedModel):
     email = models.EmailField(blank=True)
     telefone = models.CharField(max_length=20, blank=True)
 
-    # Endereco
+    # Endereco (tipo_logradouro adicionado na Onda 1.6a para o S-2200 do eSocial)
+    tipo_logradouro = models.CharField(
+        max_length=15, choices=TipoLogradouro.choices, blank=True
+    )
     logradouro = models.CharField(max_length=200, blank=True)
     numero = models.CharField(max_length=20, blank=True)
     complemento = models.CharField(max_length=100, blank=True)
@@ -263,6 +291,26 @@ class VinculoFuncional(TimeStampedModel):
         blank=True,
         related_name="vinculos",
         help_text="De qual orçamento sai o empenho deste vínculo (Onda 1.4-bis).",
+    )
+    # Campos pré-eSocial S-2200 (Onda 1.6a) — opcionais
+    orgao_emissor = models.ForeignKey(
+        "people.OrgaoEmissor",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="vinculos",
+        help_text=(
+            "Estabelecimento (CNPJ) ao qual o vínculo é atribuído no eSocial. "
+            "Tipicamente Prefeitura, Câmara, Fundo de Saúde, FMAS, etc."
+        ),
+    )
+    sindicato = models.ForeignKey(
+        "people.Sindicato",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vinculos",
+        help_text="Sindicato representante da categoria (S-2200 — vinculo/categoria/sindical).",
     )
     regime = models.CharField(max_length=30, choices=Regime.choices)
     data_admissao = models.DateField()
@@ -337,3 +385,104 @@ class Documento(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.get_tipo_display()} - {self.servidor.nome}"
+
+
+# ============================================================
+# OrgaoEmissor — entidade fiscal autônoma com CNPJ próprio (Onda 1.6a)
+# ============================================================
+
+
+class OrgaoEmissor(TimeStampedModel):
+    """
+    Entidade fiscal com CNPJ próprio que emite obrigações (eSocial S-1005,
+    MANAD, SEFIP) dentro do município. Antecipado da ADR-0011 (Bloco 4)
+    para servir de FK em VinculoFuncional desde a Onda 1.6a.
+
+    Tipicamente um município tem 3-5: Prefeitura matriz, Câmara, Fundo
+    Municipal de Saúde, FMAS, IPM (regime próprio). Cada um com CNPJ
+    distinto e endereço próprio que vai no envio do S-1005.
+    """
+
+    nome = models.CharField(max_length=200)
+    sigla = models.CharField(max_length=20, blank=True)
+    cnpj = models.CharField("CNPJ", max_length=18, unique=True)
+    eh_principal = models.BooleanField(
+        "É o órgão principal?",
+        default=False,
+        help_text="Marca a Prefeitura matriz. Apenas um por município.",
+    )
+    cnae_principal = models.CharField(
+        "CNAE preponderante",
+        max_length=7,
+        blank=True,
+        help_text="Código CNAE de 7 dígitos (sem separador) — usado no S-1005.",
+    )
+    # Endereço próprio do estabelecimento (separado do endereço do servidor)
+    tipo_logradouro = models.CharField(
+        max_length=15, choices=TipoLogradouro.choices, blank=True
+    )
+    logradouro = models.CharField(max_length=200, blank=True)
+    numero = models.CharField(max_length=20, blank=True)
+    complemento = models.CharField(max_length=100, blank=True)
+    bairro = models.CharField(max_length=100, blank=True)
+    cidade = models.CharField(max_length=100, blank=True)
+    uf = models.CharField(max_length=2, blank=True)
+    cep = models.CharField("CEP", max_length=10, blank=True)
+    telefone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    ativo = models.BooleanField(default=True)
+
+    history = HistoricalRecords(excluded_fields=["atualizado_em"])
+
+    class Meta:
+        ordering = ["nome"]
+        verbose_name = "órgão emissor"
+        verbose_name_plural = "órgãos emissores"
+
+    def __str__(self) -> str:
+        return f"{self.sigla or self.nome} ({self.cnpj})"
+
+
+# ============================================================
+# Sindicato — pré-requisito do S-2200 do eSocial (Onda 1.6a)
+# ============================================================
+
+
+class Sindicato(TimeStampedModel):
+    """
+    Sindicato representante da categoria. Cada município pode ter vários
+    sindicatos atuantes (servidores municipais, professores, agentes de
+    saúde, etc.). Pré-requisito do campo `vinculo/categoria/sindical` do
+    S-2200 (Admissão do trabalhador) no eSocial.
+    """
+
+    nome = models.CharField(max_length=200)
+    cnpj = models.CharField("CNPJ", max_length=18, unique=True)
+    codigo_sindical = models.CharField(
+        "Código sindical",
+        max_length=20,
+        blank=True,
+        help_text="Código MTE de 9 dígitos (com ou sem separador).",
+    )
+    categoria = models.CharField(
+        "Categoria representada",
+        max_length=200,
+        blank=True,
+        help_text="Ex.: Servidores Públicos Municipais, Trabalhadores em Educação.",
+    )
+    base_territorial = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Cidade(s) ou estado(s) onde o sindicato atua.",
+    )
+    ativo = models.BooleanField(default=True)
+
+    history = HistoricalRecords(excluded_fields=["atualizado_em"])
+
+    class Meta:
+        ordering = ["nome"]
+        verbose_name = "sindicato"
+        verbose_name_plural = "sindicatos"
+
+    def __str__(self) -> str:
+        return self.nome

@@ -595,6 +595,80 @@ export interface paths {
         patch: operations["people_lotacoes_partial_update"];
         trace?: never;
     };
+    "/api/people/orgaos-emissores/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+         *
+         *     Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+         *     FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+         *     eSocial.
+         */
+        get: operations["people_orgaos_emissores_list"];
+        put?: never;
+        /**
+         * @description CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+         *
+         *     Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+         *     FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+         *     eSocial.
+         */
+        post: operations["people_orgaos_emissores_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/orgaos-emissores/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+         *
+         *     Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+         *     FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+         *     eSocial.
+         */
+        get: operations["people_orgaos_emissores_retrieve"];
+        /**
+         * @description CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+         *
+         *     Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+         *     FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+         *     eSocial.
+         */
+        put: operations["people_orgaos_emissores_update"];
+        post?: never;
+        /**
+         * @description CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+         *
+         *     Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+         *     FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+         *     eSocial.
+         */
+        delete: operations["people_orgaos_emissores_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * @description CRUD de órgãos emissores (entidades fiscais com CNPJ próprio).
+         *
+         *     Tipicamente Prefeitura matriz, Câmara, Fundo Municipal de Saúde,
+         *     FMAS, IPM. Cada um com CNPJ distinto, base do envio do S-1005 no
+         *     eSocial.
+         */
+        patch: operations["people_orgaos_emissores_partial_update"];
+        trace?: never;
+    };
     "/api/people/servidores/": {
         parameters: {
             query?: never;
@@ -682,6 +756,44 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/people/sindicatos/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de sindicatos representantes de categoria. */
+        get: operations["people_sindicatos_list"];
+        put?: never;
+        /** @description CRUD de sindicatos representantes de categoria. */
+        post: operations["people_sindicatos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/sindicatos/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD de sindicatos representantes de categoria. */
+        get: operations["people_sindicatos_retrieve"];
+        /** @description CRUD de sindicatos representantes de categoria. */
+        put: operations["people_sindicatos_update"];
+        post?: never;
+        /** @description CRUD de sindicatos representantes de categoria. */
+        delete: operations["people_sindicatos_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD de sindicatos representantes de categoria. */
+        patch: operations["people_sindicatos_partial_update"];
         trace?: never;
     };
     "/api/people/vinculos/": {
@@ -1061,6 +1173,81 @@ export interface components {
          * @enum {string}
          */
         NivelEscolaridadeEnum: "fundamental" | "medio" | "tecnico" | "superior" | "pos_graduacao";
+        OrgaoEmissorDetail: {
+            readonly id: number;
+            nome: string;
+            sigla?: string;
+            cnpj: string;
+            /**
+             * É o órgão principal?
+             * @description Marca a Prefeitura matriz. Apenas um por município.
+             */
+            eh_principal?: boolean;
+            /**
+             * CNAE preponderante
+             * @description Código CNAE de 7 dígitos (sem separador) — usado no S-1005.
+             */
+            cnae_principal?: string;
+            tipo_logradouro?: components["schemas"]["TipoLogradouroEnum"] | components["schemas"]["BlankEnum"];
+            readonly tipo_logradouro_display: string;
+            logradouro?: string;
+            numero?: string;
+            complemento?: string;
+            bairro?: string;
+            cidade?: string;
+            uf?: string;
+            cep?: string;
+            telefone?: string;
+            /** Format: email */
+            email?: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+        };
+        OrgaoEmissorList: {
+            readonly id: number;
+            readonly nome: string;
+            readonly sigla: string;
+            readonly cnpj: string;
+            /**
+             * É o órgão principal?
+             * @description Marca a Prefeitura matriz. Apenas um por município.
+             */
+            readonly eh_principal: boolean;
+            readonly cidade: string;
+            readonly uf: string;
+            readonly ativo: boolean;
+        };
+        OrgaoEmissorWrite: {
+            readonly id: number;
+            nome: string;
+            sigla?: string;
+            cnpj: string;
+            /**
+             * É o órgão principal?
+             * @description Marca a Prefeitura matriz. Apenas um por município.
+             */
+            eh_principal?: boolean;
+            /**
+             * CNAE preponderante
+             * @description Código CNAE de 7 dígitos (sem separador) — usado no S-1005.
+             */
+            cnae_principal?: string;
+            tipo_logradouro?: components["schemas"]["TipoLogradouroEnum"] | components["schemas"]["BlankEnum"];
+            logradouro?: string;
+            numero?: string;
+            complemento?: string;
+            bairro?: string;
+            cidade?: string;
+            uf?: string;
+            cep?: string;
+            telefone?: string;
+            /** Format: email */
+            email?: string;
+            ativo?: boolean;
+        };
         PaginatedCargoListList: {
             /** @example 123 */
             count: number;
@@ -1151,6 +1338,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["LotacaoList"][];
         };
+        PaginatedOrgaoEmissorListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["OrgaoEmissorList"][];
+        };
         PaginatedRubricaListList: {
             /** @example 123 */
             count: number;
@@ -1180,6 +1382,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ServidorList"][];
+        };
+        PaginatedSindicatoListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["SindicatoList"][];
         };
         PaginatedUsuarioMunicipioPapelListList: {
             /** @example 123 */
@@ -1289,6 +1506,34 @@ export interface components {
             lotacao_pai?: number | null;
             ativo?: boolean;
         };
+        PatchedOrgaoEmissorWrite: {
+            readonly id?: number;
+            nome?: string;
+            sigla?: string;
+            cnpj?: string;
+            /**
+             * É o órgão principal?
+             * @description Marca a Prefeitura matriz. Apenas um por município.
+             */
+            eh_principal?: boolean;
+            /**
+             * CNAE preponderante
+             * @description Código CNAE de 7 dígitos (sem separador) — usado no S-1005.
+             */
+            cnae_principal?: string;
+            tipo_logradouro?: components["schemas"]["TipoLogradouroEnum"] | components["schemas"]["BlankEnum"];
+            logradouro?: string;
+            numero?: string;
+            complemento?: string;
+            bairro?: string;
+            cidade?: string;
+            uf?: string;
+            cep?: string;
+            telefone?: string;
+            /** Format: email */
+            email?: string;
+            ativo?: boolean;
+        };
         PatchedRubricaWrite: {
             readonly id?: number;
             codigo?: string;
@@ -1326,6 +1571,24 @@ export interface components {
             cidade?: string;
             uf?: string;
             cep?: string;
+            ativo?: boolean;
+        };
+        PatchedSindicatoWrite: {
+            readonly id?: number;
+            nome?: string;
+            cnpj?: string;
+            /**
+             * Código sindical
+             * @description Código MTE de 9 dígitos (com ou sem separador).
+             */
+            codigo_sindical?: string;
+            /**
+             * Categoria representada
+             * @description Ex.: Servidores Públicos Municipais, Trabalhadores em Educação.
+             */
+            categoria?: string;
+            /** @description Cidade(s) ou estado(s) onde o sindicato atua. */
+            base_territorial?: string;
             ativo?: boolean;
         };
         /** @description PATCH /api/core/usuarios/{id}/ — troca o papel do usuário no tenant. */
@@ -1472,6 +1735,62 @@ export interface components {
          * @enum {string}
          */
         SexoEnum: "M" | "F";
+        SindicatoDetail: {
+            readonly id: number;
+            nome: string;
+            cnpj: string;
+            /**
+             * Código sindical
+             * @description Código MTE de 9 dígitos (com ou sem separador).
+             */
+            codigo_sindical?: string;
+            /**
+             * Categoria representada
+             * @description Ex.: Servidores Públicos Municipais, Trabalhadores em Educação.
+             */
+            categoria?: string;
+            /** @description Cidade(s) ou estado(s) onde o sindicato atua. */
+            base_territorial?: string;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+        };
+        SindicatoList: {
+            readonly id: number;
+            readonly nome: string;
+            readonly cnpj: string;
+            /**
+             * Categoria representada
+             * @description Ex.: Servidores Públicos Municipais, Trabalhadores em Educação.
+             */
+            readonly categoria: string;
+            /**
+             * Código sindical
+             * @description Código MTE de 9 dígitos (com ou sem separador).
+             */
+            readonly codigo_sindical: string;
+            readonly ativo: boolean;
+        };
+        SindicatoWrite: {
+            readonly id: number;
+            nome: string;
+            cnpj: string;
+            /**
+             * Código sindical
+             * @description Código MTE de 9 dígitos (com ou sem separador).
+             */
+            codigo_sindical?: string;
+            /**
+             * Categoria representada
+             * @description Ex.: Servidores Públicos Municipais, Trabalhadores em Educação.
+             */
+            categoria?: string;
+            /** @description Cidade(s) ou estado(s) onde o sindicato atua. */
+            base_territorial?: string;
+            ativo?: boolean;
+        };
         /**
          * @description * `aberta` - Aberta
          *     * `calculada` - Calculada
@@ -1508,6 +1827,20 @@ export interface components {
          * @enum {string}
          */
         TipoD83Enum: "mensal" | "13_primeira" | "13_segunda" | "ferias" | "rescisao" | "complementar";
+        /**
+         * @description * `rua` - Rua
+         *     * `avenida` - Avenida
+         *     * `praca` - Praça
+         *     * `travessa` - Travessa
+         *     * `rodovia` - Rodovia
+         *     * `estrada` - Estrada
+         *     * `viela` - Viela
+         *     * `alameda` - Alameda
+         *     * `largo` - Largo
+         *     * `outro` - Outro
+         * @enum {string}
+         */
+        TipoLogradouroEnum: "rua" | "avenida" | "praca" | "travessa" | "rodovia" | "estrada" | "viela" | "alameda" | "largo" | "outro";
         TokenRefresh: {
             readonly access: string;
             refresh: string;
@@ -3004,6 +3337,156 @@ export interface operations {
             };
         };
     };
+    people_orgaos_emissores_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOrgaoEmissorListList"];
+                };
+            };
+        };
+    };
+    people_orgaos_emissores_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrgaoEmissorWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["OrgaoEmissorWrite"];
+                "multipart/form-data": components["schemas"]["OrgaoEmissorWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgaoEmissorWrite"];
+                };
+            };
+        };
+    };
+    people_orgaos_emissores_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this órgão emissor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgaoEmissorDetail"];
+                };
+            };
+        };
+    };
+    people_orgaos_emissores_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this órgão emissor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrgaoEmissorWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["OrgaoEmissorWrite"];
+                "multipart/form-data": components["schemas"]["OrgaoEmissorWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgaoEmissorWrite"];
+                };
+            };
+        };
+    };
+    people_orgaos_emissores_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this órgão emissor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_orgaos_emissores_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this órgão emissor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedOrgaoEmissorWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedOrgaoEmissorWrite"];
+                "multipart/form-data": components["schemas"]["PatchedOrgaoEmissorWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgaoEmissorWrite"];
+                };
+            };
+        };
+    };
     people_servidores_list: {
         parameters: {
             query?: {
@@ -3238,6 +3721,156 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdmissaoInput"];
+                };
+            };
+        };
+    };
+    people_sindicatos_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSindicatoListList"];
+                };
+            };
+        };
+    };
+    people_sindicatos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SindicatoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["SindicatoWrite"];
+                "multipart/form-data": components["schemas"]["SindicatoWrite"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SindicatoWrite"];
+                };
+            };
+        };
+    };
+    people_sindicatos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this sindicato. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SindicatoDetail"];
+                };
+            };
+        };
+    };
+    people_sindicatos_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this sindicato. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SindicatoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["SindicatoWrite"];
+                "multipart/form-data": components["schemas"]["SindicatoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SindicatoWrite"];
+                };
+            };
+        };
+    };
+    people_sindicatos_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this sindicato. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    people_sindicatos_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this sindicato. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSindicatoWrite"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSindicatoWrite"];
+                "multipart/form-data": components["schemas"]["PatchedSindicatoWrite"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SindicatoWrite"];
                 };
             };
         };

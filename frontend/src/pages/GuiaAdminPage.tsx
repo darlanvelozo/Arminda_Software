@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-24";
+const LAST_UPDATED = "2026-05-27";
 
 interface TocItem {
   id: string;
@@ -94,7 +94,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">v0.8.1 — primeira versão em produção</Badge>
+            <Badge variant="info">Onda 1.6a ✓ — cadastros pré-eSocial</Badge>
           </span>
         </p>
       </header>
@@ -328,10 +328,16 @@ function SectionModeloDados() {
         <li>
           <strong>people:</strong> <code className="bg-muted px-1 rounded">Servidor</code>,{" "}
           <code className="bg-muted px-1 rounded">VinculoFuncional</code> (FK servidor
-          + cargo + lotacao + unidade_orcamentaria + regime),{" "}
+          + cargo + lotacao + unidade_orcamentaria + orgao_emissor + sindicato +
+          regime),{" "}
           <code className="bg-muted px-1 rounded">Cargo</code>,{" "}
           <code className="bg-muted px-1 rounded">Lotacao</code>,{" "}
-          <code className="bg-muted px-1 rounded">UnidadeOrcamentaria</code>,{" "}
+          <code className="bg-muted px-1 rounded">UnidadeOrcamentaria</code>{" "}
+          (FK opcional para <code className="bg-muted px-1 rounded">OrgaoEmissor</code>),{" "}
+          <code className="bg-muted px-1 rounded">OrgaoEmissor</code>{" "}
+          (CNPJ próprio + endereço — pré-S-1005),{" "}
+          <code className="bg-muted px-1 rounded">Sindicato</code>{" "}
+          (CNPJ + categoria — pré-S-2200),{" "}
           <code className="bg-muted px-1 rounded">Dependente</code>,{" "}
           <code className="bg-muted px-1 rounded">Documento</code>.
         </li>

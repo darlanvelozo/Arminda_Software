@@ -5,7 +5,17 @@ from __future__ import annotations
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Cargo, Dependente, Documento, Lotacao, Servidor, VinculoFuncional
+from .models import (
+    Cargo,
+    Dependente,
+    Documento,
+    Lotacao,
+    OrgaoEmissor,
+    Servidor,
+    Sindicato,
+    UnidadeOrcamentaria,
+    VinculoFuncional,
+)
 
 
 class VinculoInline(admin.TabularInline):
@@ -93,3 +103,48 @@ class DocumentoAdmin(admin.ModelAdmin):
     list_filter = ("tipo",)
     search_fields = ("servidor__nome", "descricao")
     raw_id_fields = ("servidor",)
+
+
+@admin.register(UnidadeOrcamentaria)
+class UnidadeOrcamentariaAdmin(SimpleHistoryAdmin):
+    list_display = ("codigo", "ano", "nome", "natureza", "orgao_emissor", "ativo")
+    list_filter = ("ano", "natureza", "ativo")
+    search_fields = ("codigo", "nome", "sigla")
+    autocomplete_fields = ("orgao_emissor",)
+
+
+# ============================================================
+# Onda 1.6a — Cadastros pré-eSocial
+# ============================================================
+
+
+@admin.register(OrgaoEmissor)
+class OrgaoEmissorAdmin(SimpleHistoryAdmin):
+    list_display = ("sigla", "nome", "cnpj", "eh_principal", "cidade", "uf", "ativo")
+    list_filter = ("eh_principal", "ativo", "uf")
+    search_fields = ("nome", "sigla", "cnpj")
+    fieldsets = (
+        (None, {"fields": ("nome", "sigla", "cnpj", "eh_principal", "ativo")}),
+        (
+            "eSocial S-1005",
+            {"fields": ("cnae_principal",)},
+        ),
+        (
+            "Endereço do estabelecimento",
+            {
+                "fields": (
+                    ("tipo_logradouro", "logradouro", "numero"),
+                    ("complemento", "bairro"),
+                    ("cidade", "uf", "cep"),
+                    ("telefone", "email"),
+                )
+            },
+        ),
+    )
+
+
+@admin.register(Sindicato)
+class SindicatoAdmin(SimpleHistoryAdmin):
+    list_display = ("nome", "cnpj", "categoria", "codigo_sindical", "ativo")
+    list_filter = ("ativo",)
+    search_fields = ("nome", "cnpj", "categoria", "codigo_sindical")

@@ -109,3 +109,43 @@ def validar_codigo_ibge(valor: str) -> str:
         raise ValidationError("Codigo IBGE deve ter 7 digitos.", code="IBGE_INVALIDO")
 
     return digitos
+
+
+# ============================================================
+# CNPJ (Onda 1.6a)
+# ============================================================
+
+_PESOS_CNPJ_1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+_PESOS_CNPJ_2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+
+
+def _cnpj_digito(parcial: str, pesos: list[int]) -> int:
+    """Calcula um digito verificador de CNPJ a partir do prefixo `parcial`."""
+    soma = sum(int(d) * peso for d, peso in zip(parcial, pesos, strict=True))
+    resto = soma % 11
+    return 0 if resto < 2 else 11 - resto
+
+
+def validar_cnpj(valor: str) -> str:
+    """Valida CNPJ e retorna apenas digitos.
+
+    Aceita '12.345.678/0001-95' ou '12345678000195'. Retorna 14 digitos.
+    Levanta ValidationError com code=CNPJ_INVALIDO se invalido.
+    """
+    digitos = _so_digitos(valor)
+
+    if len(digitos) != 14:
+        raise ValidationError("CNPJ deve ter 14 digitos.", code="CNPJ_INVALIDO")
+
+    if digitos == digitos[0] * 14:
+        # CNPJs com todos os digitos iguais sao matematicamente validos
+        # mas invalidos legalmente (mesmo padrao adotado para CPF).
+        raise ValidationError("CNPJ invalido.", code="CNPJ_INVALIDO")
+
+    d1 = _cnpj_digito(digitos[:12], _PESOS_CNPJ_1)
+    d2 = _cnpj_digito(digitos[:13], _PESOS_CNPJ_2)
+
+    if int(digitos[12]) != d1 or int(digitos[13]) != d2:
+        raise ValidationError("CNPJ invalido.", code="CNPJ_INVALIDO")
+
+    return digitos

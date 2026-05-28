@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-04-27"
   },
-  "ultima_atualizacao": "2026-05-24",
+  "ultima_atualizacao": "2026-05-27",
   "bloco_atual": 2,
   "progresso_geral_pct": 52,
   "blocos": [
@@ -174,6 +174,13 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-27",
+      "tipo": "entrega",
+      "titulo": "Cadastros pré-eSocial: órgão emissor e sindicato (Onda 1.6a)",
+      "resumo_executivo": "O sistema ganhou dois cadastros novos que faltavam para emitir as obrigações do governo federal: \"órgão emissor\" (cada CNPJ próprio do município — Prefeitura, Câmara, Fundo de Saúde, etc., com endereço próprio) e \"sindicato\" (CNPJ + categoria que cada servidor representa). Resolve o problema real apontado pela equipe de operação ao analisar o banco de outro município: 186 páginas de campos faltantes no relatório do eSocial. Agora dá pra cadastrar a estrutura toda e a próxima onda libera o preenchimento em massa via planilha.",
+      "descricao": "Onda 1.6a entrega o backend completo de OrgaoEmissor + Sindicato + tipo_logradouro em Servidor, todos pré-requisitos do S-1005 e S-2200 do eSocial. Modelo OrgaoEmissor em apps.people (TENANT) com CNPJ único, eh_principal, cnae_principal, endereço próprio (10 campos), telefone e email — antecipa o que a ADR-0011 já previa para o Bloco 4, expandido para cobrir os campos do S-1005. Modelo Sindicato com nome, CNPJ único, codigo_sindical, categoria, base_territorial — pré-requisito do vinculo/categoria/sindical do S-2200. Enum TipoLogradouro com 10 opções da tabela oficial eSocial. FKs novos em VinculoFuncional (orgao_emissor PROTECT + sindicato SET_NULL) e em UnidadeOrcamentaria.orgao_emissor (SET_NULL, cumprindo o que a ADR-0011 já planejava). Validador validar_cnpj() em apps.core.validators (algoritmo público da Receita) + 8 testes parametrizados. ViewSets ModelViewSet com RBAC (leitura permite, escrita exige RH/admin/staff) em /api/people/orgaos-emissores/ e /api/people/sindicatos/. Admin Django com fieldsets organizados (básico / S-1005 / endereço). 23 testes novos (validação CNPJ + CRUD + tenant isolation + FK), 413 verde no total. Tipos TypeScript regenerados via OpenAPI. Próxima parte da onda (1.6b): bulk edit + import CSV + tela /qualidade-cadastral."
+    },
     {
       "data": "2026-05-24",
       "tipo": "processo",

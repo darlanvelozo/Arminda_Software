@@ -37,6 +37,14 @@ export type DependenteWrite = components["schemas"]["DependenteWrite"];
 
 export type Documento = components["schemas"]["DocumentoList"];
 
+// Onda 1.6a — cadastros pré-eSocial
+export type OrgaoEmissor = components["schemas"]["OrgaoEmissorList"];
+export type OrgaoEmissorDetail = components["schemas"]["OrgaoEmissorDetail"];
+export type OrgaoEmissorWrite = components["schemas"]["OrgaoEmissorWrite"];
+export type Sindicato = components["schemas"]["SindicatoList"];
+export type SindicatoDetail = components["schemas"]["SindicatoDetail"];
+export type SindicatoWrite = components["schemas"]["SindicatoWrite"];
+
 // ============================================================
 // Ações de RH (input dos endpoints @action)
 // ============================================================

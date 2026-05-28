@@ -17,13 +17,15 @@ from datetime import date
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from apps.core.validators import validar_cpf, validar_pis_pasep
+from apps.core.validators import validar_cnpj, validar_cpf, validar_pis_pasep
 from apps.people.models import (
     Cargo,
     Dependente,
     Documento,
     Lotacao,
+    OrgaoEmissor,
     Servidor,
+    Sindicato,
     VinculoFuncional,
 )
 
@@ -650,3 +652,150 @@ class TransferenciaInputSerializer(serializers.Serializer):
 
     nova_lotacao_id = serializers.IntegerField()
     data_transferencia = serializers.DateField()
+
+
+# ============================================================
+# OrgaoEmissor (Onda 1.6a — pré-eSocial S-1005)
+# ============================================================
+
+
+class OrgaoEmissorListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrgaoEmissor
+        fields = ["id", "nome", "sigla", "cnpj", "eh_principal", "cidade", "uf", "ativo"]
+        read_only_fields = fields
+
+
+class OrgaoEmissorDetailSerializer(serializers.ModelSerializer):
+    tipo_logradouro_display = serializers.CharField(
+        source="get_tipo_logradouro_display", read_only=True
+    )
+
+    class Meta:
+        model = OrgaoEmissor
+        fields = [
+            "id",
+            "nome",
+            "sigla",
+            "cnpj",
+            "eh_principal",
+            "cnae_principal",
+            "tipo_logradouro",
+            "tipo_logradouro_display",
+            "logradouro",
+            "numero",
+            "complemento",
+            "bairro",
+            "cidade",
+            "uf",
+            "cep",
+            "telefone",
+            "email",
+            "ativo",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = ["id", "criado_em", "atualizado_em", "tipo_logradouro_display"]
+
+
+class OrgaoEmissorWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrgaoEmissor
+        fields = [
+            "id",
+            "nome",
+            "sigla",
+            "cnpj",
+            "eh_principal",
+            "cnae_principal",
+            "tipo_logradouro",
+            "logradouro",
+            "numero",
+            "complemento",
+            "bairro",
+            "cidade",
+            "uf",
+            "cep",
+            "telefone",
+            "email",
+            "ativo",
+        ]
+        read_only_fields = ["id"]
+
+    def validate_cnpj(self, value: str) -> str:
+        try:
+            digitos = validar_cnpj(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages[0]) from exc
+        # Checa unique manualmente (o UniqueValidator do DRF não roda
+        # com o valor já normalizado por este método).
+        qs = OrgaoEmissor.objects.filter(cnpj=digitos)
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(
+                "Já existe um órgão emissor com este CNPJ."
+            )
+        return digitos
+
+    def validate_cnae_principal(self, value: str) -> str:
+        digits = "".join(c for c in (value or "") if c.isdigit())
+        if value and len(digits) != 7:
+            raise serializers.ValidationError("CNAE preponderante deve ter 7 dígitos.")
+        return digits
+
+
+# ============================================================
+# Sindicato (Onda 1.6a)
+# ============================================================
+
+
+class SindicatoListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sindicato
+        fields = ["id", "nome", "cnpj", "categoria", "codigo_sindical", "ativo"]
+        read_only_fields = fields
+
+
+class SindicatoDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sindicato
+        fields = [
+            "id",
+            "nome",
+            "cnpj",
+            "codigo_sindical",
+            "categoria",
+            "base_territorial",
+            "ativo",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = ["id", "criado_em", "atualizado_em"]
+
+
+class SindicatoWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sindicato
+        fields = [
+            "id",
+            "nome",
+            "cnpj",
+            "codigo_sindical",
+            "categoria",
+            "base_territorial",
+            "ativo",
+        ]
+        read_only_fields = ["id"]
+
+    def validate_cnpj(self, value: str) -> str:
+        try:
+            digitos = validar_cnpj(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages[0]) from exc
+        qs = Sindicato.objects.filter(cnpj=digitos)
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Já existe um sindicato com este CNPJ.")
+        return digitos

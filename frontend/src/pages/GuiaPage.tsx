@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-18";
+const LAST_UPDATED = "2026-05-27";
 
 interface TocItem {
   id: string;
@@ -83,7 +83,7 @@ export default function GuiaPage() {
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
           <span className="ml-1 inline-flex items-center gap-2">
             <Badge variant="success">Bloco 1 entregue</Badge>
-            <Badge variant="info">Bloco 2 em andamento (Onda 2.6 ✓ — tela de Folha)</Badge>
+            <Badge variant="info">Onda 1.6a ✓ — cadastros pré-eSocial</Badge>
           </span>
         </p>
       </header>

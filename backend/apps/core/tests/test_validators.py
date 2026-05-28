@@ -5,7 +5,12 @@ from __future__ import annotations
 import pytest
 from django.core.exceptions import ValidationError
 
-from apps.core.validators import validar_codigo_ibge, validar_cpf, validar_pis_pasep
+from apps.core.validators import (
+    validar_cnpj,
+    validar_codigo_ibge,
+    validar_cpf,
+    validar_pis_pasep,
+)
 
 
 class TestValidarCpf:
@@ -86,3 +91,38 @@ class TestValidarCodigoIbge:
         with pytest.raises(ValidationError) as exc:
             validar_codigo_ibge(entrada)
         assert exc.value.code == "IBGE_INVALIDO"
+
+
+class TestValidarCnpj:
+    @pytest.mark.parametrize(
+        "entrada",
+        [
+            # CNPJs públicos válidos (Receita Federal e Banco do Brasil)
+            "11.222.333/0001-81",
+            "11222333000181",
+            "00.000.000/0001-91",  # Banco do Brasil matriz
+            "00000000000191",
+        ],
+    )
+    def test_aceita_cnpj_valido_com_e_sem_mascara(self, entrada):
+        digitos_esperados = "".join(c for c in entrada if c.isdigit())
+        assert validar_cnpj(entrada) == digitos_esperados
+
+    @pytest.mark.parametrize(
+        "entrada",
+        [
+            "11.111.111/1111-11",  # todos repetidos
+            "11.222.333/0001-82",  # último dígito errado
+            "11.222.333/0001-91",  # ambos errados
+        ],
+    )
+    def test_rejeita_cnpj_invalido(self, entrada):
+        with pytest.raises(ValidationError) as exc:
+            validar_cnpj(entrada)
+        assert exc.value.code == "CNPJ_INVALIDO"
+
+    @pytest.mark.parametrize("entrada", ["", "12345", "123456789012345"])
+    def test_rejeita_tamanho_errado(self, entrada):
+        with pytest.raises(ValidationError) as exc:
+            validar_cnpj(entrada)
+        assert exc.value.code == "CNPJ_INVALIDO"

@@ -132,14 +132,32 @@ correspondentes — município que não usa Sagres não vê o ícone.
 
 ### 5. Entidade `OrgaoEmissor` em `apps.people` (TENANT)
 
+> **Antecipado da Onda 1.6a (2026-05-27).** Originalmente previsto para
+> o Bloco 4 junto com o `ESocialAdapter`, mas o caso de Brejo trouxe a
+> demanda antes — sem `OrgaoEmissor` modelado, o operador não tem onde
+> apontar o "local de trabalho" dos vínculos exigido pelo S-2200. A
+> implementação expandiu os campos básicos abaixo para cobrir também o
+> S-1005 (CNAE preponderante + endereço próprio do estabelecimento).
+> Esquema básico mantido aqui como referência; ver
+> `apps/people/models.py:OrgaoEmissor` para a versão atual.
+
 ```python
 class OrgaoEmissor(TimeStampedModel):
     nome = CharField(max_length=200)        # "Fundo Municipal de Assistência Social"
     sigla = CharField(max_length=20)         # "FMAS"
     cnpj = CharField(max_length=18)          # único por tenant
     eh_principal = BooleanField(default=False)  # 1 marca a Prefeitura matriz
+    # Onda 1.6a expandiu para S-1005:
+    cnae_principal = CharField(max_length=7, blank=True)
+    # ... endereço próprio completo (tipo_logradouro, logradouro, ..., cep)
     ativo = BooleanField(default=True)
 ```
+
+Junto com `OrgaoEmissor`, a Onda 1.6a entregou também:
+- `apps.people.Sindicato` — CNPJ + categoria, pré-requisito do
+  `vinculo/categoria/sindical` do S-2200.
+- `apps.people.TipoLogradouro` choices (tabela oficial eSocial).
+- `VinculoFuncional.orgao_emissor` e `VinculoFuncional.sindicato`.
 
 Relacionamento com `UnidadeOrcamentaria`:
 - `UnidadeOrcamentaria.orgao_emissor` (FK nullable) — quem é o
