@@ -8,9 +8,16 @@ Sistema SaaS de folha de pagamento e gestão de pessoal para prefeituras brasile
 
 ## Status
 
-🟡 **Bloco 0 — Estrutura inicial** (em andamento)
+🟢 **Em produção** — https://arminda.site (Hostinger VPS, HTTPS, gunicorn + Nginx + systemd).
 
-O projeto está sendo construído em blocos sequenciais. Ver [docs/ROADMAP.md](docs/ROADMAP.md) para o plano completo.
+- **Versão atual:** `v0.10.0` (Onda 1.6b — qualidade cadastral + bulk-edit + importador CSV/XLSX)
+- **Bloco corrente:** Bloco 2 — Engine de cálculo de folha (56% — Ondas 2.1/2.2/2.3/2.6 entregues)
+- **Testes:** 441 backend (pytest) + 10 frontend (vitest) verdes
+- **Painel público:** https://darlanvelozo.github.io/Arminda_Software/
+
+O projeto está sendo construído em **11 blocos sequenciais** (0–10). Ver
+[docs/ROADMAP.md](docs/ROADMAP.md) para o plano completo. Previsão de v1
+completa: dez/2027.
 
 ---
 
@@ -121,10 +128,15 @@ Interface em `http://localhost:5173`.
 
 ### Documentação técnica
 
-- **[ROADMAP.md](docs/ROADMAP.md)** — os 7 blocos de construção e o que cada um entrega
+- **[CLAUDE.md](CLAUDE.md)** — instruções para Claude Code (leia antes de qualquer trabalho com IA neste repo)
+- **[ROADMAP.md](docs/ROADMAP.md)** — os 11 blocos de construção (0–10) e o que cada um entrega
+- **[PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** — visão arquitetural e decisões de stack
 - **[CONTRIBUTING.md](docs/CONTRIBUTING.md)** — padrões de commit, branch e PR
-- **[adr/](docs/adr)** — Architecture Decision Records (decisões técnicas registradas)
+- **[SETUP_NOVA_MAQUINA.md](docs/SETUP_NOVA_MAQUINA.md)** — checklist passo-a-passo para subir o projeto em máquina nova
+- **[DEPLOY_PRODUCAO.md](docs/DEPLOY_PRODUCAO.md)** — runbook de deploy na VPS (arminda.site)
+- **[MULTI_TENANT_PLAYBOOK.md](docs/MULTI_TENANT_PLAYBOOK.md)** — operação multi-tenant no dia-a-dia
+- **[adr/](docs/adr)** — 12 Architecture Decision Records (decisões técnicas registradas)
 
 ---
 

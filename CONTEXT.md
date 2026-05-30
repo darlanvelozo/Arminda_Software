@@ -1,7 +1,20 @@
 # CONTEXT.md — Contexto Global do Arminda
 
 > **Documento mestre.** Toda implementação deve começar pela leitura deste arquivo.
-> Última atualização: 2026-05-12 · Bloco corrente: **Bloco 2 — Engine de cálculo de folha em andamento (Onda 2.1 ✅)**. Bloco 1 100% concluído. Engine entregue: DSL de fórmulas via subset seguro de Python (ADR-0012), todas as variáveis em Decimal, endpoint `/api/payroll/rubricas/{id}/avaliar/`. **332 testes backend verde** + 10 testes frontend. Próximo: **Onda 2.2 — Cálculo de folha mensal ordinária**.
+> **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
+> as regras de processo (validação integral, guias vivos, etc.).
+>
+> Última atualização: **2026-05-27** · Versão atual: **v0.10.0** ·
+> Bloco corrente: **Bloco 2 — Engine de cálculo de folha (56%)**. Bloco 0
+> e 1 concluídos. No Bloco 2 estão entregues as Ondas **2.1** (DSL de
+> fórmulas via Python AST), **2.2** (cálculo mensal + toposort + endpoint
+> `/calcular/`), **2.3** (tabelas legais INSS/IRRF 2024-2026) e **2.6**
+> (tela operacional `/folha`). Faltam Ondas 2.4 (FGTS/previdência),
+> 2.5 (holerite PDF), 2.7 (paridade Fiorilli). Também entregues fora do
+> Bloco 2: Onda **1.6a** (OrgaoEmissor + Sindicato + tipo_logradouro,
+> pré-eSocial) e Onda **1.6b** (qualidade cadastral + bulk-edit +
+> importador CSV/XLSX). **441 testes backend verde** + 10 frontend.
+> Em produção desde **maio/2026**: https://arminda.site (Hostinger VPS).
 
 ---
 
@@ -60,10 +73,11 @@ React SPA  ──HTTPS──▶  Django + DRF  ──▶  PostgreSQL (schemas po
 
 ```
 Arminda_Software/
-├── CONTEXT.md                  ← este arquivo (mestre)
+├── CLAUDE.md                   ← instruções para Claude Code (lido automaticamente)
+├── CONTEXT.md                  ← este arquivo (mestre técnico)
 ├── CHANGELOG.md                ← memória do projeto (toda alteração registrada)
 ├── README.md                   ← porta de entrada
-├── docker-compose.yml          ← infra dev
+├── docker-compose.yml          ← infra dev (Postgres + Redis)
 ├── .env.example                ← template de variáveis
 ├── .github/workflows/          ← CI
 ├── backend/
@@ -73,9 +87,11 @@ Arminda_Software/
 │   ├── arminda/                ← config Django (settings/urls/wsgi)
 │   ├── apps/
 │   │   ├── CONTEXT.md          ← estrutura padrão de app Django
-│   │   ├── core/               ← Tenant, auth, RBAC, modelo base
-│   │   ├── people/             ← Servidor, Cargo, Lotação, Vínculo
-│   │   ├── payroll/            ← Rubrica, Folha, Lançamento (DSL no Bloco 2)
+│   │   ├── core/               ← Tenant, auth, RBAC, modelo base, tabelas legais
+│   │   ├── people/             ← Servidor, Cargo, Lotação, Vínculo, OrgaoEmissor, Sindicato
+│   │   ├── payroll/            ← Rubrica, Folha, Lançamento
+│   │   ├── calculo/            ← DSL + toposort + serviço de cálculo (Bloco 2)
+│   │   ├── imports/            ← Importadores (Fiorilli SIP + CSV/XLSX)
 │   │   └── reports/            ← Relatórios e exportações
 │   └── tests/                  ← testes globais e fixtures
 ├── frontend/
@@ -85,16 +101,21 @@ Arminda_Software/
 │       │   └── CONTEXT.md
 │       ├── pages/              ← páginas (rotas)
 │       │   └── CONTEXT.md
-│       ├── lib/                ← utilitários (api.ts, utils.ts)
+│       ├── lib/                ← utilitários (api.ts, queries/, auth-context)
 │       ├── styles/             ← globals.css (tokens Tailwind/shadcn)
 │       └── test/               ← setup e testes globais
+├── deploy/                     ← scripts de produção (setup-producao.sh, deploy.sh, systemd, nginx)
 ├── docs/
-│   ├── ROADMAP.md              ← plano em 7 blocos
+│   ├── ROADMAP.md              ← plano em 11 blocos (0–10)
+│   ├── PERSONAS.md             ← personas e matriz Persona × Bloco
 │   ├── ARCHITECTURE.md         ← arquitetura técnica
 │   ├── CONTRIBUTING.md         ← convenções de PR/commit/branch
-│   ├── adr/                    ← Architecture Decision Records
+│   ├── SETUP_NOVA_MAQUINA.md   ← checklist de bootstrap em máquina nova
+│   ├── DEPLOY_PRODUCAO.md      ← runbook de deploy na VPS
+│   ├── MULTI_TENANT_PLAYBOOK.md ← operação multi-tenant no dia-a-dia
+│   ├── adr/                    ← 12 Architecture Decision Records
 │   └── relatorios/             ← entregáveis quinzenais
-├── status-page/                ← painel público de progresso
+├── status-page/                ← painel público (GH Pages — darlanvelozo.github.io/Arminda_Software)
 └── scripts/                    ← setup.sh e utilitários
 ```
 
@@ -148,8 +169,9 @@ Após qualquer alteração relevante:
    leve (`git tag X`); sempre `git tag -a X -m "..."` com mensagem padronizada.
 6. **A cada 15 dias publicar um relatório quinzenal** em
    `status-page/relatorios/<YYYY-MM-DD>-quinzenal-NN.html` consolidando o período,
-   e adicionar entrada no array `relatorios` do `status-page/status.json`. Próximo:
-   2026-05-22.
+   e adicionar entrada no array `relatorios` do `status-page/status.json`.
+   Últimos: `#1` (08/05/2026, período 27/04→08/05), `#2` (24/05/2026,
+   período 09/05→24/05). Próximo: por volta de 08/06/2026.
 
 ---
 
@@ -200,6 +222,15 @@ Decisões formais ficam em `docs/adr/`. Resumo do já decidido:
 | [0006](docs/adr/0006-multi-tenant-implementacao.md) | Implementação concreta do multi-tenant (refina ADR-0004) | Aceito |
 | [0007](docs/adr/0007-jwt-rbac.md) | Autenticação JWT + RBAC escopado por município | Aceito |
 | [0008](docs/adr/0008-openapi-types-typescript.md) | Geração de tipos TS via `openapi-typescript` | Aceito |
+| [0009](docs/adr/0009-importador-fiorilli-sip.md) | Importador Fiorilli SIP (Firebird → Postgres) com ETL idempotente | Aceito |
+| [0010](docs/adr/0010-versionamento-e-releases.md) | Versionamento `MAJOR.MINOR.PATCH` (MAJOR=bloco, MINOR=onda) e fluxo de release | Aceito |
+| [0011](docs/adr/0011-adaptadores-externos-configuraveis.md) | Adaptadores externos configuráveis no admin (`OrgaoEmissor`, `IntegracaoExterna`) | Aceito |
+| [0012](docs/adr/0012-dsl-formulas-via-python-ast.md) | DSL de fórmulas via Python AST whitelist (sem `eval`/`exec`) | Aceito |
+
+Personas e seus papéis técnicos estão em [PERSONAS.md](docs/PERSONAS.md).
+Papéis novos a criar têm ADRs reservados: `gestor_municipio` (Bloco 7),
+`contador_municipio` (Bloco 9), `controle_interno_municipio` (Bloco 10),
+`servidor_final` (Bloco 7).
 
 **Quando criar ADR:** sempre que a decisão **influencia futuras decisões** ou **é difícil de reverter**.
 
@@ -207,22 +238,25 @@ Decisões formais ficam em `docs/adr/`. Resumo do já decidido:
 
 ## 7. Roadmap — onde estamos
 
-Plano completo em [docs/ROADMAP.md](docs/ROADMAP.md). Snapshot:
+Plano completo em [docs/ROADMAP.md](docs/ROADMAP.md). Personas atendidas
+por bloco em [docs/PERSONAS.md](docs/PERSONAS.md). Snapshot:
 
 | Bloco | Tema | Status |
 |-------|------|--------|
-| 0 | Estrutura inicial | ✅ Concluído |
-| 1.1 | Fundação técnica (multi-tenant ativo + User customizado + JWT + RBAC + simple-history) | ✅ Concluído |
-| 1.2 | Cadastros core via API REST (serializers, viewsets, permissions, services) | 🟡 Próximo |
-| 1.3 | Frontend autenticado (login + telas de cadastro) | ⏳ |
-| 1.4 | Importador Firebird v1 (Fiorilli SIP → Postgres) | ⏳ |
-| 1.5 | Hardening + entrega Bloco 1 (cobertura ≥ 80%, validações finais) | ⏳ |
-| 2 | Engine de cálculo + DSL de rubricas | ⏳ |
-| 3 | Folhas especiais (13º, férias, rescisão) | ⏳ |
-| 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF) | ⏳ |
-| 5 | Integração TCE | ⏳ |
-| 6 | MVP piloto em produção (gate crítico) | ⏳ |
-| 7 | Diferenciação (PWA, WhatsApp, BI, IA) | ⏳ |
+| 0 | Estrutura inicial | ✅ Concluído (abr/2026) |
+| 1 | Fundação multi-tenant e cadastros (inclui Ondas 1.1 a 1.6b) | ✅ Concluído (mai/2026) |
+| 2 | Engine de cálculo + DSL de rubricas | 🟡 Em andamento — 56% (Ondas 2.1, 2.2, 2.3, 2.6 prontas; faltam 2.4, 2.5, 2.7) |
+| 3 | Folhas especiais (13º, férias, rescisão) | ⏳ Set/2026 |
+| 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF, MANAD) | ⏳ Out-Nov/2026 |
+| 5 | Integração TCE (MA, PB, framework outros) | ⏳ Dez/2026 |
+| 6 | MVP piloto em produção (gate crítico) | ⏳ Jan/2027 |
+| 7 | Diferenciação (PWA, WhatsApp, BI, IA, Portal Servidor) | ⏳ Fev-Abr/2027 |
+| 8 | **RH operacional** (probatório, progressão, frequência, férias, saúde, aposentadoria) | ⏳ Mai-Set/2027 (paralelo ao 9) |
+| 9 | **Tesouraria, contábil e LRF** (CNAB, RREO/RGF, PCASP, conta-corrente) | ⏳ Mai-Set/2027 (paralelo ao 8) |
+| 10 | **Compliance, transparência e auditoria** (Portal Transp., LGPD, certificado, WCAG) | ⏳ Out-Dez/2027 |
+
+Em produção desde mai/2026: https://arminda.site. Previsão de v1
+completa: **dez/2027**.
 
 ---
 
