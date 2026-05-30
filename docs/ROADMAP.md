@@ -1,6 +1,9 @@
 # Roadmap
 
 > Plano de construção do Arminda em blocos sequenciais. Cada bloco é entregue de forma independente, testado e documentado antes de avançar.
+>
+> **Quem usa o quê** — para a matriz Persona × Bloco e descrição de cada
+> tipo de usuário, ver [PERSONAS.md](PERSONAS.md).
 
 ## Princípios
 
