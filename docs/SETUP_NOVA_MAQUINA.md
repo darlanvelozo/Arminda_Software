@@ -8,6 +8,32 @@
 
 ---
 
+## 0. Desenvolvimento direto na VPS (ambiente atual)
+
+> A partir de 30/05/2026 o desenvolvimento acontece **na própria VPS**, num
+> diretório **separado** da produção. Não desenvolva dentro de `/opt/arminda`
+> (é o checkout que o `arminda-backend.service` serve em produção, com `.env`
+> de prod e banco `arminda_prod`).
+
+| Item | Produção | Desenvolvimento |
+|---|---|---|
+| Diretório | `/opt/arminda` | `/opt/arminda-dev` |
+| Banco PostgreSQL | `arminda_prod` (role `arminda`) | `arminda_dev` (role `arminda_dev`) |
+| `.env` | prod (gerenciado pelo deploy) | dev, `DJANGO_DEBUG=True` |
+| Como sobe | systemd + gunicorn na porta **8001** | `manage.py runserver` manual |
+| Redis (DBs) | 0/1/2 | 3/4/5 |
+
+> ⚠️ A porta **8000** já está ocupada por outro serviço da VPS e a **8001**
+> é da produção. Use uma porta livre para o runserver de dev, ex.:
+> `python manage.py runserver 127.0.0.1:8010`.
+
+O setup do `/opt/arminda-dev` já está feito (venv, deps, migrations, tenant
+`mun_dev`, usuário `dev@arminda.local` / senha `dev-12345`, superuser
+`dev-admin@arminda.local`). Os passos abaixo (1–10) servem de referência para
+recriar do zero ou montar em outra máquina.
+
+---
+
 ## 1. Pré-requisitos
 
 | Ferramenta | Versão mínima | Como verificar |
@@ -139,11 +165,14 @@ python manage.py listar_tenants
 ```bash
 python manage.py criar_usuario \
   --email smoke-admin@arminda.local \
-  --senha "trocar-em-prod" \
+  --password "trocar-em-prod" \
   --nome "Admin Smoke" \
-  --municipio-schema mun_smoke \
+  --tenant mun_smoke \
   --papel admin_municipio
 ```
+
+> A senha precisa ter **ao menos 8 caracteres**. Para não expor a senha no
+> histórico do shell, omita `--password` e use `--senha-stdin` (lê do stdin).
 
 Papéis disponíveis: `staff_arminda`, `admin_municipio`, `rh_municipio`,
 `financeiro_municipio`, `leitura_municipio`.

@@ -28,6 +28,13 @@ similares com paridade legal + UX moderna + multi-tenant nativo.
 Próximas ondas naturais: **2.4** (FGTS + previdência municipal) ou **2.5**
 (holerite PDF). Ver [CHANGELOG.md](CHANGELOG.md) pra histórico recente.
 
+> **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
+> **na própria VPS**, em `/opt/arminda-dev` (banco `arminda_dev`, `.env` de dev,
+> `runserver` manual na porta **8010**). **Nunca desenvolva em `/opt/arminda`** —
+> aquele é o checkout que serve a produção (`arminda-backend.service`, gunicorn
+> na 8001, banco `arminda_prod`). Detalhes em
+> [docs/SETUP_NOVA_MAQUINA.md](docs/SETUP_NOVA_MAQUINA.md) (seção 0).
+
 ---
 
 ## 2. Onde ler primeiro (em ordem)
@@ -197,7 +204,7 @@ Detalhes em cada `CONTEXT.md` específico. O essencial:
 - Conventional Commits em português: `feat(payroll): adiciona X`
 - `feat`/`fix`/`refactor`/`chore`/`docs`/`test`/`perf`/`ci`
 - Marcar `⚠ BREAKING` quando muda contrato de API ou semântica
-- Co-author no commit: `Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`
+- Co-author no commit: `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
 
 ---
 
