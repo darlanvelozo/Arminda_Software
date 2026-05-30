@@ -7,11 +7,12 @@
  *   - Usuários — gestão de quem tem acesso ao município (admin only)
  */
 
-import { Settings, Shield, UserCircle, Users } from "lucide-react";
+import { Landmark, Settings, Shield, UserCircle, Users } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { PerfilTab } from "./PerfilTab";
+import { PrevidenciaTab } from "./PrevidenciaTab";
 import { SegurancaTab } from "./SegurancaTab";
 import { UsuariosTab } from "./UsuariosTab";
 
@@ -24,7 +25,7 @@ export default function ConfiguracoesPage() {
           Configurações
         </h1>
         <p className="text-sm text-muted-foreground">
-          Perfil pessoal, segurança e gestão de usuários do município ativo.
+          Perfil pessoal, segurança, previdência (RPPS) e gestão de usuários do município ativo.
         </p>
       </header>
 
@@ -36,6 +37,9 @@ export default function ConfiguracoesPage() {
           <TabsTrigger value="seguranca">
             <Shield className="h-4 w-4 mr-1.5" /> Segurança
           </TabsTrigger>
+          <TabsTrigger value="previdencia">
+            <Landmark className="h-4 w-4 mr-1.5" /> Previdência
+          </TabsTrigger>
           <TabsTrigger value="usuarios">
             <Users className="h-4 w-4 mr-1.5" /> Usuários
           </TabsTrigger>
@@ -46,6 +50,9 @@ export default function ConfiguracoesPage() {
         </TabsContent>
         <TabsContent value="seguranca">
           <SegurancaTab />
+        </TabsContent>
+        <TabsContent value="previdencia">
+          <PrevidenciaTab />
         </TabsContent>
         <TabsContent value="usuarios">
           <UsuariosTab />

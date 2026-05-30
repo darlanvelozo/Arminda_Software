@@ -67,6 +67,9 @@ export type FolhaDetail = components["schemas"]["FolhaDetail"];
 export type FolhaWrite = components["schemas"]["FolhaWrite"];
 export type Lancamento = components["schemas"]["Lancamento"];
 
+// Regime previdenciário / RPPS (Onda 2.4)
+export type RegimePrevidenciario = components["schemas"]["RegimePrevidenciario"];
+
 /**
  * Resposta do POST /api/payroll/folhas/{id}/calcular/.
  *

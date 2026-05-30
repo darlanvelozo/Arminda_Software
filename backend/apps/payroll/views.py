@@ -26,13 +26,19 @@ from apps.calculo.formula.avaliador import avaliar
 from apps.calculo.formula.contexto import ContextoFolha
 from apps.calculo.formula.errors import FormulaError
 from apps.core.permissions import IsFinanceiroMunicipio, IsLeituraMunicipio
-from apps.payroll.filters import FolhaFilter, LancamentoFilter, RubricaFilter
-from apps.payroll.models import Folha, Lancamento, Rubrica
+from apps.payroll.filters import (
+    FolhaFilter,
+    LancamentoFilter,
+    RegimePrevidenciarioFilter,
+    RubricaFilter,
+)
+from apps.payroll.models import Folha, Lancamento, RegimePrevidenciario, Rubrica
 from apps.payroll.serializers import (
     FolhaDetailSerializer,
     FolhaListSerializer,
     FolhaWriteSerializer,
     LancamentoSerializer,
+    RegimePrevidenciarioSerializer,
     RubricaDetailSerializer,
     RubricaListSerializer,
     RubricaWriteSerializer,
@@ -244,6 +250,35 @@ class FolhaViewSet(viewsets.ModelViewSet):
                 ],
             }
         )
+
+
+# ============================================================
+# Regime previdenciário / RPPS (Onda 2.4)
+# ============================================================
+
+
+class RegimePrevidenciarioViewSet(viewsets.ModelViewSet):
+    """
+    CRUD do regime próprio de previdência (RPPS/IPM) do município.
+
+    Permissões: leitura para qualquer papel; escrita exige
+    financeiro/admin/staff. As alíquotas são municipais e versionadas
+    por competência (ADR-0013).
+    """
+
+    queryset = RegimePrevidenciario.objects.select_related("orgao_emissor").all()
+    serializer_class = RegimePrevidenciarioSerializer
+    filterset_class = RegimePrevidenciarioFilter
+    search_fields = ["nome"]
+    ordering_fields = ["vigencia_inicio", "nome", "criado_em"]
+    ordering = ["-vigencia_inicio"]
+
+    READ_ACTIONS = {"list", "retrieve"}
+
+    def get_permissions(self):
+        if self.action in self.READ_ACTIONS:
+            return [IsLeituraMunicipio()]
+        return [IsFinanceiroMunicipio()]
 
 
 # ============================================================

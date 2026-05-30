@@ -162,6 +162,32 @@ export interface paths {
         patch: operations["core_usuarios_partial_update"];
         trace?: never;
     };
+    "/api/imports/csv/servidores/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description POST /api/imports/csv/servidores/.
+         *
+         *     Form multipart:
+         *         arquivo: CSV ou XLSX
+         *         coluna_identificador: "matricula" (default) ou "cpf"
+         *         dry_run: "true" (default) ou "false"
+         *
+         *     Resposta: mesmo shape do `importar_servidores_csv`.
+         */
+        post: operations["imports_csv_servidores_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payroll/folhas/": {
         parameters: {
             query?: never;
@@ -336,6 +362,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payroll/regimes-previdenciarios/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD do regime próprio de previdência (RPPS/IPM) do município.
+         *
+         *     Permissões: leitura para qualquer papel; escrita exige
+         *     financeiro/admin/staff. As alíquotas são municipais e versionadas
+         *     por competência (ADR-0013).
+         */
+        get: operations["payroll_regimes_previdenciarios_list"];
+        put?: never;
+        /**
+         * @description CRUD do regime próprio de previdência (RPPS/IPM) do município.
+         *
+         *     Permissões: leitura para qualquer papel; escrita exige
+         *     financeiro/admin/staff. As alíquotas são municipais e versionadas
+         *     por competência (ADR-0013).
+         */
+        post: operations["payroll_regimes_previdenciarios_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/regimes-previdenciarios/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD do regime próprio de previdência (RPPS/IPM) do município.
+         *
+         *     Permissões: leitura para qualquer papel; escrita exige
+         *     financeiro/admin/staff. As alíquotas são municipais e versionadas
+         *     por competência (ADR-0013).
+         */
+        get: operations["payroll_regimes_previdenciarios_retrieve"];
+        /**
+         * @description CRUD do regime próprio de previdência (RPPS/IPM) do município.
+         *
+         *     Permissões: leitura para qualquer papel; escrita exige
+         *     financeiro/admin/staff. As alíquotas são municipais e versionadas
+         *     por competência (ADR-0013).
+         */
+        put: operations["payroll_regimes_previdenciarios_update"];
+        post?: never;
+        /**
+         * @description CRUD do regime próprio de previdência (RPPS/IPM) do município.
+         *
+         *     Permissões: leitura para qualquer papel; escrita exige
+         *     financeiro/admin/staff. As alíquotas são municipais e versionadas
+         *     por competência (ADR-0013).
+         */
+        delete: operations["payroll_regimes_previdenciarios_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * @description CRUD do regime próprio de previdência (RPPS/IPM) do município.
+         *
+         *     Permissões: leitura para qualquer papel; escrita exige
+         *     financeiro/admin/staff. As alíquotas são municipais e versionadas
+         *     por competência (ADR-0013).
+         */
+        patch: operations["payroll_regimes_previdenciarios_partial_update"];
+        trace?: never;
+    };
     "/api/payroll/rubricas/": {
         parameters: {
             query?: never;
@@ -479,6 +579,23 @@ export interface paths {
         head?: never;
         /** @description CRUD de cargos do municipio (tenant atual). */
         patch: operations["people_cargos_partial_update"];
+        trace?: never;
+    };
+    "/api/people/cargos/{id}/sugestao-natureza/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description GET /api/people/cargos/<id>/sugestao-natureza/ — heurística (Onda 1.6b). */
+        get: operations["people_cargos_sugestao_natureza_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/people/dependentes/": {
@@ -741,6 +858,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/people/servidores/{id}/qualidade/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description GET /api/people/servidores/<id>/qualidade/ — score do servidor. */
+        get: operations["people_servidores_qualidade_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/people/servidores/admitir/": {
         parameters: {
             query?: never;
@@ -752,6 +886,51 @@ export interface paths {
         put?: never;
         /** @description POST /api/people/servidores/admitir/ — cria Servidor + Vinculo (atomico). */
         post: operations["people_servidores_admitir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/servidores/bulk-update/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description POST /api/people/servidores/bulk-update/.
+         *
+         *     Body:
+         *         {
+         *             "servidor_ids": [1,2,3],
+         *             "updates": {"tipo_logradouro": "avenida", "cidade": "Aracaju", "uf": "SE"}
+         *         }
+         *
+         *     Aplica `updates` em cada `Servidor` cujo id está em `servidor_ids`.
+         *     Campos não listados em `updates` ficam intactos.
+         */
+        post: operations["people_servidores_bulk_update_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/servidores/qualidade-resumo/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description GET /api/people/servidores/qualidade-resumo/ — dashboard agregado. */
+        get: operations["people_servidores_qualidade_resumo_retrieve"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -845,6 +1024,31 @@ export interface paths {
         put?: never;
         /** @description POST /api/people/vinculos/<id>/transferir/ — encerra atual + cria novo. */
         post: operations["people_vinculos_transferir_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/vinculos/bulk-update/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description POST /api/people/vinculos/bulk-update/ — aplica updates em lote.
+         *
+         *     Body:
+         *         {
+         *             "vinculo_ids": [10, 11, 12],
+         *             "updates": {"orgao_emissor": 3, "sindicato": 7}
+         *         }
+         */
+        post: operations["people_vinculos_bulk_update_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1156,6 +1360,12 @@ export interface components {
             ativo?: boolean;
         };
         /**
+         * @description * `flat` - Alíquota única
+         *     * `progressivo` - Tabela progressiva (EC 103)
+         * @enum {string}
+         */
+        ModoContribuicaoEnum: "flat" | "progressivo";
+        /**
          * @description * `administracao` - Administração
          *     * `saude` - Saúde
          *     * `educacao` - Educação
@@ -1353,6 +1563,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["OrgaoEmissorList"][];
         };
+        PaginatedRegimePrevidenciarioList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["RegimePrevidenciario"][];
+        };
         PaginatedRubricaListList: {
             /** @example 123 */
             count: number;
@@ -1534,6 +1759,52 @@ export interface components {
             email?: string;
             ativo?: boolean;
         };
+        /** @description CRUD do regime próprio (RPPS) do município — Onda 2.4. */
+        PatchedRegimePrevidenciario: {
+            readonly id?: number;
+            /** @description Nome do regime/instituto (ex.: 'IPM - Instituto de Previdência Municipal'). */
+            nome?: string;
+            /** @description Entidade (CNPJ) gestora do RPPS, quando aplicável. */
+            orgao_emissor?: number | null;
+            modo_contribuicao?: components["schemas"]["ModoContribuicaoEnum"];
+            readonly modo_contribuicao_display?: string;
+            /**
+             * Alíquota do servidor
+             * Format: decimal
+             * @description Usada no modo 'flat' (ex.: 0.14 = 14%). Ignorada no progressivo.
+             */
+            aliquota_servidor?: string;
+            /**
+             * Alíquota patronal
+             * Format: decimal
+             * @description Contribuição do ente (ex.: 0.22 = 22%). Exposta como ALIQ_RPPS_PATRONAL.
+             */
+            aliquota_patronal?: string;
+            /**
+             * Format: decimal
+             * @description Teto da base de contribuição (null = sem teto).
+             */
+            teto?: string | null;
+            /** @description Faixas progressivas (modo 'progressivo'): [{"ate": "1518.00", "aliquota": "0.075"}, {"ate": null, "aliquota": "0.14"}] */
+            faixas?: unknown;
+            /** @description Regimes de vínculo cobertos pelo RPPS (valores de people.Regime). Vazio = usa o padrão (apenas efetivos/estatutários). */
+            regimes_aplicaveis?: unknown;
+            /**
+             * Format: date
+             * @description Primeiro dia em que esta config vigora.
+             */
+            vigencia_inicio?: string;
+            /**
+             * Format: date
+             * @description Último dia de vigência (null = continua valendo).
+             */
+            vigencia_fim?: string | null;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em?: string;
+            /** Format: date-time */
+            readonly atualizado_em?: string;
+        };
         PatchedRubricaWrite: {
             readonly id?: number;
             codigo?: string;
@@ -1542,6 +1813,8 @@ export interface components {
             incide_inss?: boolean;
             incide_irrf?: boolean;
             incide_fgts?: boolean;
+            /** @description Compõe a base da previdência municipal própria (Onda 2.4). */
+            incide_rpps?: boolean;
             /**
              * Formula de calculo
              * @description DSL de calculo (sera implementada no Bloco 2)
@@ -1564,6 +1837,7 @@ export interface components {
             /** Format: email */
             email?: string;
             telefone?: string;
+            tipo_logradouro?: components["schemas"]["TipoLogradouroEnum"] | components["schemas"]["BlankEnum"];
             logradouro?: string;
             numero?: string;
             complemento?: string;
@@ -1571,6 +1845,13 @@ export interface components {
             cidade?: string;
             uf?: string;
             cep?: string;
+            nacionalidade?: string;
+            /** Raça/cor */
+            raca?: string;
+            nome_pai?: string;
+            nome_mae?: string;
+            /** Código de instrução (eSocial) */
+            instrucao?: string;
             ativo?: boolean;
         };
         PatchedSindicatoWrite: {
@@ -1621,6 +1902,52 @@ export interface components {
          * @enum {string}
          */
         RegimeEnum: "estatutario" | "celetista" | "comissionado" | "temporario" | "eletivo" | "estagiario";
+        /** @description CRUD do regime próprio (RPPS) do município — Onda 2.4. */
+        RegimePrevidenciario: {
+            readonly id: number;
+            /** @description Nome do regime/instituto (ex.: 'IPM - Instituto de Previdência Municipal'). */
+            nome: string;
+            /** @description Entidade (CNPJ) gestora do RPPS, quando aplicável. */
+            orgao_emissor?: number | null;
+            modo_contribuicao?: components["schemas"]["ModoContribuicaoEnum"];
+            readonly modo_contribuicao_display: string;
+            /**
+             * Alíquota do servidor
+             * Format: decimal
+             * @description Usada no modo 'flat' (ex.: 0.14 = 14%). Ignorada no progressivo.
+             */
+            aliquota_servidor?: string;
+            /**
+             * Alíquota patronal
+             * Format: decimal
+             * @description Contribuição do ente (ex.: 0.22 = 22%). Exposta como ALIQ_RPPS_PATRONAL.
+             */
+            aliquota_patronal?: string;
+            /**
+             * Format: decimal
+             * @description Teto da base de contribuição (null = sem teto).
+             */
+            teto?: string | null;
+            /** @description Faixas progressivas (modo 'progressivo'): [{"ate": "1518.00", "aliquota": "0.075"}, {"ate": null, "aliquota": "0.14"}] */
+            faixas?: unknown;
+            /** @description Regimes de vínculo cobertos pelo RPPS (valores de people.Regime). Vazio = usa o padrão (apenas efetivos/estatutários). */
+            regimes_aplicaveis?: unknown;
+            /**
+             * Format: date
+             * @description Primeiro dia em que esta config vigora.
+             */
+            vigencia_inicio: string;
+            /**
+             * Format: date
+             * @description Último dia de vigência (null = continua valendo).
+             */
+            vigencia_fim?: string | null;
+            ativo?: boolean;
+            /** Format: date-time */
+            readonly criado_em: string;
+            /** Format: date-time */
+            readonly atualizado_em: string;
+        };
         RubricaDetail: {
             readonly id: number;
             codigo: string;
@@ -1630,6 +1957,8 @@ export interface components {
             incide_inss?: boolean;
             incide_irrf?: boolean;
             incide_fgts?: boolean;
+            /** @description Compõe a base da previdência municipal própria (Onda 2.4). */
+            incide_rpps?: boolean;
             /**
              * Formula de calculo
              * @description DSL de calculo (sera implementada no Bloco 2)
@@ -1657,6 +1986,8 @@ export interface components {
             incide_inss?: boolean;
             incide_irrf?: boolean;
             incide_fgts?: boolean;
+            /** @description Compõe a base da previdência municipal própria (Onda 2.4). */
+            incide_rpps?: boolean;
             /**
              * Formula de calculo
              * @description DSL de calculo (sera implementada no Bloco 2)
@@ -1682,6 +2013,9 @@ export interface components {
             /** Format: email */
             email?: string;
             telefone?: string;
+            tipo_logradouro?: components["schemas"]["TipoLogradouroEnum"] | components["schemas"]["BlankEnum"];
+            /** @default  */
+            readonly tipo_logradouro_display: string;
             logradouro?: string;
             numero?: string;
             complemento?: string;
@@ -1689,6 +2023,13 @@ export interface components {
             cidade?: string;
             uf?: string;
             cep?: string;
+            nacionalidade?: string;
+            /** Raça/cor */
+            raca?: string;
+            nome_pai?: string;
+            nome_mae?: string;
+            /** Código de instrução (eSocial) */
+            instrucao?: string;
             ativo?: boolean;
             /** Format: date-time */
             readonly criado_em: string;
@@ -1720,6 +2061,7 @@ export interface components {
             /** Format: email */
             email?: string;
             telefone?: string;
+            tipo_logradouro?: components["schemas"]["TipoLogradouroEnum"] | components["schemas"]["BlankEnum"];
             logradouro?: string;
             numero?: string;
             complemento?: string;
@@ -1727,6 +2069,13 @@ export interface components {
             cidade?: string;
             uf?: string;
             cep?: string;
+            nacionalidade?: string;
+            /** Raça/cor */
+            raca?: string;
+            nome_pai?: string;
+            nome_mae?: string;
+            /** Código de instrução (eSocial) */
+            instrucao?: string;
             ativo?: boolean;
         };
         /**
@@ -2245,6 +2594,24 @@ export interface operations {
             };
         };
     };
+    imports_csv_servidores_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     payroll_folhas_list: {
         parameters: {
             query?: {
@@ -2498,6 +2865,163 @@ export interface operations {
             };
         };
     };
+    payroll_regimes_previdenciarios_list: {
+        parameters: {
+            query?: {
+                ativo?: boolean;
+                /**
+                 * @description * `flat` - Alíquota única
+                 *     * `progressivo` - Tabela progressiva (EC 103)
+                 */
+                modo_contribuicao?: "flat" | "progressivo";
+                nome?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRegimePrevidenciarioList"];
+                };
+            };
+        };
+    };
+    payroll_regimes_previdenciarios_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegimePrevidenciario"];
+                "application/x-www-form-urlencoded": components["schemas"]["RegimePrevidenciario"];
+                "multipart/form-data": components["schemas"]["RegimePrevidenciario"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegimePrevidenciario"];
+                };
+            };
+        };
+    };
+    payroll_regimes_previdenciarios_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this regime previdenciário (RPPS). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegimePrevidenciario"];
+                };
+            };
+        };
+    };
+    payroll_regimes_previdenciarios_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this regime previdenciário (RPPS). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegimePrevidenciario"];
+                "application/x-www-form-urlencoded": components["schemas"]["RegimePrevidenciario"];
+                "multipart/form-data": components["schemas"]["RegimePrevidenciario"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegimePrevidenciario"];
+                };
+            };
+        };
+    };
+    payroll_regimes_previdenciarios_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this regime previdenciário (RPPS). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    payroll_regimes_previdenciarios_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this regime previdenciário (RPPS). */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedRegimePrevidenciario"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedRegimePrevidenciario"];
+                "multipart/form-data": components["schemas"]["PatchedRegimePrevidenciario"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegimePrevidenciario"];
+                };
+            };
+        };
+    };
     payroll_rubricas_list: {
         parameters: {
             query?: {
@@ -2506,6 +3030,7 @@ export interface operations {
                 incide_fgts?: boolean;
                 incide_inss?: boolean;
                 incide_irrf?: boolean;
+                incide_rpps?: boolean;
                 nome?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -2845,6 +3370,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CargoWrite"];
+                };
+            };
+        };
+    };
+    people_cargos_sugestao_natureza_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this cargo. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CargoDetail"];
                 };
             };
         };
@@ -3491,6 +4038,7 @@ export interface operations {
         parameters: {
             query?: {
                 ativo?: boolean;
+                cadastro_incompleto?: boolean;
                 cargo?: number;
                 lotacao?: number;
                 matricula?: string;
@@ -3700,6 +4248,28 @@ export interface operations {
             };
         };
     };
+    people_servidores_qualidade_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this servidor. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorDetail"];
+                };
+            };
+        };
+    };
     people_servidores_admitir_create: {
         parameters: {
             query?: never;
@@ -3721,6 +4291,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdmissaoInput"];
+                };
+            };
+        };
+    };
+    people_servidores_bulk_update_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServidorDetail"];
+                "application/x-www-form-urlencoded": components["schemas"]["ServidorDetail"];
+                "multipart/form-data": components["schemas"]["ServidorDetail"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorDetail"];
+                };
+            };
+        };
+    };
+    people_servidores_qualidade_resumo_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServidorDetail"];
                 };
             };
         };
@@ -4064,6 +4678,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TransferenciaInput"];
+                };
+            };
+        };
+    };
+    people_vinculos_bulk_update_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VinculoDetail"];
+                "application/x-www-form-urlencoded": components["schemas"]["VinculoDetail"];
+                "multipart/form-data": components["schemas"]["VinculoDetail"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VinculoDetail"];
                 };
             };
         };

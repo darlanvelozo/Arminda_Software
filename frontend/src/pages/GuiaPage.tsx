@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-27";
+const LAST_UPDATED = "2026-05-30";
 
 interface TocItem {
   id: string;
@@ -691,6 +691,19 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
           <code className="bg-muted px-1 rounded">COMPETENCIA_ANO</code>,{" "}
           <code className="bg-muted px-1 rounded">COMPETENCIA_MES</code>
         </li>
+        <li>
+          <strong>Incidências (Onda 2.4):</strong>{" "}
+          <code className="bg-muted px-1 rounded">BASE_INSS</code>,{" "}
+          <code className="bg-muted px-1 rounded">BASE_IRRF</code>,{" "}
+          <code className="bg-muted px-1 rounded">BASE_FGTS</code>,{" "}
+          <code className="bg-muted px-1 rounded">BASE_RPPS</code> (somas automáticas
+          dos proventos marcados),{" "}
+          <code className="bg-muted px-1 rounded">EH_RGPS</code>,{" "}
+          <code className="bg-muted px-1 rounded">EH_RPPS</code>,{" "}
+          <code className="bg-muted px-1 rounded">EH_FGTS</code> (1/0 por regime),{" "}
+          <code className="bg-muted px-1 rounded">ALIQ_RPPS_PATRONAL</code>,{" "}
+          <code className="bg-muted px-1 rounded">ALIQ_FGTS</code>
+        </li>
       </ul>
 
       <h3 className="text-base font-semibold mt-4">Funções builtin</h3>
@@ -719,7 +732,26 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
           <code className="bg-muted px-1 rounded">FAIXA_INSS(base)</code> —
           INSS progressivo (faixas + teto) conforme tabela legal vigente (Onda 2.3 ✓)
         </li>
+        <li>
+          <code className="bg-muted px-1 rounded">FAIXA_RPPS(base)</code> —
+          contribuição ao regime próprio (RPPS) conforme a config do município —
+          alíquota única ou progressiva (Onda 2.4 ✓)
+        </li>
       </ul>
+
+      <h3 className="text-base font-semibold mt-4">Incidências e previdência (Onda 2.4)</h3>
+      <p>
+        As <strong>bases de incidência</strong> são calculadas automaticamente: marque
+        em cada rubrica os encargos sobre os quais ela incide (INSS, IRRF, FGTS, RPPS)
+        e o sistema soma os proventos para formar{" "}
+        <code className="bg-muted px-1 rounded">BASE_INSS</code> etc. — não é mais
+        preciso remontar a base na fórmula. O <strong>FGTS</strong> (8% patronal) entra
+        como rubrica informativa para celetistas. A{" "}
+        <strong>previdência própria (RPPS)</strong> é configurada em{" "}
+        <Link to="/configuracoes" className="underline">Configurações → Previdência</Link>{" "}
+        (alíquotas do servidor e patronal, modo único ou progressivo, regimes cobertos).
+        Estatutários cobertos contribuem ao RPPS; os demais, ao INSS.
+      </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">

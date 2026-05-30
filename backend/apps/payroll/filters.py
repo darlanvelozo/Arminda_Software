@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import django_filters
 
-from apps.payroll.models import Folha, Lancamento, Rubrica
+from apps.payroll.models import Folha, Lancamento, RegimePrevidenciario, Rubrica
 
 
 class RubricaFilter(django_filters.FilterSet):
@@ -20,8 +20,17 @@ class RubricaFilter(django_filters.FilterSet):
             "incide_inss",
             "incide_irrf",
             "incide_fgts",
+            "incide_rpps",
             "ativo",
         ]
+
+
+class RegimePrevidenciarioFilter(django_filters.FilterSet):
+    nome = django_filters.CharFilter(lookup_expr="icontains")
+
+    class Meta:
+        model = RegimePrevidenciario
+        fields = ["modo_contribuicao", "ativo"]
 
 
 class FolhaFilter(django_filters.FilterSet):

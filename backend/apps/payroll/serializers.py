@@ -9,7 +9,14 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.payroll.models import Folha, Lancamento, Rubrica
+from apps.payroll.models import (
+    Folha,
+    Lancamento,
+    ModoContribuicaoRPPS,
+    RegimePrevidenciario,
+    Rubrica,
+)
+from apps.people.models import Regime
 
 
 class RubricaListSerializer(serializers.ModelSerializer):
@@ -35,6 +42,7 @@ class RubricaDetailSerializer(serializers.ModelSerializer):
             "incide_inss",
             "incide_irrf",
             "incide_fgts",
+            "incide_rpps",
             "formula",
             "ativo",
             "criado_em",
@@ -54,6 +62,7 @@ class RubricaWriteSerializer(serializers.ModelSerializer):
             "incide_inss",
             "incide_irrf",
             "incide_fgts",
+            "incide_rpps",
             "formula",
             "ativo",
         ]
@@ -115,6 +124,78 @@ class FolhaWriteSerializer(serializers.ModelSerializer):
         model = Folha
         fields = ["id", "competencia", "tipo", "observacoes"]
         read_only_fields = ["id"]
+
+
+class RegimePrevidenciarioSerializer(serializers.ModelSerializer):
+    """CRUD do regime próprio (RPPS) do município — Onda 2.4."""
+
+    modo_contribuicao_display = serializers.CharField(
+        source="get_modo_contribuicao_display", read_only=True
+    )
+
+    class Meta:
+        model = RegimePrevidenciario
+        fields = [
+            "id",
+            "nome",
+            "orgao_emissor",
+            "modo_contribuicao",
+            "modo_contribuicao_display",
+            "aliquota_servidor",
+            "aliquota_patronal",
+            "teto",
+            "faixas",
+            "regimes_aplicaveis",
+            "vigencia_inicio",
+            "vigencia_fim",
+            "ativo",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = ["id", "criado_em", "atualizado_em", "modo_contribuicao_display"]
+
+    def validate_regimes_aplicaveis(self, value: list) -> list:
+        validos = set(Regime.values)
+        invalidos = [v for v in (value or []) if v not in validos]
+        if invalidos:
+            raise serializers.ValidationError(
+                f"Regimes inválidos: {', '.join(invalidos)}. "
+                f"Use valores de people.Regime."
+            )
+        return value
+
+    def validate_faixas(self, value: list) -> list:
+        if not value:
+            return value
+        for i, f in enumerate(value):
+            if not isinstance(f, dict) or "aliquota" not in f:
+                raise serializers.ValidationError(
+                    f"Faixa #{i + 1} precisa de 'aliquota' (e 'ate' ou null na última)."
+                )
+        if value[-1].get("ate") is not None:
+            raise serializers.ValidationError(
+                "A última faixa precisa ter 'ate': null (faixa aberta)."
+            )
+        return value
+
+    def validate(self, attrs: dict) -> dict:
+        modo = attrs.get("modo_contribuicao") or getattr(
+            self.instance, "modo_contribuicao", None
+        )
+        faixas = attrs.get("faixas", getattr(self.instance, "faixas", None))
+        if modo == ModoContribuicaoRPPS.PROGRESSIVO and not faixas:
+            raise serializers.ValidationError(
+                {"faixas": "Modo progressivo exige ao menos uma faixa."}
+            )
+        vig_inicio = attrs.get("vigencia_inicio") or getattr(
+            self.instance, "vigencia_inicio", None
+        )
+        vig_fim = attrs.get("vigencia_fim", getattr(self.instance, "vigencia_fim", None))
+        if vig_fim and vig_inicio and vig_fim < vig_inicio:
+            raise serializers.ValidationError(
+                {"vigencia_fim": "Fim da vigência não pode ser antes do início."}
+            )
+        return attrs
 
 
 class LancamentoSerializer(serializers.ModelSerializer):

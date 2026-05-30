@@ -141,6 +141,21 @@ def make_fn_faixa_irrf(competencia: date) -> Callable[..., Decimal]:
     return fn_faixa_irrf
 
 
+def make_fn_faixa_rpps(rpps_config: dict[str, Any] | None) -> Callable[..., Decimal]:
+    """
+    Cria FAIXA_RPPS(base) bound à config do regime próprio do município
+    (Onda 2.4). A config flui como dado (ContextoFolha.rpps_config) para
+    manter o engine puro — ver ADR-0013. `None` → contribuição 0.
+    """
+    from apps.calculo.previdencia import contribuicao_rpps
+
+    def fn_faixa_rpps(base: Any) -> Decimal:
+        base_d = _to_decimal(base, nome_arg="FAIXA_RPPS base")
+        return contribuicao_rpps(base_d, rpps_config)
+
+    return fn_faixa_rpps
+
+
 # ============================================================
 # Whitelist de builtins
 # ============================================================
@@ -160,6 +175,8 @@ BUILTINS_STATIC: dict[str, Callable[..., Any]] = {
 
 # Nomes reservados que são injetados dinamicamente (dependem do contexto
 # da competência sendo calculada).
-BUILTINS_DINAMICAS: frozenset[str] = frozenset({"RUBRICA", "FAIXA_INSS", "FAIXA_IRRF"})
+BUILTINS_DINAMICAS: frozenset[str] = frozenset(
+    {"RUBRICA", "FAIXA_INSS", "FAIXA_IRRF", "FAIXA_RPPS"}
+)
 
 NOMES_PERMITIDOS: frozenset[str] = frozenset(BUILTINS_STATIC) | BUILTINS_DINAMICAS

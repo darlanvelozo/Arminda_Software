@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-05-27";
+const LAST_UPDATED = "2026-05-30";
 
 interface TocItem {
   id: string;
@@ -165,10 +165,10 @@ function SectionPanorama() {
       </p>
       <p>
         Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1),
-        cálculo mensal (2.2), tabelas legais reais (2.3) e tela operacional
-        de Folha (2.6 ✓) já no ar. Adiantamos a Onda 2.6 pra ter algo
-        visual demonstrável; a Onda 2.4 (FGTS/previdência) e a 2.5
-        (holerite PDF) continuam pendentes mas não bloqueiam apresentação.
+        cálculo mensal (2.2), tabelas legais reais (2.3), incidências
+        FGTS + previdência própria RPPS (2.4 ✓) e tela operacional de
+        Folha (2.6 ✓) já no ar. Falta a Onda 2.5 (holerite PDF) e a 2.7
+        (paridade Fiorilli) para fechar o Bloco 2.
       </p>
     </Section>
   );
@@ -449,9 +449,10 @@ function SectionDSL() {
         </li>
         <li>
           <code className="bg-muted px-1 rounded">funcoes.py</code> — builtins{" "}
-          <code className="bg-muted px-1 rounded">SE, MAX, MIN, ABS, ARRED, RUBRICA</code>.
-          Placeholders <code className="bg-muted px-1 rounded">FAIXA_IRRF</code> e{" "}
-          <code className="bg-muted px-1 rounded">FAIXA_INSS</code> (Onda 2.3).
+          <code className="bg-muted px-1 rounded">SE, MAX, MIN, ABS, ARRED, RUBRICA</code>,{" "}
+          <code className="bg-muted px-1 rounded">FAIXA_IRRF</code>,{" "}
+          <code className="bg-muted px-1 rounded">FAIXA_INSS</code> (Onda 2.3) e{" "}
+          <code className="bg-muted px-1 rounded">FAIXA_RPPS</code> (Onda 2.4).
         </li>
         <li>
           <code className="bg-muted px-1 rounded">contexto.py</code> —{" "}
@@ -529,6 +530,35 @@ function SectionCalculo() {
         <code className="text-xs bg-muted px-1 rounded">ErroLancamento</code>{" "}
         no relatório, batch continua.
       </Callout>
+
+      <h3 className="text-base font-semibold mt-4">
+        Incidências automáticas (Onda 2.4 — ADR-0013)
+      </h3>
+      <p>
+        O cálculo roda em <strong>duas fases</strong> por vínculo: (1) proventos,
+        acumulando as bases por flag{" "}
+        <code className="bg-muted px-1 rounded">incide_inss/irrf/fgts/rpps</code>;
+        (2) descontos e informativas, já com{" "}
+        <code className="bg-muted px-1 rounded">BASE_INSS/IRRF/FGTS/RPPS</code>,{" "}
+        <code className="bg-muted px-1 rounded">EH_RGPS/EH_RPPS/EH_FGTS</code> e{" "}
+        <code className="bg-muted px-1 rounded">ALIQ_RPPS_PATRONAL/ALIQ_FGTS</code>{" "}
+        no contexto. Assim a fórmula de INSS vira{" "}
+        <code className="bg-muted px-1 rounded">FAIXA_INSS(BASE_INSS) * EH_RGPS</code>.
+      </p>
+      <p>
+        O <strong>RPPS</strong> (previdência própria) vive em{" "}
+        <code className="bg-muted px-1 rounded">apps.payroll.RegimePrevidenciario</code>{" "}
+        (TENANT, versionado por competência), modo{" "}
+        <code className="bg-muted px-1 rounded">flat</code> ou{" "}
+        <code className="bg-muted px-1 rounded">progressivo</code>. A config flui como
+        dado para o engine via{" "}
+        <code className="bg-muted px-1 rounded">ContextoFolha.rpps_config</code>{" "}
+        (mantém <code className="bg-muted px-1 rounded">apps.calculo</code> puro).
+        Estatutários cobertos pagam RPPS; os demais, INSS; celetistas geram FGTS.
+        Comando{" "}
+        <code className="bg-muted px-1 rounded">seed_rubricas_incidencia</code>{" "}
+        cria o conjunto padrão de rubricas.
+      </p>
     </Section>
   );
 }

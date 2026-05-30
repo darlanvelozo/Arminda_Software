@@ -34,11 +34,18 @@ class ContextoFolha:
             tabela legal vigente. Opcional — quando ausente, essas
             funções caem para a competência atual da máquina (útil em
             chamadas avulsas do endpoint /avaliar/).
+        rpps_config: config do regime próprio (RPPS) do município já
+            resolvida pela competência, como dicionário simples (ver
+            `apps.calculo.previdencia.contribuicao_rpps`). Usada por
+            FAIXA_RPPS. `None` = município sem RPPS (contribuição 0).
+            Mantém o engine puro — quem resolve no banco é
+            `apps.payroll.services.previdencia` (ADR-0013).
     """
 
     variaveis: dict[str, Any] = field(default_factory=dict)
     rubricas_calculadas: dict[str, Decimal] = field(default_factory=dict)
     competencia: date | None = None
+    rpps_config: dict[str, Any] | None = None
 
     def como_namespace(self) -> dict[str, Any]:
         """Retorna um dict pronto para servir de namespace local em `eval`."""
@@ -64,4 +71,15 @@ VARIAVEIS_PADRAO = (
     "SALARIO_MINIMO",       # Decimal — valor do salário-mínimo no exercício
     "COMPETENCIA_ANO",      # int — ano da competência (uso em FAIXA_*)
     "COMPETENCIA_MES",      # int — mês da competência (1-12)
+    # Incidências automáticas (Onda 2.4) — preenchidas pelo engine por
+    # vínculo na fase 2 (descontos/informativas). Ver ADR-0013.
+    "BASE_INSS",            # Decimal — soma dos proventos com incide_inss
+    "BASE_IRRF",            # Decimal — soma dos proventos com incide_irrf
+    "BASE_FGTS",            # Decimal — soma dos proventos com incide_fgts
+    "BASE_RPPS",            # Decimal — soma dos proventos com incide_rpps
+    "EH_RGPS",              # Decimal 1/0 — vínculo contribui ao RGPS (INSS)
+    "EH_RPPS",              # Decimal 1/0 — vínculo contribui ao RPPS municipal
+    "EH_FGTS",              # Decimal 1/0 — vínculo gera FGTS (celetista)
+    "ALIQ_RPPS_PATRONAL",   # Decimal — alíquota patronal do RPPS
+    "ALIQ_FGTS",            # Decimal — alíquota do FGTS (0.08)
 )

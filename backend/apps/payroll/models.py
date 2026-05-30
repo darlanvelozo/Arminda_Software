@@ -7,10 +7,13 @@ DSL de calculo (campo formula) e implementada no Bloco 2.
 
 from __future__ import annotations
 
+from decimal import Decimal
+from typing import Any
+
 from django.db import models
 
 from apps.core.models import TimeStampedModel
-from apps.people.models import Servidor, VinculoFuncional
+from apps.people.models import Regime, Servidor, VinculoFuncional
 
 
 class TipoRubrica(models.TextChoices):
@@ -44,6 +47,11 @@ class Rubrica(TimeStampedModel):
     incide_inss = models.BooleanField("Incide INSS", default=False)
     incide_irrf = models.BooleanField("Incide IRRF", default=False)
     incide_fgts = models.BooleanField("Incide FGTS", default=False)
+    incide_rpps = models.BooleanField(
+        "Incide RPPS",
+        default=False,
+        help_text="Compõe a base da previdência municipal própria (Onda 2.4).",
+    )
     formula = models.TextField(
         "Formula de calculo",
         blank=True,
@@ -115,3 +123,124 @@ class Lancamento(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.servidor.nome} | {self.rubrica.nome}: R$ {self.valor}"
+
+
+class ModoContribuicaoRPPS(models.TextChoices):
+    FLAT = "flat", "Alíquota única"
+    PROGRESSIVO = "progressivo", "Tabela progressiva (EC 103)"
+
+
+# Regimes de vínculo que, por padrão, contribuem ao regime próprio (RPPS).
+# Municípios podem ajustar via `RegimePrevidenciario.regimes_aplicaveis`.
+REGIMES_RPPS_PADRAO = [Regime.ESTATUTARIO]
+
+
+class RegimePrevidenciario(TimeStampedModel):
+    """
+    Configuração do regime próprio de previdência (RPPS/IPM) do município
+    — Onda 2.4 (ADR-0013).
+
+    Vive no schema do tenant (TENANT_APP): as alíquotas são municipais e
+    não podem vazar entre municípios. Versionado por competência igual à
+    `TabelaLegal` federal: resolve-se a config com `vigencia_inicio <=
+    competencia` e (`vigencia_fim is null` ou `vigencia_fim >= competencia`).
+
+    A contribuição do servidor pode ser:
+    - `flat`: percentual único (`aliquota_servidor`) sobre a base (com teto).
+    - `progressivo`: faixas (`faixas`) com alíquota efetiva por faixa, estilo
+      INSS pós-EC 103/2019.
+
+    A contribuição patronal é exposta às fórmulas via `ALIQ_RPPS_PATRONAL`.
+    """
+
+    nome = models.CharField(
+        max_length=200,
+        help_text="Nome do regime/instituto (ex.: 'IPM - Instituto de Previdência Municipal').",
+    )
+    orgao_emissor = models.ForeignKey(
+        "people.OrgaoEmissor",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="regimes_previdenciarios",
+        help_text="Entidade (CNPJ) gestora do RPPS, quando aplicável.",
+    )
+    modo_contribuicao = models.CharField(
+        max_length=15,
+        choices=ModoContribuicaoRPPS.choices,
+        default=ModoContribuicaoRPPS.FLAT,
+    )
+    aliquota_servidor = models.DecimalField(
+        "Alíquota do servidor",
+        max_digits=6,
+        decimal_places=4,
+        default=Decimal("0.14"),
+        help_text="Usada no modo 'flat' (ex.: 0.14 = 14%). Ignorada no progressivo.",
+    )
+    aliquota_patronal = models.DecimalField(
+        "Alíquota patronal",
+        max_digits=6,
+        decimal_places=4,
+        default=Decimal("0.22"),
+        help_text="Contribuição do ente (ex.: 0.22 = 22%). Exposta como ALIQ_RPPS_PATRONAL.",
+    )
+    teto = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Teto da base de contribuição (null = sem teto).",
+    )
+    faixas = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Faixas progressivas (modo 'progressivo'): "
+            '[{"ate": "1518.00", "aliquota": "0.075"}, {"ate": null, "aliquota": "0.14"}]'
+        ),
+    )
+    regimes_aplicaveis = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Regimes de vínculo cobertos pelo RPPS (valores de people.Regime). "
+            "Vazio = usa o padrão (apenas efetivos/estatutários)."
+        ),
+    )
+    vigencia_inicio = models.DateField(help_text="Primeiro dia em que esta config vigora.")
+    vigencia_fim = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Último dia de vigência (null = continua valendo).",
+    )
+    ativo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-vigencia_inicio"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["vigencia_inicio"],
+                name="rpps_unico_por_vigencia_inicio",
+            ),
+        ]
+        verbose_name = "regime previdenciário (RPPS)"
+        verbose_name_plural = "regimes previdenciários (RPPS)"
+
+    def __str__(self) -> str:
+        return f"{self.nome} (desde {self.vigencia_inicio:%m/%Y})"
+
+    @property
+    def regimes_efetivos(self) -> list[str]:
+        """Regimes cobertos — cai no padrão quando não configurado."""
+        return list(self.regimes_aplicaveis) if self.regimes_aplicaveis else list(REGIMES_RPPS_PADRAO)
+
+    def como_config(self) -> dict[str, Any]:
+        """Serializa a config para o dicionário consumido por FAIXA_RPPS
+        (ver `apps.calculo.previdencia.contribuicao_rpps`)."""
+        return {
+            "modo": self.modo_contribuicao,
+            "aliquota_servidor": self.aliquota_servidor,
+            "aliquota_patronal": self.aliquota_patronal,
+            "teto": self.teto,
+            "faixas": list(self.faixas or []),
+        }

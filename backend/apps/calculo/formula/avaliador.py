@@ -25,6 +25,7 @@ from apps.calculo.formula.funcoes import (
     NOMES_PERMITIDOS,
     make_fn_faixa_inss,
     make_fn_faixa_irrf,
+    make_fn_faixa_rpps,
     make_fn_rubrica,
 )
 from apps.calculo.formula.parser import compilar
@@ -40,6 +41,8 @@ def _construir_namespace(ctx: ContextoFolha) -> dict[str, Any]:
     - Builtins estáticos (SE, MAX, MIN, ABS, ARRED).
     - `RUBRICA(codigo)` injetado dinamicamente com o dict da competência.
     - `FAIXA_INSS(base)` e `FAIXA_IRRF(base, deps)` bound à `ctx.competencia`.
+    - `FAIXA_RPPS(base)` bound à `ctx.rpps_config` (config do regime
+      próprio do município — Onda 2.4).
     - Variáveis do contexto (SALARIO_BASE, IDADE, etc.).
     """
     from datetime import date as _date
@@ -50,6 +53,7 @@ def _construir_namespace(ctx: ContextoFolha) -> dict[str, Any]:
     competencia = ctx.competencia or _date.today().replace(day=1)
     namespace["FAIXA_INSS"] = make_fn_faixa_inss(competencia)
     namespace["FAIXA_IRRF"] = make_fn_faixa_irrf(competencia)
+    namespace["FAIXA_RPPS"] = make_fn_faixa_rpps(ctx.rpps_config)
     namespace.update(ctx.como_namespace())
     return namespace
 

@@ -60,6 +60,7 @@ const rubricaSchema = z.object({
   incide_inss: z.boolean(),
   incide_irrf: z.boolean(),
   incide_fgts: z.boolean(),
+  incide_rpps: z.boolean(),
   formula: z.string(),
   ativo: z.boolean(),
 });
@@ -84,6 +85,7 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
       incide_inss: false,
       incide_irrf: false,
       incide_fgts: false,
+      incide_rpps: false,
       formula: "",
       ativo: true,
     },
@@ -98,6 +100,7 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
         incide_inss: rubrica.incide_inss,
         incide_irrf: rubrica.incide_irrf,
         incide_fgts: rubrica.incide_fgts,
+        incide_rpps: rubrica.incide_rpps,
         formula: rubrica.formula || "",
         ativo: rubrica.ativo,
       });
@@ -109,6 +112,7 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
         incide_inss: false,
         incide_irrf: false,
         incide_fgts: false,
+        incide_rpps: false,
         formula: "",
         ativo: true,
       });
@@ -244,7 +248,7 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
               <p className="text-xs text-muted-foreground">
                 Marque os encargos sobre os quais esta rubrica incide.
               </p>
-              <div className="grid grid-cols-3 gap-3 pt-2">
+              <div className="grid grid-cols-2 gap-3 pt-2">
                 <FormField
                   control={form.control}
                   name="incide_inss"
@@ -290,6 +294,22 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
                         className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
                       />
                       FGTS
+                    </label>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="incide_rpps"
+                  render={({ field }) => (
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        disabled={isSubmitting}
+                        className="h-4 w-4 rounded border-input text-primary focus:ring-2 focus:ring-ring"
+                      />
+                      RPPS
                     </label>
                   )}
                 />

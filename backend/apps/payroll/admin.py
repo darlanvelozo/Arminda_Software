@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import Folha, Lancamento, Rubrica
+from .models import Folha, Lancamento, RegimePrevidenciario, Rubrica
 
 
 class LancamentoInline(admin.TabularInline):
@@ -23,9 +23,10 @@ class RubricaAdmin(admin.ModelAdmin):
         "incide_inss",
         "incide_irrf",
         "incide_fgts",
+        "incide_rpps",
         "ativo",
     )
-    list_filter = ("tipo", "incide_inss", "incide_irrf", "incide_fgts", "ativo")
+    list_filter = ("tipo", "incide_inss", "incide_irrf", "incide_fgts", "incide_rpps", "ativo")
     search_fields = ("codigo", "nome")
     list_editable = ("ativo",)
     list_per_page = 50
@@ -45,6 +46,22 @@ class FolhaAdmin(admin.ModelAdmin):
     date_hierarchy = "competencia"
     inlines = [LancamentoInline]
     readonly_fields = ("total_proventos", "total_descontos", "total_liquido")
+
+
+@admin.register(RegimePrevidenciario)
+class RegimePrevidenciarioAdmin(admin.ModelAdmin):
+    list_display = (
+        "nome",
+        "modo_contribuicao",
+        "aliquota_servidor",
+        "aliquota_patronal",
+        "vigencia_inicio",
+        "vigencia_fim",
+        "ativo",
+    )
+    list_filter = ("modo_contribuicao", "ativo")
+    search_fields = ("nome",)
+    date_hierarchy = "vigencia_inicio"
 
 
 @admin.register(Lancamento)

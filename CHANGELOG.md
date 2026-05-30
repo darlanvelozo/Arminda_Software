@@ -35,6 +35,56 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 2.4 — Incidências: FGTS + previdência própria (RPPS) · 2026-05-30
+
+> Incidências automáticas sobre a folha (ADR-0013). Os flags `incide_*` das
+> rubricas passam a valer: o cálculo roda em duas fases (proventos → bases →
+> descontos/encargos) e expõe `BASE_INSS/IRRF/FGTS/RPPS`, `EH_RGPS/RPPS/FGTS`
+> e `ALIQ_*` às fórmulas. Entra o FGTS (8% patronal, celetistas) e a
+> previdência municipal própria (RPPS), configurável por município.
+
+#### Adicionado — Backend
+
+- **feat(calculo):** função pura `apps.calculo.previdencia.contribuicao_rpps`
+  (modo `flat` ou `progressivo` com teto) + builtin `FAIXA_RPPS(base)`. A
+  config flui como dado via `ContextoFolha.rpps_config` — `apps.calculo`
+  permanece sem importar `apps.payroll`.
+- **feat(payroll):** modelo `RegimePrevidenciario` (TENANT, versionado por
+  competência) — RPPS é municipal, não pode viver na `TabelaLegal` federal.
+  Flag `incide_rpps` em `Rubrica` (migration `payroll.0002`).
+- **feat(payroll.services.calculo):** `calcular_folha` reescrito em duas fases
+  (helpers `_fase_proventos` / `_fase_descontos`). Bases acumuladas por flag.
+- **feat(payroll.services.previdencia):** resolve o regime vigente e mapeia
+  regime-de-vínculo → incidência (estatutário coberto = RPPS; demais = INSS;
+  celetista = FGTS 8%).
+- **feat(payroll):** API REST do `RegimePrevidenciario` (serializer com
+  validação modo×faixas + regimes válidos, viewset RBAC, filtro, admin).
+- **feat(payroll):** comando `seed_rubricas_incidencia` (idempotente) cria o
+  conjunto padrão: SAL_BASE, INSS, RPPS, IRRF (base − previdência), FGTS,
+  RPPS_PATRONAL.
+
+#### Adicionado — Frontend
+
+- **feat(configuracoes):** aba **Previdência** — config do RPPS (modo, alíquotas
+  servidor/patronal, teto, regimes cobertos, faixas progressivas em JSON,
+  vigência). Query `lib/queries/previdencia.ts`.
+- **feat(rubricas):** flag **RPPS** no formulário de rubrica.
+- **docs:** guias do operador e do desenvolvedor atualizados (incidências,
+  variáveis `BASE_*`/`EH_*`/`ALIQ_*`, `FAIXA_RPPS`). `LAST_UPDATED 2026-05-30`.
+
+#### Impacto
+
+- Migration nova em `apps.payroll` (TENANT) — rodar `migrate_schemas`.
+- Semântica de cálculo: ⚠ proventos calculam antes de descontos. Um provento
+  que referencie um desconto via `RUBRICA()` agora erra (`FORMULA_RUBRICA_NAO_EXISTE`).
+- Tipos TS regenerados do OpenAPI. 24 testes novos (465 no total).
+
+#### Próximos passos
+
+- Onda 2.5 (holerite PDF + JSON) e Onda 2.7 (paridade Fiorilli) fecham o Bloco 2.
+
+---
+
 ### Onda 1.6b — Qualidade cadastral + bulk-edit + importador CSV · 2026-05-27
 
 > Segunda parte da Onda 1.6 (qualidade cadastral em lote). Coloca em

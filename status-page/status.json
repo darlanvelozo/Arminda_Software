@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-05-27",
+  "ultima_atualizacao": "2026-05-30",
   "bloco_atual": 2,
-  "progresso_geral_pct": 25,
+  "progresso_geral_pct": 27,
   "blocos": [
     {
       "numero": 0,
@@ -71,12 +71,12 @@
       "data_fim_prevista": "2026-08-31",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 56,
+      "progresso_pct": 70,
       "entregas": [
         "✅ Linguagem de fórmulas configurável (DSL via Python AST whitelist, ADR-0012) — Onda 2.1",
         "✅ Cálculo de folha mensal ordinária (toposort de rubricas + serviço idempotente + endpoint /calcular/) — Onda 2.2",
         "✅ Tabelas legais 2024/2025/2026 (FAIXA_IRRF e FAIXA_INSS reais + salário mínimo dinâmico + admin Django para virar exercício sem deploy) — Onda 2.3",
-        "Incidências (FGTS, previdência municipal própria) — Onda 2.4",
+        "✅ Incidências automáticas: FGTS + previdência própria RPPS (cálculo em duas fases, bases por flag, RegimePrevidenciario por município, FAIXA_RPPS, ADR-0013) — Onda 2.4",
         "Geração de holerite (PDF + JSON) — Onda 2.5",
         "✅ Tela /folha operacional (lista, criar, calcular/recalcular com confirmação, relatório do último cálculo, tabs de lançamentos e erros) — Onda 2.6",
         "Testes de paridade contra Fiorilli — Onda 2.7"
@@ -251,6 +251,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-30",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.11.0 (Onda 2.4)",
+      "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 465 verde em ~62s (24 testes novos: contribuição RPPS pura flat/progressivo/teto, FAIXA_RPPS via avaliador, bases automáticas por flag, gating por regime estatutário×celetista, FGTS informativo, RPPS progressivo batendo com a função pura, convenção de fase provento→desconto, seed idempotente, API do regime previdenciário com RBAC e validação). Frontend: ESLint 0 erros (6 warnings de HMR inócuos pré-existentes), tsc --noEmit 0 erros, vitest 10/10, build de produção em ~9s. Tipos TypeScript regenerados do OpenAPI. Pronto para tag v0.11.0.",
+      "descricao": "Onda 2.4 passou pela rotina padrão de validação integral. Backend (cd backend): ruff check apps/ → 'All checks passed!' (incluindo refatoração de calcular_folha em helpers _fase_proventos/_fase_descontos para respeitar o limite de complexidade ciclomática), python manage.py check → '0 issues', pytest -q → 465 passed (441 anteriores sem regressão + 24 novos), migration payroll.0002 aplicada no tenant de desenvolvimento. Frontend (cd frontend): npm run lint → 0 errors, npx tsc --noEmit → 0 erros, vitest run → 10 passed, npm run build → ✓ built. Os valores esperados de INSS/IRRF nos testes são calculados via apps.calculo.tabelas (não hardcodados) para resistir a mudança das tabelas legais. Pronto para git push + tag v0.11.0 na branch develop."
+    },
+    {
+      "data": "2026-05-30",
+      "tipo": "entrega",
+      "titulo": "Incidências automáticas: FGTS + previdência própria (RPPS) — Onda 2.4",
+      "resumo_executivo": "O cálculo de folha passou a tratar sozinho as incidências. Em cada rubrica, basta marcar sobre quais encargos ela incide (INSS, IRRF, FGTS, RPPS) e o sistema soma os proventos para formar a base de cada um — não é mais preciso reescrever a base em cada fórmula. Entrou o FGTS (8% de encargo, para celetistas) e a previdência municipal própria (RPPS): cada município configura, numa nova aba de Previdência em Configurações, a alíquota do servidor e a patronal, em modo único (ex.: 14%) ou progressivo por faixas. O servidor efetivo passa a contribuir ao regime próprio em vez do INSS, automaticamente conforme o regime do vínculo.",
+      "descricao": "Onda 2.4 (ADR-0013) implementa as incidências sobre a folha. Engine: o cálculo agora roda em DUAS FASES por vínculo — fase 1 calcula os proventos acumulando as bases pelos flags incide_inss/irrf/fgts/rpps; fase 2 calcula descontos e informativas com BASE_INSS/IRRF/FGTS/RPPS, EH_RGPS/EH_RPPS/EH_FGTS (1/0 por regime) e ALIQ_RPPS_PATRONAL/ALIQ_FGTS já no contexto. Assim os flags incide_*, que antes eram só metadado, passam a alimentar o cálculo. Novo builtin FAIXA_RPPS(base) e função pura apps.calculo.previdencia.contribuicao_rpps (modo flat ou progressivo com teto); a config flui como dado via ContextoFolha.rpps_config, mantendo apps.calculo sem dependência de apps.payroll. Modelo novo apps.payroll.RegimePrevidenciario (TENANT, versionado por competência: alíquota servidor/patronal, teto, faixas JSON, regimes cobertos, vigência) — RPPS é municipal e não pode viver na TabelaLegal federal compartilhada. Flag incide_rpps em Rubrica (+migration payroll.0002). Service apps.payroll.services.previdencia resolve o regime vigente e mapeia regime-de-vínculo → incidência (estatutário coberto = RPPS; demais = RGPS/INSS; celetista gera FGTS 8%). Comando seed_rubricas_incidencia cria o conjunto padrão idempotente (SAL_BASE, INSS, RPPS, IRRF, FGTS, RPPS_PATRONAL) com as fórmulas já corretas — a base do IRRF subtrai a previdência oficial. API REST do RegimePrevidenciario (serializer com validação de modo×faixas e regimes válidos, viewset com RBAC leitura/financeiro, filtro, admin). Frontend: aba Previdência em Configurações (form com modo único/progressivo, alíquotas, teto, regimes cobertos por checkbox, faixas em JSON, vigência), flag RPPS adicionada ao formulário de rubrica, hooks TanStack Query e tipos regenerados do OpenAPI. 24 testes novos (465 no total). Guias do operador e do desenvolvedor atualizados (LAST_UPDATED 2026-05-30). Falta a Onda 2.5 (holerite PDF) e a 2.7 (paridade) para fechar o Bloco 2."
+    },
     {
       "data": "2026-05-27",
       "tipo": "marco",

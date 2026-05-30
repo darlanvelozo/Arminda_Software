@@ -22,6 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from django.db import transaction
 from django.db.models import Q
@@ -31,7 +32,15 @@ from apps.calculo.formula.avaliador import avaliar
 from apps.calculo.formula.contexto import ContextoFolha
 from apps.calculo.formula.errors import FormulaError
 from apps.payroll.models import Folha, Lancamento, Rubrica, TipoRubrica
+from apps.payroll.services.previdencia import (
+    regime_vigente,
+    resolver_previdencia,
+    rpps_config_para,
+)
 from apps.people.models import Dependente, VinculoFuncional
+
+if TYPE_CHECKING:
+    from apps.payroll.models import RegimePrevidenciario
 
 # Fallback do salário-mínimo caso a TabelaLegal não tenha sido seedada.
 # A partir da Onda 2.3, o valor real vem de `apps.calculo.tabelas.salario_minimo`
@@ -101,10 +110,17 @@ def construir_contexto(
     competencia: date,
     *,
     rubricas_calculadas: dict[str, Decimal] | None = None,
+    variaveis_extra: dict[str, Decimal] | None = None,
+    rpps_config: dict | None = None,
 ) -> ContextoFolha:
     """
     Monta `ContextoFolha` com todas as variáveis padrão a partir de um
     vínculo. Esta é a fonte da verdade dos nomes de variáveis disponíveis.
+
+    `variaveis_extra` injeta variáveis calculadas pelo engine (bases de
+    incidência BASE_*, flags de regime EH_*, alíquotas ALIQ_* — Onda 2.4).
+    `rpps_config` é a config do regime próprio resolvida pela competência
+    (consumida por FAIXA_RPPS).
 
     Variáveis derivadas (Dependente, Tempo Serviço, etc.) consultam o
     banco — caller deve ter `select_related`/`prefetch_related` se
@@ -149,10 +165,14 @@ def construir_contexto(
         "COMPETENCIA_MES": competencia.month,
     }
 
+    if variaveis_extra:
+        variaveis.update(variaveis_extra)
+
     return ContextoFolha(
         variaveis=variaveis,
         rubricas_calculadas=rubricas_calculadas or {},
         competencia=competencia,
+        rpps_config=rpps_config,
     )
 
 
@@ -203,13 +223,21 @@ def _processar_rubrica(
     rubrica: Rubrica,
     rubricas_calc: dict[str, Decimal],
     relatorio: RelatorioCalculo,
+    variaveis_extra: dict[str, Decimal] | None = None,
+    rpps_config: dict | None = None,
 ) -> Decimal | None:
     """
     Avalia uma rubrica para um vínculo, persiste idempotentemente.
     Devolve o valor calculado (ou `None` se erro de fórmula — já registrado
     no relatório). Cache `rubricas_calc` é atualizado quando sucesso.
     """
-    ctx = construir_contexto(vinculo, folha.competencia, rubricas_calculadas=rubricas_calc)
+    ctx = construir_contexto(
+        vinculo,
+        folha.competencia,
+        rubricas_calculadas=rubricas_calc,
+        variaveis_extra=variaveis_extra,
+        rpps_config=rpps_config,
+    )
     try:
         valor = avaliar(rubrica.formula, ctx)
     except FormulaError as exc:
@@ -240,6 +268,132 @@ def _processar_rubrica(
     else:
         relatorio.lancamentos_atualizados += 1
     return valor
+
+
+# Flags `incide_*` → nome da base que a rubrica alimenta na fase 1.
+_FLAG_PARA_BASE = (
+    ("incide_inss", "BASE_INSS"),
+    ("incide_irrf", "BASE_IRRF"),
+    ("incide_fgts", "BASE_FGTS"),
+    ("incide_rpps", "BASE_RPPS"),
+)
+
+
+def _fase_proventos(
+    *,
+    folha: Folha,
+    vinculo: VinculoFuncional,
+    proventos: list[Rubrica],
+    rubricas_calc: dict[str, Decimal],
+    vars_regime: dict[str, Decimal],
+    rpps_config: dict | None,
+    relatorio: RelatorioCalculo,
+    pares_processados: set[tuple[int, int]],
+) -> tuple[Decimal, dict[str, Decimal]]:
+    """Fase 1 — calcula proventos e acumula as bases de incidência por flag.
+    Devolve `(total_proventos, bases)`."""
+    bases: dict[str, Decimal] = {
+        "BASE_INSS": Decimal(0),
+        "BASE_IRRF": Decimal(0),
+        "BASE_FGTS": Decimal(0),
+        "BASE_RPPS": Decimal(0),
+    }
+    total = Decimal(0)
+    for rubrica in proventos:
+        if not rubrica.formula or not rubrica.formula.strip():
+            continue
+        valor = _processar_rubrica(
+            folha=folha,
+            vinculo=vinculo,
+            rubrica=rubrica,
+            rubricas_calc=rubricas_calc,
+            relatorio=relatorio,
+            variaveis_extra={**vars_regime, **bases},
+            rpps_config=rpps_config,
+        )
+        if valor is None:
+            continue
+        pares_processados.add((vinculo.id, rubrica.id))
+        total += valor
+        for flag, base in _FLAG_PARA_BASE:
+            if getattr(rubrica, flag):
+                bases[base] += valor
+    return total, bases
+
+
+def _fase_descontos(
+    *,
+    folha: Folha,
+    vinculo: VinculoFuncional,
+    pos_proventos: list[Rubrica],
+    rubricas_calc: dict[str, Decimal],
+    variaveis_extra: dict[str, Decimal],
+    rpps_config: dict | None,
+    relatorio: RelatorioCalculo,
+    pares_processados: set[tuple[int, int]],
+) -> Decimal:
+    """Fase 2 — calcula descontos e informativas. Devolve `total_descontos`
+    (informativas não entram nos totais)."""
+    total = Decimal(0)
+    for rubrica in pos_proventos:
+        if not rubrica.formula or not rubrica.formula.strip():
+            continue
+        valor = _processar_rubrica(
+            folha=folha,
+            vinculo=vinculo,
+            rubrica=rubrica,
+            rubricas_calc=rubricas_calc,
+            relatorio=relatorio,
+            variaveis_extra=variaveis_extra,
+            rpps_config=rpps_config,
+        )
+        if valor is None:
+            continue
+        pares_processados.add((vinculo.id, rubrica.id))
+        if rubrica.tipo == TipoRubrica.DESCONTO:
+            total += valor
+    return total
+
+
+def _processar_vinculo(
+    *,
+    folha: Folha,
+    vinculo: VinculoFuncional,
+    proventos: list[Rubrica],
+    pos_proventos: list[Rubrica],
+    regime: RegimePrevidenciario | None,
+    rpps_config: dict | None,
+    relatorio: RelatorioCalculo,
+    pares_processados: set[tuple[int, int]],
+) -> tuple[Decimal, Decimal]:
+    """
+    Processa um vínculo nas duas fases (proventos → bases → descontos).
+    Devolve `(total_proventos, total_descontos)` deste vínculo.
+    """
+    rubricas_calc: dict[str, Decimal] = {}
+    vars_regime = resolver_previdencia(vinculo, regime).como_variaveis()
+
+    total_proventos, bases = _fase_proventos(
+        folha=folha,
+        vinculo=vinculo,
+        proventos=proventos,
+        rubricas_calc=rubricas_calc,
+        vars_regime=vars_regime,
+        rpps_config=rpps_config,
+        relatorio=relatorio,
+        pares_processados=pares_processados,
+    )
+    total_descontos = _fase_descontos(
+        folha=folha,
+        vinculo=vinculo,
+        pos_proventos=pos_proventos,
+        rubricas_calc=rubricas_calc,
+        variaveis_extra={**vars_regime, **bases},
+        rpps_config=rpps_config,
+        relatorio=relatorio,
+        pares_processados=pares_processados,
+    )
+    return total_proventos, total_descontos
 
 
 def _limpar_orfaos_e_fechar(
@@ -308,6 +462,16 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
     relatorio.vinculos_processados = len(vinculos)
     relatorio.rubricas_processadas = len(rubricas_ordenadas)
 
+    # Cálculo em duas fases (Onda 2.4 — ADR-0013): proventos primeiro,
+    # acumulando as bases de incidência por flag; depois descontos e
+    # informativas, que consomem BASE_*/EH_*/ALIQ_*.
+    proventos = [r for r in rubricas_ordenadas if r.tipo == TipoRubrica.PROVENTO]
+    pos_proventos = [r for r in rubricas_ordenadas if r.tipo != TipoRubrica.PROVENTO]
+
+    # Previdência do município resolvida uma vez por folha.
+    regime = regime_vigente(folha.competencia)
+    rpps_config = rpps_config_para(regime)
+
     # Pares (vinculo_id, rubrica_id) que foram tocados nesta execução
     # — ao final, deletamos os lançamentos que sobraram (rubrica antiga).
     pares_processados: set[tuple[int, int]] = set()
@@ -317,33 +481,18 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
 
     with transaction.atomic():
         for vinculo in vinculos:
-            # Cache de rubricas calculadas para este vínculo —
-            # acessada por RUBRICA('X') nas fórmulas seguintes.
-            rubricas_calc: dict[str, Decimal] = {}
-
-            for rubrica in rubricas_ordenadas:
-                if not rubrica.formula or not rubrica.formula.strip():
-                    # Rubrica sem fórmula = não calcula (provavelmente
-                    # placeholder, preenchida manualmente)
-                    continue
-
-                valor = _processar_rubrica(
-                    folha=folha,
-                    vinculo=vinculo,
-                    rubrica=rubrica,
-                    rubricas_calc=rubricas_calc,
-                    relatorio=relatorio,
-                )
-                if valor is None:
-                    continue
-
-                pares_processados.add((vinculo.id, rubrica.id))
-
-                # Totais (rubrica informativa não conta)
-                if rubrica.tipo == TipoRubrica.PROVENTO:
-                    total_proventos += valor
-                elif rubrica.tipo == TipoRubrica.DESCONTO:
-                    total_descontos += valor
+            prov, desc = _processar_vinculo(
+                folha=folha,
+                vinculo=vinculo,
+                proventos=proventos,
+                pos_proventos=pos_proventos,
+                regime=regime,
+                rpps_config=rpps_config,
+                relatorio=relatorio,
+                pares_processados=pares_processados,
+            )
+            total_proventos += prov
+            total_descontos += desc
 
         _limpar_orfaos_e_fechar(
             folha, pares_processados, total_proventos, total_descontos, relatorio
