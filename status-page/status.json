@@ -71,13 +71,13 @@
       "data_fim_prevista": "2026-08-31",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 70,
+      "progresso_pct": 85,
       "entregas": [
         "✅ Linguagem de fórmulas configurável (DSL via Python AST whitelist, ADR-0012) — Onda 2.1",
         "✅ Cálculo de folha mensal ordinária (toposort de rubricas + serviço idempotente + endpoint /calcular/) — Onda 2.2",
         "✅ Tabelas legais 2024/2025/2026 (FAIXA_IRRF e FAIXA_INSS reais + salário mínimo dinâmico + admin Django para virar exercício sem deploy) — Onda 2.3",
         "✅ Incidências automáticas: FGTS + previdência própria RPPS (cálculo em duas fases, bases por flag, RegimePrevidenciario por município, FAIXA_RPPS, ADR-0013) — Onda 2.4",
-        "Geração de holerite (PDF + JSON) — Onda 2.5",
+        "✅ Geração de holerite PDF + JSON (ReportLab, endpoints por vínculo, download na tela de folha, ADR-0014) — Onda 2.5",
         "✅ Tela /folha operacional (lista, criar, calcular/recalcular com confirmação, relatório do último cálculo, tabs de lançamentos e erros) — Onda 2.6",
         "Testes de paridade contra Fiorilli — Onda 2.7"
       ]
@@ -251,6 +251,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-30",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.12.0 (Onda 2.5)",
+      "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 472 verde (7 testes novos de holerite: estrutura do JSON e totais, vínculo sem lançamentos, bytes do PDF começando com %PDF, endpoints JSON e PDF, 400 sem vínculo, 404 vínculo inexistente). Frontend: ESLint 0 erros (6 warnings pré-existentes), tsc --noEmit 0 erros, vitest 10/10, build de produção OK. Tipos TypeScript regenerados do OpenAPI. Geração de holerite validada também ponta a ponta (PDF abre no navegador via blob autenticado). Pronto para tag v0.12.0.",
+      "descricao": "Onda 2.5 passou pela rotina padrão de validação integral. Backend (cd backend): ruff check apps/ → 'All checks passed!', python manage.py check → '0 issues', pytest -q → 472 passed (465 anteriores sem regressão + 7 de holerite). reportlab 4.2.5 adicionado ao requirements (pure-Python, sem libs de sistema — não muda o deploy além do pip install). Frontend (cd frontend): npm run lint → 0 errors, npx tsc --noEmit → 0 erros, vitest run → 10 passed, npm run build → ✓ built. O download do PDF usa axios com responseType blob porque o endpoint exige Bearer + X-Tenant (não dá para abrir a URL direto). Pronto para git push + tag v0.12.0 na branch develop."
+    },
+    {
+      "data": "2026-05-30",
+      "tipo": "entrega",
+      "titulo": "Holerite: contracheque em PDF e JSON (Onda 2.5)",
+      "resumo_executivo": "Depois de calcular a folha, agora dá para emitir o holerite (contracheque) de cada servidor. Na tela da folha, cada lançamento tem um botão que abre o holerite em PDF — com o cabeçalho do município, os dados do servidor e do vínculo, a lista de proventos e descontos, os totais e o valor líquido a receber, além das informativas (FGTS e contribuição patronal). O mesmo holerite também sai em formato estruturado (JSON), pronto para o futuro portal do servidor e integrações.",
+      "descricao": "Onda 2.5 (ADR-0014) entrega a geração de holerite. Backend: serviço apps.payroll.services.holerite com montar_holerite(folha, vinculo) — agrega os Lancamento do vínculo em proventos/descontos/informativas, subtotais, total líquido e cabeçalho (município via connection.tenant, servidor, cargo/lotação/regime/admissão); e gerar_pdf(holerite) que renderiza o dict em PDF com ReportLab (pure-Python, sem dependências de sistema na VPS — só pip install reportlab==4.2.5; formatação monetária BR sem depender de locale do SO). Endpoints na FolhaViewSet (leitura): GET /api/payroll/folhas/{id}/holerite/?vinculo={id} devolve o JSON; GET /api/payroll/folhas/{id}/holerite-pdf/?vinculo={id} devolve application/pdf com Content-Disposition inline. 400 se faltar o parâmetro vinculo, 404 se o vínculo não existir ou não tiver lançamentos na folha. Frontend: helper abrirHoleritePdf em lib/queries/folhas.ts (axios responseType blob + URL.createObjectURL + window.open, porque o endpoint exige Bearer + X-Tenant e não pode ser aberto direto); coluna Holerite na tabela de lançamentos da FolhaDetailPage com botão PDF por linha (estado de carregando por vínculo). 7 testes novos (472 no total). Guias do operador e do desenvolvedor atualizados. Falta só a Onda 2.7 (paridade Fiorilli) para fechar o Bloco 2."
+    },
     {
       "data": "2026-05-30",
       "tipo": "validacao",

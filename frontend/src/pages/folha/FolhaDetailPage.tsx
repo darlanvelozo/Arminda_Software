@@ -13,6 +13,7 @@ import {
   Calculator,
   CircleAlert,
   CircleCheck,
+  FileText,
   ListChecks,
   RefreshCw,
   Tag,
@@ -45,6 +46,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { extractDomainErrorMessage } from "@/lib/api";
 import {
+  abrirHoleritePdf,
   useCalcularFolha,
   useFolha,
   useLancamentosList,
@@ -128,6 +130,19 @@ export default function FolhaDetailPage() {
       refetchLanc();
     } catch (e) {
       toast.error(extractDomainErrorMessage(e) ?? "Erro ao calcular folha.");
+    }
+  }
+
+  const [holeriteVinculo, setHoleriteVinculo] = useState<number | null>(null);
+  async function verHolerite(vinculoId: number) {
+    if (id === null) return;
+    setHoleriteVinculo(vinculoId);
+    try {
+      await abrirHoleritePdf(id, vinculoId);
+    } catch (e) {
+      toast.error(extractDomainErrorMessage(e) ?? "Não foi possível gerar o holerite.");
+    } finally {
+      setHoleriteVinculo(null);
     }
   }
 
@@ -249,19 +264,20 @@ export default function FolhaDetailPage() {
                   <TableHead>Rubrica</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead className="text-right">Valor</TableHead>
+                  <TableHead className="text-right">Holerite</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loadingLanc && Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={`skel-${i}`}>
-                    {Array.from({ length: 4 }).map((_, j) => (
+                    {Array.from({ length: 5 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))}
                 {!loadingLanc && lancamentos?.results.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       Sem lançamentos. Clique em "Calcular folha" para gerar.
                     </TableCell>
                   </TableRow>
@@ -284,6 +300,19 @@ export default function FolhaDetailPage() {
                       <Badge variant={rubricaTipoVariant(l.rubrica_tipo)}>{l.rubrica_tipo}</Badge>
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm">{fmtMoeda(l.valor)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 h-7"
+                        disabled={holeriteVinculo === l.vinculo}
+                        onClick={() => verHolerite(l.vinculo)}
+                        title={`Holerite de ${l.servidor_nome}`}
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        PDF
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

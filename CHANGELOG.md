@@ -35,6 +35,41 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 2.5 — Holerite: contracheque em PDF + JSON · 2026-05-30
+
+> Geração de holerite por servidor (ADR-0014). JSON estruturado (agregação
+> dos lançamentos) + PDF via ReportLab (pure-Python, sem libs de sistema).
+
+#### Adicionado — Backend
+
+- **feat(payroll.services.holerite):** `montar_holerite(folha, vinculo)`
+  agrega lançamentos (proventos/descontos/informativas + totais + cabeçalho
+  município/servidor/vínculo) num dict; `gerar_pdf(dict)` renderiza em PDF
+  com ReportLab.
+- **feat(payroll):** endpoints na `FolhaViewSet` (leitura) —
+  `GET /folhas/{id}/holerite/?vinculo={id}` (JSON) e `/holerite-pdf/` (PDF
+  `application/pdf`). 400 sem `vinculo`, 404 se vínculo inexistente ou sem
+  lançamentos na folha.
+- **chore(deps):** `reportlab==4.2.5` (pure-Python, sem dependência de sistema).
+
+#### Adicionado — Frontend
+
+- **feat(folha):** coluna **Holerite** na tabela de lançamentos com botão
+  **PDF** por linha; helper `abrirHoleritePdf` (axios `responseType: blob` +
+  `window.open`, pois o endpoint exige Bearer + X-Tenant).
+- **docs:** guias do operador e do desenvolvedor atualizados (holerite).
+
+#### Impacto
+
+- Nova dependência `reportlab` — `pip install -r requirements.txt` no deploy.
+- Tipos TS regenerados do OpenAPI. 7 testes novos (472 no total).
+
+#### Próximos passos
+
+- Onda 2.7 (paridade Fiorilli) fecha o Bloco 2.
+
+---
+
 ### Onda 2.4 — Incidências: FGTS + previdência própria (RPPS) · 2026-05-30
 
 > Incidências automáticas sobre a folha (ADR-0013). Os flags `incide_*` das

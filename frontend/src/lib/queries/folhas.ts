@@ -182,6 +182,22 @@ export function useCalcularFolha() {
   });
 }
 
+/**
+ * Baixa o holerite (PDF) de um vínculo numa folha e o abre em nova aba.
+ * Usa o axios autenticado (responseType blob) — o endpoint exige Bearer +
+ * X-Tenant, então não dá para abrir a URL diretamente.
+ */
+export async function abrirHoleritePdf(folhaId: number, vinculoId: number): Promise<void> {
+  const resp = await api.get(`${FOLHAS}${folhaId}/holerite-pdf/`, {
+    params: { vinculo: vinculoId },
+    responseType: "blob",
+  });
+  const url = URL.createObjectURL(resp.data as Blob);
+  window.open(url, "_blank", "noopener");
+  // Revoga depois de dar tempo de a aba carregar o blob.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 export function useLancamentosList(params: LancamentosListParams) {
   const { activeTenant } = useAuth();
   return useQuery({

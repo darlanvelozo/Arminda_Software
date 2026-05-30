@@ -166,8 +166,8 @@ function SectionPanorama() {
       <p>
         Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1),
         cálculo mensal (2.2), tabelas legais reais (2.3), incidências
-        FGTS + previdência própria RPPS (2.4 ✓) e tela operacional de
-        Folha (2.6 ✓) já no ar. Falta a Onda 2.5 (holerite PDF) e a 2.7
+        FGTS + previdência própria RPPS (2.4 ✓), holerite PDF+JSON (2.5 ✓)
+        e tela operacional de Folha (2.6 ✓) já no ar. Falta só a Onda 2.7
         (paridade Fiorilli) para fechar o Bloco 2.
       </p>
     </Section>
@@ -558,6 +558,22 @@ function SectionCalculo() {
         Comando{" "}
         <code className="bg-muted px-1 rounded">seed_rubricas_incidencia</code>{" "}
         cria o conjunto padrão de rubricas.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Holerite (Onda 2.5 — ADR-0014)</h3>
+      <p>
+        <code className="bg-muted px-1 rounded">apps.payroll.services.holerite</code>:{" "}
+        <code className="bg-muted px-1 rounded">montar_holerite(folha, vinculo)</code>{" "}
+        agrega os lançamentos (proventos/descontos/informativas + totais +
+        cabeçalho) num dict; <code className="bg-muted px-1 rounded">gerar_pdf(dict)</code>{" "}
+        renderiza em PDF via <strong>ReportLab</strong> (pure-Python, sem libs de
+        sistema). Endpoints na FolhaViewSet:{" "}
+        <code className="bg-muted px-1 rounded">GET /folhas/{`{id}`}/holerite/?vinculo={`{id}`}</code>{" "}
+        (JSON) e{" "}
+        <code className="bg-muted px-1 rounded">/holerite-pdf/?vinculo={`{id}`}</code>{" "}
+        (application/pdf). No front, o download usa axios com{" "}
+        <code className="bg-muted px-1 rounded">responseType: blob</code> (o endpoint
+        exige Bearer + X-Tenant).
       </p>
     </Section>
   );

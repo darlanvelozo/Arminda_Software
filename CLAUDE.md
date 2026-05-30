@@ -17,16 +17,16 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.11.0` (Onda 2.4 — incidências FGTS + previdência própria RPPS)
-- **Bloco corrente:** Bloco 2 — Engine de cálculo de folha (70% — Ondas 2.1, 2.2, 2.3, 2.4, 2.6 entregues; faltam 2.5, 2.7)
+- **Versão atual:** `v0.12.0` (Onda 2.5 — holerite PDF + JSON)
+- **Bloco corrente:** Bloco 2 — Engine de cálculo de folha (85% — Ondas 2.1, 2.2, 2.3, 2.4, 2.5, 2.6 entregues; falta 2.7)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 465 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 472 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
-Próximas ondas naturais: **2.5** (holerite PDF + JSON) ou **2.7** (paridade
-Fiorilli, fecha o Bloco 2). Ver [CHANGELOG.md](CHANGELOG.md) pra histórico recente.
+Próxima onda natural: **2.7** (testes de paridade contra Fiorilli) — fecha o
+Bloco 2. Ver [CHANGELOG.md](CHANGELOG.md) pra histórico recente.
 
 > **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
 > **na própria VPS**, em `/opt/arminda-dev` (banco `arminda_dev`, `.env` de dev,

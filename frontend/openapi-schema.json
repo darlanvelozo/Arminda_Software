@@ -614,6 +614,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/FolhaDetail'
           description: ''
+  /api/payroll/folhas/{id}/holerite/:
+    get:
+      operationId: payroll_folhas_holerite_retrieve
+      description: GET /api/payroll/folhas/{id}/holerite/?vinculo={id} → holerite
+        (JSON).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this folha.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolhaDetail'
+          description: ''
+  /api/payroll/folhas/{id}/holerite-pdf/:
+    get:
+      operationId: payroll_folhas_holerite_pdf_retrieve
+      description: GET /api/payroll/folhas/{id}/holerite-pdf/?vinculo={id} → application/pdf.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this folha.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolhaDetail'
+          description: ''
   /api/payroll/lancamentos/:
     get:
       operationId: payroll_lancamentos_list

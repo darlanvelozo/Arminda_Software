@@ -13,9 +13,10 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from django.http import HttpResponse
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 
 from apps.calculo.dependencias import (
@@ -44,6 +45,8 @@ from apps.payroll.serializers import (
     RubricaWriteSerializer,
 )
 from apps.payroll.services.calculo import calcular_folha
+from apps.payroll.services.holerite import gerar_pdf, montar_holerite
+from apps.people.models import VinculoFuncional
 
 
 def _to_decimal_safe(v: Any) -> Any:
@@ -179,7 +182,7 @@ class FolhaViewSet(viewsets.ModelViewSet):
     filterset_class = FolhaFilter
     ordering_fields = ["competencia", "tipo", "status", "criado_em"]
 
-    READ_ACTIONS = {"list", "retrieve", "lancamentos"}
+    READ_ACTIONS = {"list", "retrieve", "lancamentos", "holerite", "holerite_pdf"}
 
     def get_permissions(self):
         if self.action in self.READ_ACTIONS:
@@ -192,6 +195,39 @@ class FolhaViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "update", "partial_update"):
             return FolhaWriteSerializer
         return FolhaDetailSerializer
+
+    def _holerite(self, folha: Folha):
+        """Resolve o vínculo via ?vinculo= e monta o holerite (ou levanta 400/404)."""
+        vinculo_id = self.request.query_params.get("vinculo")
+        if not vinculo_id:
+            raise ValidationError(
+                {"detail": "Informe o parâmetro 'vinculo'.", "code": "VINCULO_OBRIGATORIO"}
+            )
+        try:
+            vinculo = VinculoFuncional.objects.select_related(
+                "servidor", "cargo", "lotacao"
+            ).get(pk=vinculo_id)
+        except (VinculoFuncional.DoesNotExist, ValueError) as exc:
+            raise NotFound("Vínculo não encontrado.") from exc
+        try:
+            return montar_holerite(folha, vinculo)
+        except Lancamento.DoesNotExist as exc:
+            raise NotFound(str(exc)) from exc
+
+    @action(detail=True, methods=["get"], url_path="holerite")
+    def holerite(self, request, pk=None):
+        """GET /api/payroll/folhas/{id}/holerite/?vinculo={id} → holerite (JSON)."""
+        return Response(self._holerite(self.get_object()))
+
+    @action(detail=True, methods=["get"], url_path="holerite-pdf")
+    def holerite_pdf(self, request, pk=None):
+        """GET /api/payroll/folhas/{id}/holerite-pdf/?vinculo={id} → application/pdf."""
+        holerite = self._holerite(self.get_object())
+        pdf = gerar_pdf(holerite)
+        nome = f"holerite-{holerite['servidor']['matricula']}-{holerite['competencia']}.pdf"
+        resp = HttpResponse(pdf, content_type="application/pdf")
+        resp["Content-Disposition"] = f'inline; filename="{nome}"'
+        return resp
 
     @action(detail=True, methods=["post"], url_path="calcular")
     def calcular(self, request, pk=None):
