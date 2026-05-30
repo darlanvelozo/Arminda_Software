@@ -687,23 +687,22 @@ body {
   transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Body colapsável — grid trick com wrapper interno único.
-   Padrão: <div class="bloco-body"><div class="bloco-body-inner">…</div></div>
-   O grid-template-rows anima 0fr→1fr; o overflow:hidden esconde o conteúdo;
-   o wrapper interno garante que o padding não vaze (problema clássico do
-   grid trick quando há múltiplos filhos diretos com padding). */
+/* Body colapsável — display:none → grid quando aberto.
+   Sem animação de altura (animações de altura puxam re-layout no scroll
+   inteiro e ficam jumpy com conteúdo variável de 50px a 2000px). Em
+   vez disso, anima o chevron e o opacity do body. */
 .bloco-body {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease;
-  overflow: hidden;
+  display: none;
 }
 .bloco-card[data-aberto="true"] .bloco-body {
-  grid-template-rows: 1fr;
+  display: block;
+  animation: blocoBodyFadeIn 0.22s ease-out;
+}
+@keyframes blocoBodyFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .bloco-body-inner {
-  min-height: 0;
-  overflow: hidden;
   padding: 16px 20px 20px;
   display: flex;
   flex-direction: column;
