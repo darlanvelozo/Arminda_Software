@@ -148,9 +148,9 @@
       var card = document.createElement('article');
       card.className = 'bloco-card card-' + bloco.status;
       card.id = 'bloco-' + bloco.numero;
-      // Em andamento começa aberto; concluído/previsto começam colapsados
-      var inicialAberto = bloco.status === 'em_andamento';
-      card.setAttribute('data-aberto', inicialAberto ? 'true' : 'false');
+      // Todos colapsados por padrão — operador decide o que abrir
+      var inicialAberto = false;
+      card.setAttribute('data-aberto', 'false');
 
       var entregas = bloco.entregas || [];
       var entregasFeitas = 0;
@@ -208,16 +208,18 @@
           '<div class="bloco-progress-fill bloco-mini-bar-fill" data-progress-bloco="' + bloco.numero + '"></div>' +
         '</div>' +
         '<div class="bloco-body" id="bloco-body-' + bloco.numero + '" role="region">' +
-          '<p class="bloco-desc">' + escapeHtml(bloco.descricao) + '</p>' +
-          (entregasHtml ?
-            '<div class="bloco-entregas-wrap">' +
-              '<div class="bloco-entregas-head">' +
-                '<span class="bloco-entregas-label">Entregas</span>' +
-                (resumoLongo ? '<span class="bloco-entregas-resumo">' + resumoLongo + '</span>' : '') +
-              '</div>' +
-              '<ul class="bloco-entregas">' + entregasHtml + '</ul>' +
-            '</div>'
-            : '') +
+          '<div class="bloco-body-inner">' +
+            '<p class="bloco-desc">' + escapeHtml(bloco.descricao) + '</p>' +
+            (entregasHtml ?
+              '<div class="bloco-entregas-wrap">' +
+                '<div class="bloco-entregas-head">' +
+                  '<span class="bloco-entregas-label">Entregas</span>' +
+                  (resumoLongo ? '<span class="bloco-entregas-resumo">' + resumoLongo + '</span>' : '') +
+                '</div>' +
+                '<ul class="bloco-entregas">' + entregasHtml + '</ul>' +
+              '</div>'
+              : '') +
+          '</div>' +
         '</div>';
 
       container.appendChild(card);

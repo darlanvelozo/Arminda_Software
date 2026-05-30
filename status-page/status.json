@@ -20,11 +20,11 @@
       "status": "concluido",
       "progresso_pct": 100,
       "entregas": [
-        "Repositório criado e organizado",
-        "Backend Django configurado",
-        "Frontend Vite + React configurado",
-        "Documentação fundacional (roadmap, arquitetura, padrões)",
-        "Pipeline de integração contínua ativo"
+        "✅ Repositório criado e organizado",
+        "✅ Backend Django configurado",
+        "✅ Frontend Vite + React configurado",
+        "✅ Documentação fundacional (roadmap, arquitetura, padrões)",
+        "✅ Pipeline de integração contínua ativo"
       ]
     },
     {
