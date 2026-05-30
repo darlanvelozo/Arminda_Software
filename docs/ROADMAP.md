@@ -177,6 +177,130 @@ Onde o Arminda vira produto, não só substituto.
 
 ---
 
+## Bloco 8 — RH operacional (rotina de pessoal)
+
+**Período estimado:** maio – setembro/2027 (em paralelo ao Bloco 9)
+
+Cobre o dia-a-dia do RH além do cadastro. Os blocos 1-7 entregam folha
+e diferenciação, mas faltam os processos contínuos de gestão de pessoas
+que **alimentam** a folha — sem isso, a folha exige intervenção manual
+a cada virada.
+
+**Escopo**
+- **Estágio probatório** — ciclo de 3 anos com avaliações periódicas,
+  comissão, relatórios e efetivação automática (CF art. 41).
+- **Progressão funcional automática** — anuênio/triênio/quinquênio
+  aplicado por tempo de serviço (substitui rubrica fixa manual).
+- **Frequência e ponto** — importação de AFD/biometria (padrão MTE
+  Portaria 1.510), banco de horas, faltas, abonos, atrasos.
+- **Férias** — período aquisitivo, escala anual, abono pecuniário
+  (1/3 + venda de 10 dias), adiantamento.
+- **Saúde ocupacional** — atestados, INSS afastamento (B-91, B-31),
+  perícia médica, CAT (Comunicação de Acidente de Trabalho),
+  retorno ao trabalho.
+- **Aposentadoria** (RPPS e RGPS) — cálculo de proventos,
+  integralidade vs paridade, requerimento, parecer técnico.
+- **Pensão** — dependentes habilitados, cota familiar, reversão,
+  pensão alimentícia.
+- **Cessão de servidor** — entre entes federativos, com ou sem ônus,
+  com período definido.
+- **Licenças não-remuneradas** — TIP, mandato classista, etc.
+- **Capacitação** — cursos, certificados, horas-aula, reembolso.
+- **Diárias e passagens** — solicitação, autorização, prestação.
+- **Empréstimos consignados** — margem 35% + 10% cartão, bancos
+  credenciados, integração com bureaus (BMG, Banco do Brasil,
+  Itaú, Bradesco, Caixa).
+- **Quadro de pessoal** — cargos vagos vs ocupados, lotação ideal,
+  plano de carreira.
+
+**Critério de aceitação**
+- Cada processo gera os eventos eSocial correspondentes automaticamente
+  (entregue no Bloco 10, parte RPPS específico).
+- 100% dos campos derivados (idade, tempo de serviço, faixa de
+  progressão) calculados em runtime — nenhum cron manual.
+
+---
+
+## Bloco 9 — Tesouraria, contábil e LRF
+
+**Período estimado:** maio – setembro/2027 (em paralelo ao Bloco 8)
+
+Liga a folha ao dinheiro de verdade: gera arquivo bancário, registra
+empenhos no sistema contábil, controla LRF e fecha o ciclo financeiro.
+
+**Escopo**
+- **CNAB 240** — geração de arquivo bancário para folha + consignados
+  + diárias. Layouts: Banco do Brasil, Caixa, Itaú, Bradesco.
+- **Conta-corrente do servidor** — créditos e débitos fora da folha
+  (acertos, devoluções, glosas).
+- **Conciliação bancária** — folha gerada vs retorno do banco;
+  diferenças apontadas e tratadas.
+- **Provisões contábeis mensais** — 13º proporcional + férias
+  proporcionais empenhadas pelo regime de competência (PCASP).
+- **Cálculo retroativo** — refazer N competências quando houver decisão
+  judicial, acordo coletivo ou erro identificado, com reflexos em
+  rubricas variáveis.
+- **Integração PCASP** — geração automática de empenho, liquidação e
+  pagamento no sistema contábil do município (Betha, Govbr, etc.).
+- **RREO** (Relatório Resumido de Execução Orçamentária) — anexos
+  de pessoal (LC 101/2000).
+- **RGF** (Relatório de Gestão Fiscal) — apuração da despesa com
+  pessoal (LRF art. 19/20, limite 54%/60%).
+- **Painel LRF** — alerta visual quando município se aproxima do
+  limite prudencial (90%) ou de alerta (95%).
+- **Pré-empenho na geração da folha** — bloqueio se orçamento da
+  unidade não comporta o valor calculado.
+
+**Critério de aceitação**
+- CNAB 240 testado em homologação de pelo menos 2 bancos.
+- RREO/RGF passam pela conferência do controle interno do município.
+- Limite LRF: alerta gerado **antes** do gestor tomar decisão (não
+  depois do TCE apontar).
+
+---
+
+## Bloco 10 — Compliance, transparência e auditoria
+
+**Período estimado:** outubro – dezembro/2027
+
+Cobre exigências legais que não são folha mas afetam o município.
+Sem isso, está em risco regulatório mesmo com a folha funcionando.
+
+**Escopo**
+- **Portal da Transparência** (Lei 12.527/2011) — folha pública por
+  servidor com filtros por área, cargo, faixa salarial.
+- **LGPD** — consentimentos rastreados, anonimização de dados
+  sensíveis, exclusão sob demanda do titular (Lei 13.709/2018).
+- **Certificação digital A1/A3** — assinatura eletrônica em
+  declarações, contracheques e contratos oficiais (MP 2.200-2/2001).
+- **Auditoria avançada com UI navegável** — timeline de quem editou
+  o quê e quando, com diff campo a campo (UI do simple-history que
+  já existe no backend).
+- **Acessibilidade WCAG 2.1 AA** (Lei 13.146/2015) — contraste,
+  navegação por teclado, leitores de tela, descrições alternativas.
+- **Logs de acesso a dados sensíveis** (folha, salário, dependentes) —
+  quem acessou, quando, de onde.
+- **Política de retenção de dados** conforme LGPD e arquivística
+  pública (TT — Tabela de Temporalidade do CONARQ).
+- **eSocial RPPS específico** — S-2410 (benefício vitalício), S-2418
+  (reativação), S-2420 (cessação), S-2230 (afastamento), S-2240
+  (insalubridade/periculosidade), S-2250 (aviso prévio), S-2298
+  (reintegração), S-2206 (alteração contratual), S-3000 (exclusão).
+- **Observabilidade em produção** — Sentry para erros, Prometheus +
+  Grafana para métricas, alertas proativos antes do operador notar.
+- **Help desk integrado** — tickets dentro do app, FAQ, base de
+  conhecimento.
+
+**Critério de aceitação**
+- Portal da Transparência audita-se contra os requisitos da
+  CGU/Ouvidoria-Geral (Lei 12.527).
+- LGPD: relatório de impacto à proteção de dados (RIPD) elaborado
+  e aprovado.
+- WCAG: auditoria automática via axe-core no CI, score ≥ 95.
+- Trinta dias sem incidentes detectados pelo Sentry após o release.
+
+---
+
 ## O que NÃO está no roadmap (intencionalmente)
 
 - **App nativo iOS/Android** — PWA cobre 90% das necessidades iniciais; nativo só se houver demanda comprovada.

@@ -489,34 +489,60 @@ body {
 .blocos-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 12px;
 }
-@media (min-width: 768px) { .blocos-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* Toolbar acima dos cards (expandir/colapsar todos) */
+.blocos-toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0 4px 8px;
+}
+.blocos-toolbar-info {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.blocos-toolbar-actions {
+  display: flex;
+  gap: 6px;
+}
+.blocos-toolbar-btn {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.blocos-toolbar-btn:hover {
+  background: var(--border-light);
+  color: var(--text);
+  border-color: var(--border-strong, var(--border));
+}
 
 .bloco-card {
   position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
 }
-.bloco-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: var(--border);
-  opacity: 0.8;
-}
+/* Linha decorativa no topo: agora cumprida pelo .bloco-mini-bar logo abaixo do header.
+   Mantida sem ::before pra evitar barra duplicada. */
+.bloco-card::before { content: none; }
 .bloco-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-3px);
   border-color: var(--border-strong, var(--border));
 }
 
@@ -530,40 +556,64 @@ body {
   .bloco-card.card-em_andamento::before { background: var(--amber); }
 }
 
-/* Header — número + título + período + badge */
+/* Header — botão clicável que expande/colapsa o body */
 .bloco-header {
+  all: unset;
+  box-sizing: border-box;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  padding: 16px 20px;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.bloco-header:hover {
+  background: var(--border-light);
+}
+.bloco-header:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+  border-radius: 6px;
 }
 
 .bloco-header-left {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
   min-width: 0;
+  flex: 1;
 }
 
 .bloco-header-text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
+  flex: 1;
+}
+
+.bloco-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .bloco-num {
   flex-shrink: 0;
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   background: var(--border-light);
-  border-radius: var(--radius-md, 10px);
-  padding: 8px 12px;
-  min-width: 44px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-width: 38px;
   text-align: center;
 }
 .bloco-card.card-concluido .bloco-num {
@@ -577,64 +627,104 @@ body {
 
 .bloco-titulo {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: var(--text);
-  line-height: 1.25;
+  line-height: 1.3;
   letter-spacing: -0.01em;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Linha de meta — período · contador · % — abaixo do título */
+.bloco-header-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.bloco-header-sep { opacity: 0.6; }
+.bloco-header-counter {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+.bloco-header-pct {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text);
 }
 
 .bloco-periodo-text {
-  font-size: 0.72rem;
-  color: var(--text-muted);
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
 }
 
+/* Chevron que rotaciona quando o card está aberto */
+.bloco-chevron {
+  color: var(--text-muted);
+  transition: transform 0.25s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.bloco-card[data-aberto="true"] .bloco-chevron {
+  transform: rotate(180deg);
+  color: var(--text);
+}
+
+/* Mini-bar logo abaixo do header — visível em qualquer estado */
+.bloco-mini-bar {
+  height: 3px;
+  background: var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+.bloco-mini-bar-fill {
+  height: 100%;
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Body colapsável (grid trick — anima 0fr → 1fr) */
+.bloco-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+.bloco-card[data-aberto="true"] .bloco-body {
+  grid-template-rows: 1fr;
+}
+.bloco-body > * {
+  min-height: 0;
+}
+.bloco-body {
+  /* aplica padding só quando aberto (via overflow no inner wrapper) */
+}
+.bloco-card .bloco-body {
+  overflow: hidden;
+}
+.bloco-card[data-aberto="true"] .bloco-body {
+  /* expandido — padding aplicado nos filhos */
+}
+
+/* Padding interno do body só quando aberto — pra evitar gap fantasma colapsado */
+.bloco-body > p.bloco-desc {
+  padding: 16px 20px 0;
+}
+.bloco-body > .bloco-entregas-wrap {
+  padding: 12px 20px 20px;
+}
+
 .bloco-desc {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.6;
+  margin: 0;
 }
 
-/* Progress */
-.bloco-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px 16px;
-  background: var(--border-light);
-  border-radius: var(--radius-md, 10px);
-}
-
-.bloco-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.bloco-progress-pct {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.bloco-progress-bar {
-  height: 6px;
-  background: var(--surface);
-  border-radius: 100px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
+/* Fill colorida por status (reaproveitada por bloco-progress-fill e mini-bar-fill) */
 .bloco-progress-fill {
   height: 100%;
   border-radius: 100px;

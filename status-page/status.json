@@ -3,11 +3,11 @@
     "nome": "Arminda",
     "descricao": "Sistema SaaS de folha de pagamento e gestão de pessoal para prefeituras brasileiras.",
     "inicio": "2026-04-27",
-    "previsao_lancamento": "2027-04-27"
+    "previsao_lancamento": "2027-12-31"
   },
   "ultima_atualizacao": "2026-05-27",
   "bloco_atual": 2,
-  "progresso_geral_pct": 54,
+  "progresso_geral_pct": 25,
   "blocos": [
     {
       "numero": 0,
@@ -175,9 +175,89 @@
         "Importador universal de outros sistemas",
         "API pública para integrações"
       ]
+    },
+    {
+      "numero": 8,
+      "titulo": "RH operacional (rotina de pessoal)",
+      "descricao": "Cobertura do dia-a-dia do RH além do cadastro: estágio probatório, progressão funcional, frequência/ponto, férias, saúde ocupacional, aposentadoria e pensão. É o que torna a folha verdadeiramente automática (em vez de exigir intervenção manual a cada virada).",
+      "periodo": "Maio – Setembro 2027 (em paralelo ao Bloco 9)",
+      "data_inicio": "2027-05-01",
+      "data_fim_prevista": "2027-09-30",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Estágio probatório: ciclo de 3 anos com avaliações periódicas, comissão, relatórios e efetivação automática",
+        "Progressão funcional automática: anuênio/triênio/quinquênio aplicado por tempo de serviço (sem rubrica fixa manual)",
+        "Frequência e ponto: importação de AFD/biometria, banco de horas, faltas, abonos, atrasos — entrada do cálculo da folha",
+        "Férias: período aquisitivo, escala anual, abono pecuniário (1/3 + venda de 10 dias), adiantamento",
+        "Saúde ocupacional: atestados, INSS afastamento, perícia médica, CAT, retorno ao trabalho",
+        "Aposentadoria (RPPS e RGPS): cálculo de proventos, integralidade vs paridade, requerimento, parecer técnico",
+        "Pensão: dependentes habilitados, cota familiar, reversão, pensão alimentícia",
+        "Cessão de servidor: entre entes federativos, com ou sem ônus, com período definido",
+        "Licenças não-remuneradas: para trato de interesse particular, mandato classista, etc.",
+        "Capacitação: cursos, certificados, horas-aula, reembolso",
+        "Diárias e passagens: solicitação, autorização, prestação de contas",
+        "Empréstimos consignados: controle de margem 35% + 10% cartão, com bancos credenciados",
+        "Quadro de pessoal: cargos vagos vs ocupados, lotação ideal, plano de carreira"
+      ]
+    },
+    {
+      "numero": 9,
+      "titulo": "Tesouraria, contábil e LRF",
+      "descricao": "Liga a folha ao dinheiro de verdade: gera arquivo bancário para pagamento, registra empenhos/liquidações no sistema contábil, controla limite de gasto com pessoal (LRF) e fecha o ciclo financeiro com conciliação.",
+      "periodo": "Maio – Setembro 2027 (em paralelo ao Bloco 8)",
+      "data_inicio": "2027-05-01",
+      "data_fim_prevista": "2027-09-30",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Arquivo bancário CNAB 240 (folha + consignados + diárias) para Banco do Brasil, Caixa, Itaú e Bradesco",
+        "Conta-corrente do servidor: créditos e débitos fora da folha (acertos, devoluções, glosas)",
+        "Conciliação bancária: folha gerada vs retorno do banco, diferenças apontadas e tratadas",
+        "Provisões contábeis mensais: 13º proporcional + férias proporcionais empenhadas pelo regime de competência",
+        "Cálculo retroativo: refazer N competências quando houver decisão judicial, acordo coletivo ou erro identificado",
+        "Integração PCASP: geração automática de empenho, liquidação e pagamento no sistema contábil do município",
+        "RREO (Relatório Resumido de Execução Orçamentária) — anexos de pessoal",
+        "RGF (Relatório de Gestão Fiscal) — apuração da despesa com pessoal (LRF art. 19/20, limite 54%/60%)",
+        "Painel LRF: alerta visual quando município se aproxima do limite (90% prudencial)",
+        "Reflexos automáticos: variação salarial em t propaga em férias, 13º e rescisão até t-N",
+        "Pré-empenho na geração da folha: bloqueio se orçamento da unidade não comporta"
+      ]
+    },
+    {
+      "numero": 10,
+      "titulo": "Compliance, transparência e auditoria",
+      "descricao": "Cobre as exigências legais que não são folha mas afetam o município: Portal da Transparência, LGPD, assinatura digital, acessibilidade e trilha de auditoria navegável. Sem isso, o município está em risco regulatório mesmo com a folha funcionando.",
+      "periodo": "Outubro – Dezembro 2027",
+      "data_inicio": "2027-10-01",
+      "data_fim_prevista": "2027-12-31",
+      "data_fim_real": null,
+      "status": "previsto",
+      "progresso_pct": 0,
+      "entregas": [
+        "Portal da transparência (Lei 12.527/2011): folha pública por servidor com filtros por área, cargo, faixa salarial",
+        "LGPD: consentimentos rastreados, anonimização de dados sensíveis, exclusão sob demanda do titular",
+        "Certificação digital A1/A3: assinatura eletrônica em declarações, contracheques e contratos oficiais",
+        "Auditoria avançada com UI navegável: timeline de quem editou o quê e quando, com diff campo a campo",
+        "Acessibilidade WCAG 2.1 AA (Lei 13.146/2015): contraste, navegação por teclado, leitores de tela, descrições alternativas",
+        "Logs de acesso a dados sensíveis (folha, salário, dependentes): quem acessou, quando, de onde",
+        "Política de retenção de dados conforme LGPD e arquivística pública",
+        "eSocial RPPS específico: S-2410 (benefício vitalício), S-2418 (reativação), S-2420 (cessação), S-2230 (afastamento), S-2240 (insalubridade), S-2250 (aviso prévio), S-2298 (reintegração), S-2206 (alteração contratual), S-3000 (exclusão)",
+        "Observabilidade em produção: Sentry para erros, Prometheus + Grafana para métricas, alertas proativos",
+        "Help desk integrado: tickets dentro do app, FAQ, base de conhecimento"
+      ]
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-27",
+      "tipo": "marco",
+      "titulo": "Roadmap ampliado: 3 blocos novos para cobertura completa da gestão municipal",
+      "resumo_executivo": "Análise dos blocos atuais (0 a 7) contra as obrigações reais de uma prefeitura brasileira identificou três áreas críticas que faltavam para o sistema ser uma solução completa de gestão municipal — não só de cálculo de folha. Foram adicionados três novos blocos depois do Bloco 7 (Diferenciação): RH operacional (estágio probatório, progressão, frequência, férias, saúde, aposentadoria/pensão), Tesouraria e LRF (arquivo bancário, RREO/RGF, conta-corrente, conciliação) e Compliance/Transparência (portal público, LGPD, certificado digital, acessibilidade). Os Blocos 8 e 9 rodam em paralelo na mesma janela (mai-set/2027). Previsão de lançamento da v1 completa empurrada de abr/2027 para dez/2027.",
+      "descricao": "Decisão arquitetural: o roadmap original (8 blocos, 0-7) cobria muito bem o núcleo da folha (cálculo, obrigações federais, TCE), o piloto e a diferenciação (portal, IA, app), mas tinha lacunas importantes para a operação real de uma prefeitura. Lacunas mapeadas: (A) RH operacional — estágio probatório com workflow de 3 anos, progressão funcional automática por tempo de serviço, frequência/ponto integrando AFD, planejamento de férias, saúde ocupacional (atestados/INSS/perícia/CAT), aposentadoria e pensão completas, cessão entre entes, capacitação, diárias, consignados. (B) Tesouraria, contábil e LRF — geração de CNAB 240 para pagar de fato a folha, conta-corrente do servidor, conciliação bancária, provisões mensais de 13º/férias, cálculo retroativo automático, integração PCASP, RREO/RGF (Lei 101/2000) com alerta de aproximação do limite prudencial. (C) Compliance/transparência — Portal da Transparência (Lei 12.527/2011) com folha pública filtrável, conformidade LGPD (consentimentos, anonimização, exclusão sob demanda), certificação digital A1/A3, auditoria avançada com UI navegável do simple-history, acessibilidade WCAG 2.1 AA (Lei 13.146/2015), eventos eSocial RPPS específicos (S-2410, S-2418, S-2420 para benefícios; S-2230, S-2240, S-2250 para vínculos), observabilidade Sentry/Prometheus/Grafana e help desk integrado. Estrutura escolhida: 3 blocos novos depois do 7, sem renumerar os blocos existentes (que já estão entregues ou planejados). Blocos 8 e 9 rodam em paralelo (mai-set/2027) porque tem times/escopos distintos. Bloco 10 fecha o ciclo (out-dez/2027). Previsão de lançamento da versão completa passou de abr/2027 para dez/2027 — adiantamento já acumulado (Bloco 2 em 56% adiantado 6 semanas) compensa parte. progresso_geral_pct recalibrado de 54 para 25 (denominador maior). docs/ROADMAP.md atualizado em paralelo. Também: cards de etapas da página de status agora são colapsáveis (header clicável, chevron, mini-bar de progresso visível mesmo colapsado, expandir/colapsar todos via toolbar) — economiza muito espaço de tela quando há 11 blocos."
+    },
     {
       "data": "2026-05-27",
       "tipo": "validacao",

@@ -133,10 +133,24 @@
     var container = document.getElementById('blocos');
     if (!container) return;
 
+    // Toolbar: contador + botões expandir/colapsar todos.
+    var toolbar = document.createElement('div');
+    toolbar.className = 'blocos-toolbar';
+    toolbar.innerHTML =
+      '<span class="blocos-toolbar-info">' + blocos.length + ' etapas — clique no cabeçalho para expandir</span>' +
+      '<div class="blocos-toolbar-actions">' +
+        '<button type="button" class="blocos-toolbar-btn" data-action="expandir-todos">Expandir todos</button>' +
+        '<button type="button" class="blocos-toolbar-btn" data-action="colapsar-todos">Colapsar todos</button>' +
+      '</div>';
+    container.appendChild(toolbar);
+
     blocos.forEach(function (bloco) {
       var card = document.createElement('article');
       card.className = 'bloco-card card-' + bloco.status;
       card.id = 'bloco-' + bloco.numero;
+      // Em andamento começa aberto; concluído/previsto começam colapsados
+      var inicialAberto = bloco.status === 'em_andamento';
+      card.setAttribute('data-aberto', inicialAberto ? 'true' : 'false');
 
       var entregas = bloco.entregas || [];
       var entregasFeitas = 0;
@@ -157,44 +171,77 @@
       }).join('');
 
       var totalEntregas = entregas.length;
-      var resumoEntregas = totalEntregas > 0
+      var resumoCurto = totalEntregas > 0
+        ? entregasFeitas + ' de ' + totalEntregas
+        : '';
+      var resumoLongo = totalEntregas > 0
         ? entregasFeitas + ' de ' + totalEntregas + ' entregas'
         : '';
 
+      // Chevron SVG — rotaciona via CSS quando data-aberto="true"
+      var chevronSvg =
+        '<svg class="bloco-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<polyline points="6 9 12 15 18 9"></polyline>' +
+        '</svg>';
+
       card.innerHTML =
-        '<header class="bloco-header">' +
+        '<button type="button" class="bloco-header" aria-expanded="' + (inicialAberto ? 'true' : 'false') + '" aria-controls="bloco-body-' + bloco.numero + '">' +
           '<div class="bloco-header-left">' +
             '<span class="bloco-num">' + String(bloco.numero).padStart(2, '0') + '</span>' +
             '<div class="bloco-header-text">' +
               '<h3 class="bloco-titulo">' + escapeHtml(bloco.titulo) + '</h3>' +
-              '<span class="bloco-periodo-text">' + escapeHtml(bloco.periodo) + '</span>' +
+              '<span class="bloco-header-meta">' +
+                '<span class="bloco-periodo-text">' + escapeHtml(bloco.periodo) + '</span>' +
+                (resumoCurto ? '<span class="bloco-header-sep">·</span><span class="bloco-header-counter">' + resumoCurto + '</span>' : '') +
+                '<span class="bloco-header-sep">·</span><span class="bloco-header-pct">' + bloco.progresso_pct + '%</span>' +
+              '</span>' +
             '</div>' +
           '</div>' +
-          '<span class="timeline-badge badge-' + bloco.status + '">' +
-            escapeHtml(STATUS_LABEL[bloco.status] || '') +
-          '</span>' +
-        '</header>' +
-        '<p class="bloco-desc">' + escapeHtml(bloco.descricao) + '</p>' +
-        '<div class="bloco-progress">' +
-          '<div class="bloco-progress-header">' +
-            '<span>Progresso</span>' +
-            '<span class="bloco-progress-pct">' + bloco.progresso_pct + '%</span>' +
+          '<div class="bloco-header-right">' +
+            '<span class="timeline-badge badge-' + bloco.status + '">' +
+              escapeHtml(STATUS_LABEL[bloco.status] || '') +
+            '</span>' +
+            chevronSvg +
           '</div>' +
-          '<div class="bloco-progress-bar">' +
-            '<div class="bloco-progress-fill" data-progress-bloco="' + bloco.numero + '"></div>' +
-          '</div>' +
+        '</button>' +
+        '<div class="bloco-mini-bar" aria-hidden="true">' +
+          '<div class="bloco-progress-fill bloco-mini-bar-fill" data-progress-bloco="' + bloco.numero + '"></div>' +
         '</div>' +
-        (entregasHtml ?
-          '<div class="bloco-entregas-wrap">' +
-            '<div class="bloco-entregas-head">' +
-              '<span class="bloco-entregas-label">Entregas</span>' +
-              (resumoEntregas ? '<span class="bloco-entregas-resumo">' + resumoEntregas + '</span>' : '') +
-            '</div>' +
-            '<ul class="bloco-entregas">' + entregasHtml + '</ul>' +
-          '</div>'
-          : '');
+        '<div class="bloco-body" id="bloco-body-' + bloco.numero + '" role="region">' +
+          '<p class="bloco-desc">' + escapeHtml(bloco.descricao) + '</p>' +
+          (entregasHtml ?
+            '<div class="bloco-entregas-wrap">' +
+              '<div class="bloco-entregas-head">' +
+                '<span class="bloco-entregas-label">Entregas</span>' +
+                (resumoLongo ? '<span class="bloco-entregas-resumo">' + resumoLongo + '</span>' : '') +
+              '</div>' +
+              '<ul class="bloco-entregas">' + entregasHtml + '</ul>' +
+            '</div>'
+            : '') +
+        '</div>';
 
       container.appendChild(card);
+    });
+
+    // Delegação: toggle individual + ações da toolbar
+    container.addEventListener('click', function (ev) {
+      var alvo = ev.target.closest('.bloco-header, .blocos-toolbar-btn');
+      if (!alvo) return;
+      if (alvo.classList.contains('blocos-toolbar-btn')) {
+        var acao = alvo.getAttribute('data-action');
+        var abrir = acao === 'expandir-todos';
+        container.querySelectorAll('.bloco-card').forEach(function (c) {
+          c.setAttribute('data-aberto', abrir ? 'true' : 'false');
+          var btn = c.querySelector('.bloco-header');
+          if (btn) btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+        });
+        return;
+      }
+      var card = alvo.closest('.bloco-card');
+      if (!card) return;
+      var aberto = card.getAttribute('data-aberto') === 'true';
+      card.setAttribute('data-aberto', aberto ? 'false' : 'true');
+      alvo.setAttribute('aria-expanded', aberto ? 'false' : 'true');
     });
   }
 
