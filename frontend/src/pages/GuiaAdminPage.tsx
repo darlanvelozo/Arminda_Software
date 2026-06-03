@@ -575,6 +575,17 @@ function SectionCalculo() {
         <code className="bg-muted px-1 rounded">responseType: blob</code> (o endpoint
         exige Bearer + X-Tenant).
       </p>
+
+      <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
+      <p>
+        <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}
+        agrega lançamentos via ORM (Sum + Coalesce, sem iterar em Python):{" "}
+        <code className="bg-muted px-1 rounded">GET /folhas/{`{id}`}/servidores/</code>{" "}
+        (uma linha por vínculo com proventos/descontos/líquido — base da aba Servidores
+        e do botão de holerite) e{" "}
+        <code className="bg-muted px-1 rounded">GET /folhas/{`{id}`}/resumo/</code>{" "}
+        (totais por lotação, por órgão emissor e geral — aba Por área).
+      </p>
     </Section>
   );
 }

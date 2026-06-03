@@ -753,13 +753,16 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         Estatutários cobertos contribuem ao RPPS; os demais, ao INSS.
       </p>
 
-      <h3 className="text-base font-semibold mt-4">Holerite (contracheque)</h3>
+      <h3 className="text-base font-semibold mt-4">Servidores, totais por área e holerite</h3>
       <p>
-        Depois de calcular a folha, cada lançamento na aba <strong>Lançamentos</strong>{" "}
-        tem um botão <strong>PDF</strong> que gera o <strong>holerite</strong> do
-        servidor — cabeçalho do município, dados do servidor e do vínculo, proventos,
-        descontos, totais e líquido, além das informativas (FGTS, RPPS patronal). O
-        mesmo holerite está disponível em JSON para integrações (Onda 2.5 ✓).
+        Na folha, a aba <strong>Servidores</strong> mostra cada servidor uma vez com
+        proventos, descontos e líquido, e um botão <strong>PDF</strong> que gera o{" "}
+        <strong>holerite</strong> (cabeçalho do município, dados do servidor e do
+        vínculo, proventos, descontos, totais, líquido e informativas como FGTS e RPPS
+        patronal). A aba <strong>Por área</strong> traz os totais agrupados por lotação
+        e por órgão emissor, mais o total geral. A aba <strong>Lançamentos</strong>{" "}
+        continua disponível para a conferência detalhada (uma linha por rubrica). O
+        holerite também sai em JSON para integrações.
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

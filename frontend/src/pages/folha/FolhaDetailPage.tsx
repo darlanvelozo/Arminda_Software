@@ -10,6 +10,7 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
+  Building2,
   Calculator,
   CircleAlert,
   CircleCheck,
@@ -17,6 +18,7 @@ import {
   ListChecks,
   RefreshCw,
   Tag,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -50,7 +52,10 @@ import {
   useCalcularFolha,
   useFolha,
   useLancamentosList,
+  useResumoArea,
+  useResumoServidores,
 } from "@/lib/queries/folhas";
+import type { ResumoAreaLinha } from "@/lib/queries/folhas";
 import type { Folha, Lancamento, RelatorioCalculo } from "@/types";
 
 const PAGE_SIZE = 50;
@@ -110,6 +115,9 @@ export default function FolhaDetailPage() {
       page,
       page_size: PAGE_SIZE,
     });
+
+  const { data: resumoServidores, isLoading: loadingServidores } = useResumoServidores(id);
+  const { data: resumoArea, isLoading: loadingArea } = useResumoArea(id);
 
   const totalLanc = lancamentos?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalLanc / PAGE_SIZE));
@@ -226,8 +234,14 @@ export default function FolhaDetailPage() {
 
       {relatorio && <RelatorioCard relatorio={relatorio} onDismiss={() => setRelatorio(null)} />}
 
-      <Tabs defaultValue="lancamentos">
+      <Tabs defaultValue="servidores">
         <TabsList>
+          <TabsTrigger value="servidores" className="gap-2">
+            <Users className="h-3.5 w-3.5" /> Servidores
+          </TabsTrigger>
+          <TabsTrigger value="areas" className="gap-2">
+            <Building2 className="h-3.5 w-3.5" /> Por área
+          </TabsTrigger>
           <TabsTrigger value="lancamentos" className="gap-2">
             <ListChecks className="h-3.5 w-3.5" /> Lançamentos ({totalLanc})
           </TabsTrigger>
@@ -239,6 +253,95 @@ export default function FolhaDetailPage() {
             <Tag className="h-3.5 w-3.5" /> Informações
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="servidores" className="space-y-3">
+          <div className="rounded-md border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Servidor</TableHead>
+                  <TableHead>Cargo / Lotação</TableHead>
+                  <TableHead className="text-right">Proventos</TableHead>
+                  <TableHead className="text-right">Descontos</TableHead>
+                  <TableHead className="text-right">Líquido</TableHead>
+                  <TableHead className="text-right">Holerite</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loadingServidores && Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={`sk-${i}`}>
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {!loadingServidores && (resumoServidores?.length ?? 0) === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      Sem servidores nesta folha. Calcule a folha para gerar.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {resumoServidores?.map((s) => (
+                  <TableRow key={s.vinculo_id}>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="text-sm">{s.servidor_nome}</span>
+                        <span className="text-xs text-muted-foreground font-mono">{s.servidor_matricula}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="text-sm">{s.cargo ?? "—"}</span>
+                        <span className="text-xs text-muted-foreground">{s.lotacao ?? "—"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-sm">{fmtMoeda(s.proventos)}</TableCell>
+                    <TableCell className="text-right font-mono text-sm">{fmtMoeda(s.descontos)}</TableCell>
+                    <TableCell className="text-right font-mono text-sm font-medium text-primary">{fmtMoeda(s.liquido)}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 h-7"
+                        disabled={holeriteVinculo === s.vinculo_id}
+                        onClick={() => verHolerite(s.vinculo_id)}
+                        title={`Holerite de ${s.servidor_nome}`}
+                      >
+                        <FileText className="h-3.5 w-3.5" /> PDF
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          {(resumoServidores?.length ?? 0) > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {resumoServidores?.length} servidor{resumoServidores?.length === 1 ? "" : "es"} na competência.
+            </p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="areas" className="space-y-4">
+          {loadingArea && <Skeleton className="h-40 w-full" />}
+          {resumoArea && (
+            <>
+              <AreaTable titulo="Por lotação" linhas={resumoArea.por_lotacao} />
+              <AreaTable titulo="Por órgão emissor" linhas={resumoArea.por_orgao} />
+              <Card className="border-primary/40 bg-primary-soft">
+                <CardContent className="py-3 flex flex-wrap items-center justify-between gap-3 text-sm">
+                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Total geral</span>
+                  <div className="flex gap-6 font-mono">
+                    <span>Proventos: <strong>{fmtMoeda(resumoArea.geral.proventos)}</strong></span>
+                    <span>Descontos: <strong>{fmtMoeda(resumoArea.geral.descontos)}</strong></span>
+                    <span className="text-primary">Líquido: <strong>{fmtMoeda(resumoArea.geral.liquido)}</strong></span>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </TabsContent>
 
         <TabsContent value="lancamentos" className="space-y-3">
           <div className="flex gap-2 flex-wrap">
@@ -264,20 +367,19 @@ export default function FolhaDetailPage() {
                   <TableHead>Rubrica</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead className="text-right">Valor</TableHead>
-                  <TableHead className="text-right">Holerite</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loadingLanc && Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={`skel-${i}`}>
-                    {Array.from({ length: 5 }).map((_, j) => (
+                    {Array.from({ length: 4 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))}
                 {!loadingLanc && lancamentos?.results.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                       Sem lançamentos. Clique em "Calcular folha" para gerar.
                     </TableCell>
                   </TableRow>
@@ -300,19 +402,6 @@ export default function FolhaDetailPage() {
                       <Badge variant={rubricaTipoVariant(l.rubrica_tipo)}>{l.rubrica_tipo}</Badge>
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm">{fmtMoeda(l.valor)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="gap-1.5 h-7"
-                        disabled={holeriteVinculo === l.vinculo}
-                        onClick={() => verHolerite(l.vinculo)}
-                        title={`Holerite de ${l.servidor_nome}`}
-                      >
-                        <FileText className="h-3.5 w-3.5" />
-                        PDF
-                      </Button>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -411,6 +500,47 @@ export default function FolhaDetailPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+// ============================================================
+// Tabela de totais por área (lotação / órgão)
+// ============================================================
+
+function AreaTable({ titulo, linhas }: { titulo: string; linhas: ResumoAreaLinha[] }) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{titulo}</p>
+      <div className="rounded-md border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Área</TableHead>
+              <TableHead className="text-right">Proventos</TableHead>
+              <TableHead className="text-right">Descontos</TableHead>
+              <TableHead className="text-right">Líquido</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {linhas.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-6 text-muted-foreground text-sm">
+                  Sem dados.
+                </TableCell>
+              </TableRow>
+            )}
+            {linhas.map((l) => (
+              <TableRow key={`${titulo}-${l.id ?? "none"}`}>
+                <TableCell className="text-sm">{l.nome}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{fmtMoeda(l.proventos)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{fmtMoeda(l.descontos)}</TableCell>
+                <TableCell className="text-right font-mono text-sm font-medium text-primary">{fmtMoeda(l.liquido)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

@@ -17,11 +17,11 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.12.0` (Onda 2.5 — holerite PDF + JSON)
-- **Bloco corrente:** Bloco 2 — Engine de cálculo de folha (85% — Ondas 2.1, 2.2, 2.3, 2.4, 2.5, 2.6 entregues; falta 2.7)
+- **Versão atual:** `v0.13.0` (refinos da folha — aba Servidores + totais por área)
+- **Bloco corrente:** Bloco 2 — Engine de cálculo de folha (85% — Ondas 2.1, 2.2, 2.3, 2.4, 2.5, 2.6 entregues + refinos; falta 2.7)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 472 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 477 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 

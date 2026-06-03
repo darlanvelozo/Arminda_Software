@@ -187,6 +187,57 @@ export function useCalcularFolha() {
  * Usa o axios autenticado (responseType blob) — o endpoint exige Bearer +
  * X-Tenant, então não dá para abrir a URL diretamente.
  */
+// ---- Resumos da folha (v0.13.0) ----
+
+export interface ResumoServidor {
+  vinculo_id: number;
+  servidor_nome: string;
+  servidor_matricula: string;
+  cargo: string | null;
+  lotacao: string | null;
+  proventos: string;
+  descontos: string;
+  liquido: string;
+}
+
+export interface ResumoAreaLinha {
+  id: number | null;
+  nome: string;
+  proventos: string;
+  descontos: string;
+  liquido: string;
+}
+
+export interface ResumoArea {
+  por_lotacao: ResumoAreaLinha[];
+  por_orgao: ResumoAreaLinha[];
+  geral: { proventos: string; descontos: string; liquido: string };
+}
+
+export function useResumoServidores(folhaId: number | null) {
+  const { activeTenant } = useAuth();
+  return useQuery({
+    queryKey: [...folhasKey(activeTenant), "servidores", folhaId] as const,
+    queryFn: async () => {
+      const { data } = await api.get<ResumoServidor[]>(`${FOLHAS}${folhaId}/servidores/`);
+      return data;
+    },
+    enabled: !!activeTenant && folhaId !== null,
+  });
+}
+
+export function useResumoArea(folhaId: number | null) {
+  const { activeTenant } = useAuth();
+  return useQuery({
+    queryKey: [...folhasKey(activeTenant), "resumo-area", folhaId] as const,
+    queryFn: async () => {
+      const { data } = await api.get<ResumoArea>(`${FOLHAS}${folhaId}/resumo/`);
+      return data;
+    },
+    enabled: !!activeTenant && folhaId !== null,
+  });
+}
+
 export async function abrirHoleritePdf(folhaId: number, vinculoId: number): Promise<void> {
   const resp = await api.get(`${FOLHAS}${folhaId}/holerite-pdf/`, {
     params: { vinculo: vinculoId },

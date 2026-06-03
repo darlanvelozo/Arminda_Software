@@ -46,6 +46,7 @@ from apps.payroll.serializers import (
 )
 from apps.payroll.services.calculo import calcular_folha
 from apps.payroll.services.holerite import gerar_pdf, montar_holerite
+from apps.payroll.services.resumo import resumo_por_area, resumo_por_servidor
 from apps.people.models import VinculoFuncional
 
 
@@ -182,7 +183,15 @@ class FolhaViewSet(viewsets.ModelViewSet):
     filterset_class = FolhaFilter
     ordering_fields = ["competencia", "tipo", "status", "criado_em"]
 
-    READ_ACTIONS = {"list", "retrieve", "lancamentos", "holerite", "holerite_pdf"}
+    READ_ACTIONS = {
+        "list",
+        "retrieve",
+        "lancamentos",
+        "holerite",
+        "holerite_pdf",
+        "servidores",
+        "resumo",
+    }
 
     def get_permissions(self):
         if self.action in self.READ_ACTIONS:
@@ -213,6 +222,18 @@ class FolhaViewSet(viewsets.ModelViewSet):
             return montar_holerite(folha, vinculo)
         except Lancamento.DoesNotExist as exc:
             raise NotFound(str(exc)) from exc
+
+    @action(detail=True, methods=["get"], url_path="servidores")
+    def servidores(self, request, pk=None):
+        """GET /api/payroll/folhas/{id}/servidores/ → 1 linha por servidor
+        (proventos/descontos/líquido) — base da aba Servidores e do holerite."""
+        return Response(resumo_por_servidor(self.get_object()))
+
+    @action(detail=True, methods=["get"], url_path="resumo")
+    def resumo(self, request, pk=None):
+        """GET /api/payroll/folhas/{id}/resumo/ → totais por lotação, por
+        órgão emissor e geral da competência."""
+        return Response(resumo_por_area(self.get_object()))
 
     @action(detail=True, methods=["get"], url_path="holerite")
     def holerite(self, request, pk=None):

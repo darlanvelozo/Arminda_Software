@@ -348,6 +348,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payroll/folhas/{id}/resumo/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description GET /api/payroll/folhas/{id}/resumo/ → totais por lotação, por
+         *     órgão emissor e geral da competência.
+         */
+        get: operations["payroll_folhas_resumo_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/folhas/{id}/servidores/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description GET /api/payroll/folhas/{id}/servidores/ → 1 linha por servidor
+         *     (proventos/descontos/líquido) — base da aba Servidores e do holerite.
+         */
+        get: operations["payroll_folhas_servidores_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payroll/lancamentos/": {
         parameters: {
             query?: never;
@@ -2868,6 +2908,50 @@ export interface operations {
         };
     };
     payroll_folhas_holerite_pdf_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaDetail"];
+                };
+            };
+        };
+    };
+    payroll_folhas_resumo_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaDetail"];
+                };
+            };
+        };
+    };
+    payroll_folhas_servidores_retrieve: {
         parameters: {
             query?: never;
             header?: never;

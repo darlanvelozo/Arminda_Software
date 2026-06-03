@@ -35,6 +35,36 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Refinos operacionais da folha — resumo por servidor + totais por área · 2026-05-30
+
+> Polimento sobre o que já está no ar (v0.13.0). A tela da folha ganhou uma
+> aba **Servidores** (uma linha por servidor, com o holerite ali) e uma aba
+> **Por área** (totais por lotação e por órgão). Sem novas regras de cálculo.
+
+#### Adicionado — Backend
+
+- **feat(payroll.services.resumo):** `resumo_por_servidor(folha)` (uma linha
+  por vínculo: servidor, cargo, lotação, proventos, descontos, líquido) e
+  `resumo_por_area(folha)` (totais por lotação, por órgão emissor e geral).
+  Agregação no banco (`Sum` com filtro por tipo + `Coalesce`), sem iterar.
+- **feat(payroll):** endpoints de leitura `GET /folhas/{id}/servidores/` e
+  `GET /folhas/{id}/resumo/`.
+
+#### Adicionado — Frontend
+
+- **feat(folha):** aba **Servidores** (uma linha por servidor com totais + botão
+  de holerite — substitui o botão antes repetido por rubrica) e aba **Por área**
+  (tabelas por lotação e por órgão + card de total geral). Coluna de holerite
+  removida da aba Lançamentos (que volta a focar na conferência detalhada).
+- **docs:** guias do operador e do desenvolvedor atualizados.
+
+#### Impacto
+
+- Apenas leitura/UX — sem migration, sem mudança de regra de cálculo.
+- Tipos TS regenerados do OpenAPI. 5 testes novos (477 no total).
+
+---
+
 ### Onda 2.5 — Holerite: contracheque em PDF + JSON · 2026-05-30
 
 > Geração de holerite por servidor (ADR-0014). JSON estruturado (agregação

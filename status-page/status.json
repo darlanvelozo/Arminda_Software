@@ -78,6 +78,7 @@
         "✅ Tabelas legais 2024/2025/2026 (FAIXA_IRRF e FAIXA_INSS reais + salário mínimo dinâmico + admin Django para virar exercício sem deploy) — Onda 2.3",
         "✅ Incidências automáticas: FGTS + previdência própria RPPS (cálculo em duas fases, bases por flag, RegimePrevidenciario por município, FAIXA_RPPS, ADR-0013) — Onda 2.4",
         "✅ Geração de holerite PDF + JSON (ReportLab, endpoints por vínculo, download na tela de folha, ADR-0014) — Onda 2.5",
+        "✅ Refinos operacionais: aba Servidores (resumo por servidor + holerite) e totais por lotação/órgão — v0.13.0",
         "✅ Tela /folha operacional (lista, criar, calcular/recalcular com confirmação, relatório do último cálculo, tabs de lançamentos e erros) — Onda 2.6",
         "Testes de paridade contra Fiorilli — Onda 2.7"
       ]
@@ -251,6 +252,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-05-30",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.13.0 (refinos da folha)",
+      "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 477 verde (5 testes novos de resumo: uma linha por servidor com totais, totais por lotação batendo com os totais da folha, rótulo padrão quando não há órgão emissor, endpoints servidores e resumo). Frontend: ESLint 0 erros, tsc --noEmit 0 erros, vitest 10/10, build de produção OK. Tipos TypeScript regenerados do OpenAPI. Pronto para tag v0.13.0.",
+      "descricao": "Refinos operacionais da folha passaram pela validação integral. Backend (cd backend): ruff check apps/ → 'All checks passed!', python manage.py check → '0 issues', pytest -q → 477 passed (472 anteriores sem regressão + 5 de resumo). A agregação usa Sum + Coalesce no banco (não itera lançamentos em Python), e os testes garantem que o total geral do resumo bate com os totais persistidos na folha. Frontend (cd frontend): lint 0 errors, tsc 0 erros, vitest 10 passed, build OK. Pronto para git push + tag v0.13.0 na branch develop."
+    },
+    {
+      "data": "2026-05-30",
+      "tipo": "entrega",
+      "titulo": "Folha mais clara: resumo por servidor + totais por área (v0.13.0)",
+      "resumo_executivo": "A tela da folha ficou mais fácil de usar. Antes, para emitir o contracheque era preciso achar o servidor numa lista que repetia o nome dele em cada linha de rubrica. Agora há uma aba Servidores que mostra cada pessoa uma única vez, com proventos, descontos e líquido, e o botão do holerite ao lado. Também entrou uma aba Por área, com os totais da folha agrupados por lotação (secretaria) e por órgão, além do total geral — uma visão gerencial rápida de quanto cada área custa na competência. A aba de lançamentos detalhados continua disponível para conferência.",
+      "descricao": "Refinos operacionais sobre o que já estava no ar (Ondas 2.4/2.5). Backend: novo serviço apps.payroll.services.resumo com resumo_por_servidor (uma linha por vínculo: servidor, cargo, lotação, proventos, descontos, líquido) e resumo_por_area (totais agrupados por lotação e por órgão emissor + total geral), tudo via agregação no banco (Sum com filtro por tipo de rubrica + Coalesce, sem iterar em Python). Endpoints de leitura na FolhaViewSet: GET /api/payroll/folhas/{id}/servidores/ e GET /api/payroll/folhas/{id}/resumo/. Frontend: aba Servidores na tela da folha (uma linha por servidor com totais e botão de holerite — substitui o botão antes repetido por rubrica) e aba Por área (tabelas por lotação e por órgão + card de total geral); a coluna de holerite saiu da aba Lançamentos, que volta a focar na conferência detalhada. 5 testes novos (477 no total). Guias do operador e do desenvolvedor atualizados."
+    },
     {
       "data": "2026-05-30",
       "tipo": "validacao",

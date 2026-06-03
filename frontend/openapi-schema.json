@@ -661,6 +661,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/FolhaDetail'
           description: ''
+  /api/payroll/folhas/{id}/resumo/:
+    get:
+      operationId: payroll_folhas_resumo_retrieve
+      description: |-
+        GET /api/payroll/folhas/{id}/resumo/ → totais por lotação, por
+        órgão emissor e geral da competência.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this folha.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolhaDetail'
+          description: ''
+  /api/payroll/folhas/{id}/servidores/:
+    get:
+      operationId: payroll_folhas_servidores_retrieve
+      description: |-
+        GET /api/payroll/folhas/{id}/servidores/ → 1 linha por servidor
+        (proventos/descontos/líquido) — base da aba Servidores e do holerite.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this folha.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolhaDetail'
+          description: ''
   /api/payroll/lancamentos/:
     get:
       operationId: payroll_lancamentos_list
