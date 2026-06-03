@@ -28,7 +28,7 @@ similares com paridade legal + UX moderna + multi-tenant nativo.
 Próxima onda natural: **2.7** (testes de paridade contra Fiorilli) — fecha o
 Bloco 2. Ver [CHANGELOG.md](CHANGELOG.md) pra histórico recente.
 
-> **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
+> **Onde você está rodando (desde 02/06/2026):** o desenvolvimento acontece
 > **na própria VPS**, em `/opt/arminda-dev` (banco `arminda_dev`, `.env` de dev,
 > `runserver` manual na porta **8010**). **Nunca desenvolva em `/opt/arminda`** —
 > aquele é o checkout que serve a produção (`arminda-backend.service`, gunicorn

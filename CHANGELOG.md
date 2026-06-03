@@ -35,12 +35,12 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
-### fix(status-page) — ordenação do changelog para entregas do mesmo dia · 2026-05-30
+### fix(status-page) — ordenação do changelog para entregas do mesmo dia · 2026-06-02
 
 > **Bug:** o comparador de ordenação do changelog (e dos relatórios) em
 > `status-page/assets/script.js` retornava `-1` para datas iguais em vez de `0`,
 > gerando comparador inconsistente. Como Ondas 2.4, 2.5 e os refinos v0.13.0 têm
-> a mesma data (30/05), o grupo era reordenado e a Onda 2.4 aparecia no topo no
+> a mesma data (02/06), o grupo era reordenado e a Onda 2.4 aparecia no topo no
 > lugar da v0.13.0.
 >
 > **Fix:** retorna `0` quando as datas são iguais, preservando a ordem de entrada
@@ -50,7 +50,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ---
 
-### Refinos operacionais da folha — resumo por servidor + totais por área · 2026-05-30
+### Refinos operacionais da folha — resumo por servidor + totais por área · 2026-06-02
 
 > Polimento sobre o que já está no ar (v0.13.0). A tela da folha ganhou uma
 > aba **Servidores** (uma linha por servidor, com o holerite ali) e uma aba
@@ -80,7 +80,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ---
 
-### Onda 2.5 — Holerite: contracheque em PDF + JSON · 2026-05-30
+### Onda 2.5 — Holerite: contracheque em PDF + JSON · 2026-06-02
 
 > Geração de holerite por servidor (ADR-0014). JSON estruturado (agregação
 > dos lançamentos) + PDF via ReportLab (pure-Python, sem libs de sistema).
@@ -115,7 +115,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ---
 
-### Onda 2.4 — Incidências: FGTS + previdência própria (RPPS) · 2026-05-30
+### Onda 2.4 — Incidências: FGTS + previdência própria (RPPS) · 2026-06-02
 
 > Incidências automáticas sobre a folha (ADR-0013). Os flags `incide_*` das
 > rubricas passam a valer: o cálculo roda em duas fases (proventos → bases →
@@ -150,7 +150,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
   vigência). Query `lib/queries/previdencia.ts`.
 - **feat(rubricas):** flag **RPPS** no formulário de rubrica.
 - **docs:** guias do operador e do desenvolvedor atualizados (incidências,
-  variáveis `BASE_*`/`EH_*`/`ALIQ_*`, `FAIXA_RPPS`). `LAST_UPDATED 2026-05-30`.
+  variáveis `BASE_*`/`EH_*`/`ALIQ_*`, `FAIXA_RPPS`). `LAST_UPDATED 2026-06-02`.
 
 #### Impacto
 

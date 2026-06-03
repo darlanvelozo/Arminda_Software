@@ -1,6 +1,6 @@
 # ADR-0013 — Incidências automáticas (FGTS + previdência municipal RPPS)
 
-**Status:** Aceita · 2026-05-30 · Vigora para Bloco 2 (Onda 2.4)
+**Status:** Aceita · 2026-06-02 · Vigora para Bloco 2 (Onda 2.4)
 
 ## Contexto
 
@@ -119,4 +119,4 @@ A base do IRRF subtrai a previdência oficial: a rubrica seed de IRRF usa
 
 ## Histórico
 
-- 2026-05-30 — Aceita. Versão `v0.11.0` ao final da Onda 2.4.
+- 2026-06-02 — Aceita. Versão `v0.11.0` ao final da Onda 2.4.
