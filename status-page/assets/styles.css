@@ -880,6 +880,7 @@ body {
 .changelog-tipo.tipo-entrega { background: var(--green-bg); color: var(--green); }
 .changelog-tipo.tipo-processo { background: var(--amber-bg); color: var(--amber); }
 .changelog-tipo.tipo-validacao { background: var(--primary-soft); color: var(--primary); }
+.changelog-tipo.tipo-fix { background: var(--amber-bg); color: var(--amber); }
 
 .changelog-content { display: flex; flex-direction: column; gap: 8px; }
 

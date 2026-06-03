@@ -35,6 +35,21 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### fix(status-page) — ordenação do changelog para entregas do mesmo dia · 2026-05-30
+
+> **Bug:** o comparador de ordenação do changelog (e dos relatórios) em
+> `status-page/assets/script.js` retornava `-1` para datas iguais em vez de `0`,
+> gerando comparador inconsistente. Como Ondas 2.4, 2.5 e os refinos v0.13.0 têm
+> a mesma data (30/05), o grupo era reordenado e a Onda 2.4 aparecia no topo no
+> lugar da v0.13.0.
+>
+> **Fix:** retorna `0` quando as datas são iguais, preservando a ordem de entrada
+> (`Array.prototype.sort` é estável em ES2019+; o `status.json` já está do mais
+> novo para o mais antigo). Validado por simulação com os dados reais (Node) —
+> topo voltou a ser a v0.13.0. Adicionado estilo `tipo-fix` ao painel.
+
+---
+
 ### Refinos operacionais da folha — resumo por servidor + totais por área · 2026-05-30
 
 > Polimento sobre o que já está no ar (v0.13.0). A tela da folha ganhou uma

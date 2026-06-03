@@ -254,6 +254,13 @@
   "changelog": [
     {
       "data": "2026-05-30",
+      "tipo": "fix",
+      "titulo": "Correção na ordenação do changelog do painel",
+      "resumo_executivo": "As entregas publicadas no mesmo dia apareciam fora de ordem no painel — uma entrega antiga acabava no topo no lugar da mais recente. O problema estava na regra de ordenação por data quando há várias entradas na mesma data. Corrigido: entradas do mesmo dia agora preservam a ordem correta (mais recente primeiro).",
+      "descricao": "Bug no comparador de ordenação do changelog (e dos relatórios) em status-page/assets/script.js: a função retornava -1 para datas iguais em vez de 0, gerando um comparador inconsistente. Como todas as entregas de 30/05/2026 (Ondas 2.4, 2.5 e os refinos v0.13.0) compartilham a mesma data, o grupo era reordenado de forma imprevisível e uma entrada antiga (Onda 2.4) subia ao topo. Correção: retorna 0 quando as datas são iguais, preservando a ordem de entrada do array (Array.prototype.sort é estável em ES2019+), mantido do mais novo para o mais antigo. Validado por simulação com os dados reais (Node): o topo passou a ser a v0.13.0."
+    },
+    {
+      "data": "2026-05-30",
       "tipo": "validacao",
       "titulo": "Validação integral antes do v0.13.0 (refinos da folha)",
       "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 477 verde (5 testes novos de resumo: uma linha por servidor com totais, totais por lotação batendo com os totais da folha, rótulo padrão quando não há órgão emissor, endpoints servidores e resumo). Frontend: ESLint 0 erros, tsc --noEmit 0 erros, vitest 10/10, build de produção OK. Tipos TypeScript regenerados do OpenAPI. Pronto para tag v0.13.0.",

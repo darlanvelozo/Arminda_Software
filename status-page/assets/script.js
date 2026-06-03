@@ -259,7 +259,10 @@
       return;
     }
 
-    var ordenado = itens.slice().sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+    var ordenado = itens.slice().sort(function (a, b) {
+      if (a.data === b.data) return 0; // datas iguais: preserva a ordem de entrada (sort estável)
+      return a.data < b.data ? 1 : -1;
+    });
 
     ordenado.forEach(function (item) {
       var li = document.createElement('li');
@@ -305,7 +308,10 @@
       return;
     }
 
-    var ordenado = itens.slice().sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+    var ordenado = itens.slice().sort(function (a, b) {
+      if (a.data === b.data) return 0; // datas iguais: preserva a ordem de entrada (sort estável)
+      return a.data < b.data ? 1 : -1;
+    });
 
     ordenado.forEach(function (rel) {
       var a = document.createElement('a');
