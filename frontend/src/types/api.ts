@@ -1884,6 +1884,11 @@ export interface components {
             codigo?: string;
             nome?: string;
             tipo?: components["schemas"]["Tipo721Enum"];
+            /**
+             * Tipos de folha
+             * @description Tipos de folha em que esta rubrica é aplicada (valores de TipoFolha). Ex.: ['mensal'] ou ['13_segunda']. — Onda 3.1.
+             */
+            tipos_folha?: unknown;
             incide_inss?: boolean;
             incide_irrf?: boolean;
             incide_fgts?: boolean;
@@ -2028,6 +2033,11 @@ export interface components {
             nome: string;
             tipo: components["schemas"]["Tipo721Enum"];
             readonly tipo_display: string;
+            /**
+             * Tipos de folha
+             * @description Tipos de folha em que esta rubrica é aplicada (valores de TipoFolha). Ex.: ['mensal'] ou ['13_segunda']. — Onda 3.1.
+             */
+            tipos_folha?: unknown;
             incide_inss?: boolean;
             incide_irrf?: boolean;
             incide_fgts?: boolean;
@@ -2057,6 +2067,11 @@ export interface components {
             codigo: string;
             nome: string;
             tipo: components["schemas"]["Tipo721Enum"];
+            /**
+             * Tipos de folha
+             * @description Tipos de folha em que esta rubrica é aplicada (valores de TipoFolha). Ex.: ['mensal'] ou ['13_segunda']. — Onda 3.1.
+             */
+            tipos_folha?: unknown;
             incide_inss?: boolean;
             incide_irrf?: boolean;
             incide_fgts?: boolean;

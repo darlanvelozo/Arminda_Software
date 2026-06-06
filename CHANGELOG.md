@@ -35,6 +35,44 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 3.1 — 13º salário (1ª e 2ª parcelas) · 2026-06-02
+
+> Início do **Bloco 3** (folhas especiais), pelo 13º salário (ADR-0015).
+> Reusa o engine de duas fases + bases automáticas (Onda 2.4): as incidências
+> do 13º saem em separado da folha mensal sem código novo de incidência.
+
+#### Adicionado — Backend
+
+- **feat(payroll):** campo `Rubrica.tipos_folha` (lista de `TipoFolha`) +
+  migration `0003` (rubricas existentes → `['mensal']`). `calcular_folha`
+  filtra rubricas por `folha.tipo` — mensal e 13º não se misturam.
+- **feat(payroll.services.decimo):** `avos_no_ano(admissao, demissao, ano)`
+  (mês com ≥15 dias = 1/12). Contexto ganha `AVOS_13`, `BASE_13`, `PARCELA_13`.
+- **feat(payroll):** comando `seed_rubricas_13` — 1ª parcela (adiantamento 50%,
+  sem incidência) e 2ª parcela (13º integral formando as bases + `13_INSS`/
+  `13_RPPS`/`13_IRRF` sobre o 13º + abatimento do adiantamento + FGTS/RPPS
+  patronal informativos).
+- **feat(payroll):** `tipos_folha` exposto em serializers/admin da Rubrica.
+
+#### Adicionado — Frontend
+
+- A criação de folha já permitia escolher o tipo (1ª/2ª parcela do 13º); as
+  abas Servidores/Por área/Holerite são agnósticas ao tipo → 13º ponta a ponta.
+- **docs:** guias do operador e do dev atualizados (13º). Tipos regenerados.
+
+#### Impacto
+
+- Migration `payroll.0003` (TENANT) — rodar `migrate_schemas`. Aditiva, com
+  default seguro (`['mensal']`).
+- 9 testes novos (486 no total).
+
+#### Próximos passos
+
+- Bloco 3 segue com **férias** e **rescisão** (a rescisão paga o 13º
+  proporcional de quem saiu no meio do ano).
+
+---
+
 ### fix(status-page) — ordenação do changelog para entregas do mesmo dia · 2026-06-02
 
 > **Bug:** o comparador de ordenação do changelog (e dos relatórios) em

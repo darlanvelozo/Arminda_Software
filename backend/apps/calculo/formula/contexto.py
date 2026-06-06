@@ -82,4 +82,8 @@ VARIAVEIS_PADRAO = (
     "EH_FGTS",              # Decimal 1/0 — vínculo gera FGTS (celetista)
     "ALIQ_RPPS_PATRONAL",   # Decimal — alíquota patronal do RPPS
     "ALIQ_FGTS",            # Decimal — alíquota do FGTS (0.08)
+    # 13º salário (Onda 3.1 — ADR-0015), preenchidas pelo engine por vínculo.
+    "AVOS_13",              # Decimal 0-12 — meses trabalhados no ano (≥15 dias)
+    "BASE_13",             # Decimal — base do 13º (v1 = SALARIO_BASE)
+    "PARCELA_13",           # Decimal — 1 (1ª parcela), 2 (2ª parcela) ou 0
 )

@@ -38,12 +38,25 @@ class StatusFolha(models.TextChoices):
     FECHADA = "fechada", "Fechada"
 
 
+def _default_tipos_folha() -> list[str]:
+    """Por padrão, a rubrica vale apenas para a folha mensal (Onda 3.1)."""
+    return [TipoFolha.MENSAL]
+
+
 class Rubrica(TimeStampedModel):
     """Rubrica da folha (provento ou desconto). DSL no campo `formula` (Bloco 2)."""
 
     codigo = models.CharField(max_length=20, unique=True)
     nome = models.CharField(max_length=200)
     tipo = models.CharField(max_length=15, choices=TipoRubrica.choices)
+    tipos_folha = models.JSONField(
+        "Tipos de folha",
+        default=_default_tipos_folha,
+        help_text=(
+            "Tipos de folha em que esta rubrica é aplicada (valores de TipoFolha). "
+            "Ex.: ['mensal'] ou ['13_segunda']. — Onda 3.1."
+        ),
+    )
     incide_inss = models.BooleanField("Incide INSS", default=False)
     incide_irrf = models.BooleanField("Incide IRRF", default=False)
     incide_fgts = models.BooleanField("Incide FGTS", default=False)

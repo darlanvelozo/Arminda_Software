@@ -87,14 +87,14 @@
       "numero": 3,
       "titulo": "Folhas especiais",
       "descricao": "Cobertura completa dos eventos não-mensais: 13º salário, férias, rescisões, licenças e adiantamentos.",
-      "periodo": "Setembro 2026",
-      "data_inicio": "2026-09-01",
+      "periodo": "Setembro 2026 (antecipado)",
+      "data_inicio": "2026-06-02",
       "data_fim_prevista": "2026-09-30",
       "data_fim_real": null,
-      "status": "previsto",
-      "progresso_pct": 0,
+      "status": "em_andamento",
+      "progresso_pct": 20,
       "entregas": [
-        "Cálculo de 13º (1ª e 2ª parcelas)",
+        "✅ Cálculo de 13º — 1ª e 2ª parcelas (avos automáticos, escopo de rubrica por tipo de folha, incidências do 13º em separado, ADR-0015) — Onda 3.1",
         "Férias (com abono e adiantamento)",
         "Rescisões",
         "Licença-prêmio",
@@ -252,6 +252,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-06-02",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.14.0 (13º salário)",
+      "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 486 verde (9 testes novos de 13º: avos em ano cheio/admissão no meio/demissão, escopo de rubrica por tipo de folha, 1ª parcela sem incidência, 2ª parcela com INSS/IRRF/RPPS sobre o 13º e abatimento do adiantamento, 13º proporcional por avos). Frontend: ESLint 0 erros, tsc 0 erros, vitest 10/10, build OK. Tipos regenerados do OpenAPI. Pronto para tag v0.14.0.",
+      "descricao": "Onda 3.1 (início do Bloco 3) passou pela validação integral. Backend: ruff 'All checks passed!', manage.py check '0 issues', pytest 486 passed (477 anteriores sem regressão + 9 de 13º). Migration payroll.0003 (campo tipos_folha) aplicada — rubricas existentes recebem ['mensal'] por padrão, preservando o comportamento atual. Frontend: lint 0 erros, tsc 0, vitest 10, build OK. O 13º reusa o engine de duas fases e as bases automáticas (Onda 2.4), então as incidências do 13º saem em separado sem código novo de incidência. Pronto para git push + tag v0.14.0 na branch develop."
+    },
+    {
+      "data": "2026-06-02",
+      "tipo": "entrega",
+      "titulo": "13º salário: 1ª e 2ª parcelas (Onda 3.1)",
+      "resumo_executivo": "Começou o módulo de folhas especiais pelo 13º salário. O sistema já calcula as duas parcelas: a 1ª (adiantamento de 50%, sem descontos) e a 2ª (13º integral, com INSS, IRRF e previdência calculados em separado sobre o 13º, abatendo o adiantamento já pago). Os avos (meses trabalhados no ano, contando o mês com 15 dias ou mais) são calculados automaticamente a partir da data de admissão de cada servidor, então quem entrou no meio do ano recebe o 13º proporcional. As rubricas de 13º já vêm prontas, e cada rubrica agora sabe em quais tipos de folha entra — a folha mensal e a de 13º não se misturam.",
+      "descricao": "Onda 3.1 (ADR-0015) abre o Bloco 3. Backend: novo campo Rubrica.tipos_folha (migration payroll.0003) e filtro por folha.tipo no calcular_folha — a folha mensal não roda rubricas de 13º e vice-versa; rubricas existentes ficam ['mensal']. apps.payroll.services.decimo.avos_no_ano calcula os avos (mês com ≥15 dias dentro de [admissão, demissão|fim do ano] = 1/12), expostos no contexto como AVOS_13/BASE_13/PARCELA_13. Comando seed_rubricas_13 cria as rubricas: 1ª parcela (adiantamento 50%, sem incidência) e 2ª parcela (13º integral com incide_* formando as bases + 13_INSS/13_RPPS/13_IRRF sobre o 13º + abatimento do adiantamento + FGTS/RPPS patronal informativos). Como reusa o engine de duas fases da Onda 2.4, INSS/IRRF/RPPS do 13º saem naturalmente em separado da folha mensal. Frontend: a criação de folha já permitia escolher o tipo (1ª/2ª parcela), e as abas Servidores/Por área/Holerite são agnósticas ao tipo — o 13º funciona ponta a ponta. 9 testes novos (486 no total). Guias do operador e do dev atualizados. Próximo no Bloco 3: férias e rescisão (a rescisão paga o 13º proporcional de quem saiu no meio do ano)."
+    },
     {
       "data": "2026-06-02",
       "tipo": "fix",

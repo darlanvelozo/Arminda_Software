@@ -576,6 +576,25 @@ function SectionCalculo() {
         exige Bearer + X-Tenant).
       </p>
 
+      <h3 className="text-base font-semibold mt-4">13º salário (Onda 3.1 — ADR-0015)</h3>
+      <p>
+        Início do Bloco 3 (folhas especiais). Novo campo{" "}
+        <code className="bg-muted px-1 rounded">Rubrica.tipos_folha</code> (lista de
+        TipoFolha) — o <code className="bg-muted px-1 rounded">calcular_folha</code>{" "}
+        filtra as rubricas pelo <code className="bg-muted px-1 rounded">folha.tipo</code>{" "}
+        (mensal não roda 13º e vice-versa). Avos via{" "}
+        <code className="bg-muted px-1 rounded">apps.payroll.services.decimo.avos_no_ano</code>{" "}
+        (mês com ≥15 dias = 1/12), expostos no contexto como{" "}
+        <code className="bg-muted px-1 rounded">AVOS_13</code>,{" "}
+        <code className="bg-muted px-1 rounded">BASE_13</code>,{" "}
+        <code className="bg-muted px-1 rounded">PARCELA_13</code>. O 13º é DSL-driven:
+        o comando <code className="bg-muted px-1 rounded">seed_rubricas_13</code> cria as
+        rubricas das duas parcelas; a 2ª parcela reusa o engine de duas fases (o
+        provento 13º forma as bases e os descontos calculam INSS/IRRF/RPPS sobre o
+        13º — separados da folha mensal). Servidores desligados no ano recebem o 13º
+        proporcional na rescisão (onda futura).
+      </p>
+
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>
         <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}

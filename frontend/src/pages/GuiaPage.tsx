@@ -765,6 +765,19 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         holerite também sai em JSON para integrações.
       </p>
 
+      <h3 className="text-base font-semibold mt-4">13º salário (Onda 3.1)</h3>
+      <p>
+        O 13º já pode ser calculado. Crie uma folha do tipo{" "}
+        <strong>13º — 1ª parcela</strong> (adiantamento de 50%, sem descontos) ou{" "}
+        <strong>13º — 2ª parcela</strong> (13º integral, com INSS/IRRF/RPPS sobre o
+        13º calculados em separado e abatimento do adiantamento). O sistema calcula
+        os <strong>avos</strong> automaticamente (meses trabalhados no ano, contando o
+        mês com 15 dias ou mais), conforme a data de admissão de cada servidor. As
+        rubricas de 13º vêm prontas pelo comando de seed; cada rubrica agora declara
+        em quais tipos de folha ela entra, então a folha mensal e a de 13º não se
+        misturam.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">
         <FlowItem

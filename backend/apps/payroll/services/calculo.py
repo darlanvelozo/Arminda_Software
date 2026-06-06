@@ -31,7 +31,8 @@ from apps.calculo.dependencias import RubricaParaOrdenar, ordenar_topologicament
 from apps.calculo.formula.avaliador import avaliar
 from apps.calculo.formula.contexto import ContextoFolha
 from apps.calculo.formula.errors import FormulaError
-from apps.payroll.models import Folha, Lancamento, Rubrica, TipoRubrica
+from apps.payroll.models import Folha, Lancamento, Rubrica, TipoFolha, TipoRubrica
+from apps.payroll.services.decimo import avos_no_ano
 from apps.payroll.services.previdencia import (
     regime_vigente,
     resolver_previdencia,
@@ -198,15 +199,22 @@ def _vinculos_da_competencia(competencia: date):
     )
 
 
-def _rubricas_ativas_ordenadas() -> tuple[list[Rubrica], list[str]]:
+def _rubricas_ativas_ordenadas(tipo_folha: str) -> tuple[list[Rubrica], list[str]]:
     """
-    Carrega rubricas ativas, ordena topologicamente pela dependência
-    declarada nas fórmulas (`RUBRICA('X')`).
+    Carrega rubricas ativas **do tipo de folha**, ordena topologicamente pela
+    dependência declarada nas fórmulas (`RUBRICA('X')`).
+
+    O filtro por `tipos_folha` (Onda 3.1) garante que a folha mensal não rode
+    rubricas de 13º e vice-versa.
 
     Returns:
         (lista de Rubrica em ordem de cálculo, lista de códigos na ordem)
     """
-    rubricas = list(Rubrica.objects.filter(ativo=True).order_by("codigo"))
+    rubricas = [
+        r
+        for r in Rubrica.objects.filter(ativo=True).order_by("codigo")
+        if tipo_folha in (r.tipos_folha or [])
+    ]
     if not rubricas:
         return [], []
 
@@ -355,6 +363,22 @@ def _fase_descontos(
     return total
 
 
+_PARCELA_POR_TIPO = {
+    TipoFolha.DECIMO_PRIMEIRO: 1,
+    TipoFolha.DECIMO_SEGUNDO: 2,
+}
+
+
+def _vars_decimo(folha: Folha, vinculo: VinculoFuncional) -> dict[str, Decimal]:
+    """Variáveis de 13º expostas às fórmulas (Onda 3.1): avos, base e parcela."""
+    avos = avos_no_ano(vinculo.data_admissao, vinculo.data_demissao, folha.competencia.year)
+    return {
+        "AVOS_13": Decimal(avos),
+        "BASE_13": Decimal(vinculo.salario_base or 0),
+        "PARCELA_13": Decimal(_PARCELA_POR_TIPO.get(folha.tipo, 0)),
+    }
+
+
 def _processar_vinculo(
     *,
     folha: Folha,
@@ -371,7 +395,8 @@ def _processar_vinculo(
     Devolve `(total_proventos, total_descontos)` deste vínculo.
     """
     rubricas_calc: dict[str, Decimal] = {}
-    vars_regime = resolver_previdencia(vinculo, regime).como_variaveis()
+    # Variáveis de regime (RGPS/RPPS/FGTS) + variáveis de 13º (avos/base/parcela).
+    vars_regime = {**resolver_previdencia(vinculo, regime).como_variaveis(), **_vars_decimo(folha, vinculo)}
 
     total_proventos, bases = _fase_proventos(
         folha=folha,
@@ -450,7 +475,7 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
             abortada.
     """
     relatorio = RelatorioCalculo(folha_id=folha.id, competencia=folha.competencia)
-    rubricas_ordenadas, ordem = _rubricas_ativas_ordenadas()
+    rubricas_ordenadas, ordem = _rubricas_ativas_ordenadas(folha.tipo)
     relatorio.ordem_rubricas = ordem
 
     if not rubricas_ordenadas:

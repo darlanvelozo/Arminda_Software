@@ -27,6 +27,7 @@ class RubricaAdmin(admin.ModelAdmin):
         "ativo",
     )
     list_filter = ("tipo", "incide_inss", "incide_irrf", "incide_fgts", "incide_rpps", "ativo")
+    # tipos_folha (JSON) é editável no formulário do admin por padrão.
     search_fields = ("codigo", "nome")
     list_editable = ("ativo",)
     list_per_page = 50
