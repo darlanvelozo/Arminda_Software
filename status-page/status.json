@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-06-05",
+  "ultima_atualizacao": "2026-06-07",
   "bloco_atual": 2,
   "progresso_geral_pct": 27,
   "blocos": [
@@ -253,14 +253,14 @@
   ],
   "changelog": [
     {
-      "data": "2026-06-05",
+      "data": "2026-06-07",
       "tipo": "validacao",
       "titulo": "Validação integral antes do v0.15.0 (rescisão)",
       "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 494 verde (8 testes novos de rescisão: avos de férias, seletor de vínculos demitidos no mês, verbas e incidências, gating por motivo, multa 40%). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Tipos regenerados. Pronto para tag v0.15.0.",
       "descricao": "Onda 3.2 passou pela validação integral. Migrations payroll.0003 (já) e people (campos de rescisão) aplicadas no tenant de dev. O engine ganhou um seletor de vínculos específico para rescisão (data_demissao no mês, mesmo inativos) sem regressão nas demais folhas. 494 passed (486 + 8)."
     },
     {
-      "data": "2026-06-05",
+      "data": "2026-06-07",
       "tipo": "entrega",
       "titulo": "Rescisão: verbas rescisórias (Onda 3.2)",
       "resumo_executivo": "O sistema passou a calcular a rescisão. Ao desligar um servidor, informa-se o motivo (pedido, dispensa sem/com justa causa, término, aposentadoria...), se há aviso prévio indenizado, férias vencidas e o saldo do FGTS. Criando uma folha do tipo Rescisão na competência do desligamento, o sistema gera as verbas conforme o motivo: saldo de salário, 13º proporcional, férias proporcionais e vencidas mais 1/3, e aviso prévio indenizado — com INSS e Imposto de Renda só sobre o que é tributável (férias e aviso indenizados não entram), além do FGTS do mês e da multa de 40% para celetistas dispensados sem justa causa. A justa causa reduz as verbas automaticamente.",

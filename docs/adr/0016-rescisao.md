@@ -1,6 +1,6 @@
 # ADR-0016 — Rescisão: verbas rescisórias, motivo no vínculo e avos de férias
 
-**Status:** Aceita · 2026-06-05 · Vigora para Bloco 3 (Onda 3.2)
+**Status:** Aceita · 2026-06-07 · Vigora para Bloco 3 (Onda 3.2)
 
 ## Contexto
 
@@ -101,4 +101,4 @@ Gating por motivo (regras clássicas):
 
 ## Histórico
 
-- 2026-06-05 — Aceita. Versão `v0.15.0` ao final da Onda 3.2.
+- 2026-06-07 — Aceita. Versão `v0.15.0` ao final da Onda 3.2.

@@ -35,7 +35,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
-### Onda 3.2 — Rescisão: verbas rescisórias · 2026-06-05
+### Onda 3.2 — Rescisão: verbas rescisórias · 2026-06-07
 
 > Segunda onda do Bloco 3 (ADR-0016). Reusa o engine de duas fases, as bases
 > automáticas e o `tipos_folha`. As incidências do saldo e do 13º saem em
