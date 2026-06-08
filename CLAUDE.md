@@ -29,7 +29,7 @@ Próximas ondas naturais: **Bloco 3** — férias e rescisão (a rescisão paga 
 proporcional de quem saiu no meio do ano); e a **2.7** (paridade Fiorilli) fecha
 o Bloco 2 quando houver dados de referência. Ver [CHANGELOG.md](CHANGELOG.md).
 
-> **Onde você está rodando (desde 02/06/2026):** o desenvolvimento acontece
+> **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
 > **na própria VPS**, em `/opt/arminda-dev` (banco `arminda_dev`, `.env` de dev,
 > `runserver` manual na porta **8010**). **Nunca desenvolva em `/opt/arminda`** —
 > aquele é o checkout que serve a produção (`arminda-backend.service`, gunicorn

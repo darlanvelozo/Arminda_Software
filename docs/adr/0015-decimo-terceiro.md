@@ -1,6 +1,6 @@
 # ADR-0015 — 13º salário (gratificação natalina): escopo por tipo de folha, avos e parcelas
 
-**Status:** Aceita · 2026-06-02 · Vigora para Bloco 3 (Onda 3.1)
+**Status:** Aceita · 2026-06-05 · Vigora para Bloco 3 (Onda 3.1)
 
 ## Contexto
 
@@ -89,4 +89,4 @@ recebem o 13º proporcional na **rescisão** (onda futura), não nesta folha.
 
 ## Histórico
 
-- 2026-06-02 — Aceita. Versão `v0.14.0` ao final da Onda 3.1.
+- 2026-06-05 — Aceita. Versão `v0.14.0` ao final da Onda 3.1.

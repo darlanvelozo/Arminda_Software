@@ -1,6 +1,6 @@
 # ADR-0014 — Geração de holerite: JSON estruturado + PDF via ReportLab
 
-**Status:** Aceita · 2026-06-02 · Vigora para Bloco 2 (Onda 2.5)
+**Status:** Aceita · 2026-05-30 · Vigora para Bloco 2 (Onda 2.5)
 
 ## Contexto
 
@@ -61,4 +61,4 @@ da API; Decimal exato, sem float).
 
 ## Histórico
 
-- 2026-06-02 — Aceita. Versão `v0.12.0` ao final da Onda 2.5.
+- 2026-05-30 — Aceita. Versão `v0.12.0` ao final da Onda 2.5.

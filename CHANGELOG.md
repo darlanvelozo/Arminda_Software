@@ -35,7 +35,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
-### Onda 3.1 — 13º salário (1ª e 2ª parcelas) · 2026-06-02
+### Onda 3.1 — 13º salário (1ª e 2ª parcelas) · 2026-06-05
 
 > Início do **Bloco 3** (folhas especiais), pelo 13º salário (ADR-0015).
 > Reusa o engine de duas fases + bases automáticas (Onda 2.4): as incidências
@@ -118,7 +118,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ---
 
-### Onda 2.5 — Holerite: contracheque em PDF + JSON · 2026-06-02
+### Onda 2.5 — Holerite: contracheque em PDF + JSON · 2026-05-30
 
 > Geração de holerite por servidor (ADR-0014). JSON estruturado (agregação
 > dos lançamentos) + PDF via ReportLab (pure-Python, sem libs de sistema).
@@ -153,7 +153,7 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ---
 
-### Onda 2.4 — Incidências: FGTS + previdência própria (RPPS) · 2026-06-02
+### Onda 2.4 — Incidências: FGTS + previdência própria (RPPS) · 2026-05-30
 
 > Incidências automáticas sobre a folha (ADR-0013). Os flags `incide_*` das
 > rubricas passam a valer: o cálculo roda em duas fases (proventos → bases →

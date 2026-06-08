@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-02";
+const LAST_UPDATED = "2026-06-05";
 
 interface TocItem {
   id: string;

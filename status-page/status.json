@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-06-02",
+  "ultima_atualizacao": "2026-06-05",
   "bloco_atual": 2,
   "progresso_geral_pct": 27,
   "blocos": [
@@ -88,7 +88,7 @@
       "titulo": "Folhas especiais",
       "descricao": "Cobertura completa dos eventos não-mensais: 13º salário, férias, rescisões, licenças e adiantamentos.",
       "periodo": "Setembro 2026 (antecipado)",
-      "data_inicio": "2026-06-02",
+      "data_inicio": "2026-06-05",
       "data_fim_prevista": "2026-09-30",
       "data_fim_real": null,
       "status": "em_andamento",
@@ -253,14 +253,14 @@
   ],
   "changelog": [
     {
-      "data": "2026-06-02",
+      "data": "2026-06-05",
       "tipo": "validacao",
       "titulo": "Validação integral antes do v0.14.0 (13º salário)",
       "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 486 verde (9 testes novos de 13º: avos em ano cheio/admissão no meio/demissão, escopo de rubrica por tipo de folha, 1ª parcela sem incidência, 2ª parcela com INSS/IRRF/RPPS sobre o 13º e abatimento do adiantamento, 13º proporcional por avos). Frontend: ESLint 0 erros, tsc 0 erros, vitest 10/10, build OK. Tipos regenerados do OpenAPI. Pronto para tag v0.14.0.",
       "descricao": "Onda 3.1 (início do Bloco 3) passou pela validação integral. Backend: ruff 'All checks passed!', manage.py check '0 issues', pytest 486 passed (477 anteriores sem regressão + 9 de 13º). Migration payroll.0003 (campo tipos_folha) aplicada — rubricas existentes recebem ['mensal'] por padrão, preservando o comportamento atual. Frontend: lint 0 erros, tsc 0, vitest 10, build OK. O 13º reusa o engine de duas fases e as bases automáticas (Onda 2.4), então as incidências do 13º saem em separado sem código novo de incidência. Pronto para git push + tag v0.14.0 na branch develop."
     },
     {
-      "data": "2026-06-02",
+      "data": "2026-06-05",
       "tipo": "entrega",
       "titulo": "13º salário: 1ª e 2ª parcelas (Onda 3.1)",
       "resumo_executivo": "Começou o módulo de folhas especiais pelo 13º salário. O sistema já calcula as duas parcelas: a 1ª (adiantamento de 50%, sem descontos) e a 2ª (13º integral, com INSS, IRRF e previdência calculados em separado sobre o 13º, abatendo o adiantamento já pago). Os avos (meses trabalhados no ano, contando o mês com 15 dias ou mais) são calculados automaticamente a partir da data de admissão de cada servidor, então quem entrou no meio do ano recebe o 13º proporcional. As rubricas de 13º já vêm prontas, e cada rubrica agora sabe em quais tipos de folha entra — a folha mensal e a de 13º não se misturam.",
@@ -288,28 +288,28 @@
       "descricao": "Refinos operacionais sobre o que já estava no ar (Ondas 2.4/2.5). Backend: novo serviço apps.payroll.services.resumo com resumo_por_servidor (uma linha por vínculo: servidor, cargo, lotação, proventos, descontos, líquido) e resumo_por_area (totais agrupados por lotação e por órgão emissor + total geral), tudo via agregação no banco (Sum com filtro por tipo de rubrica + Coalesce, sem iterar em Python). Endpoints de leitura na FolhaViewSet: GET /api/payroll/folhas/{id}/servidores/ e GET /api/payroll/folhas/{id}/resumo/. Frontend: aba Servidores na tela da folha (uma linha por servidor com totais e botão de holerite — substitui o botão antes repetido por rubrica) e aba Por área (tabelas por lotação e por órgão + card de total geral); a coluna de holerite saiu da aba Lançamentos, que volta a focar na conferência detalhada. 5 testes novos (477 no total). Guias do operador e do desenvolvedor atualizados."
     },
     {
-      "data": "2026-06-02",
+      "data": "2026-05-30",
       "tipo": "validacao",
       "titulo": "Validação integral antes do v0.12.0 (Onda 2.5)",
       "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 472 verde (7 testes novos de holerite: estrutura do JSON e totais, vínculo sem lançamentos, bytes do PDF começando com %PDF, endpoints JSON e PDF, 400 sem vínculo, 404 vínculo inexistente). Frontend: ESLint 0 erros (6 warnings pré-existentes), tsc --noEmit 0 erros, vitest 10/10, build de produção OK. Tipos TypeScript regenerados do OpenAPI. Geração de holerite validada também ponta a ponta (PDF abre no navegador via blob autenticado). Pronto para tag v0.12.0.",
       "descricao": "Onda 2.5 passou pela rotina padrão de validação integral. Backend (cd backend): ruff check apps/ → 'All checks passed!', python manage.py check → '0 issues', pytest -q → 472 passed (465 anteriores sem regressão + 7 de holerite). reportlab 4.2.5 adicionado ao requirements (pure-Python, sem libs de sistema — não muda o deploy além do pip install). Frontend (cd frontend): npm run lint → 0 errors, npx tsc --noEmit → 0 erros, vitest run → 10 passed, npm run build → ✓ built. O download do PDF usa axios com responseType blob porque o endpoint exige Bearer + X-Tenant (não dá para abrir a URL direto). Pronto para git push + tag v0.12.0 na branch develop."
     },
     {
-      "data": "2026-06-02",
+      "data": "2026-05-30",
       "tipo": "entrega",
       "titulo": "Holerite: contracheque em PDF e JSON (Onda 2.5)",
       "resumo_executivo": "Depois de calcular a folha, agora dá para emitir o holerite (contracheque) de cada servidor. Na tela da folha, cada lançamento tem um botão que abre o holerite em PDF — com o cabeçalho do município, os dados do servidor e do vínculo, a lista de proventos e descontos, os totais e o valor líquido a receber, além das informativas (FGTS e contribuição patronal). O mesmo holerite também sai em formato estruturado (JSON), pronto para o futuro portal do servidor e integrações.",
       "descricao": "Onda 2.5 (ADR-0014) entrega a geração de holerite. Backend: serviço apps.payroll.services.holerite com montar_holerite(folha, vinculo) — agrega os Lancamento do vínculo em proventos/descontos/informativas, subtotais, total líquido e cabeçalho (município via connection.tenant, servidor, cargo/lotação/regime/admissão); e gerar_pdf(holerite) que renderiza o dict em PDF com ReportLab (pure-Python, sem dependências de sistema na VPS — só pip install reportlab==4.2.5; formatação monetária BR sem depender de locale do SO). Endpoints na FolhaViewSet (leitura): GET /api/payroll/folhas/{id}/holerite/?vinculo={id} devolve o JSON; GET /api/payroll/folhas/{id}/holerite-pdf/?vinculo={id} devolve application/pdf com Content-Disposition inline. 400 se faltar o parâmetro vinculo, 404 se o vínculo não existir ou não tiver lançamentos na folha. Frontend: helper abrirHoleritePdf em lib/queries/folhas.ts (axios responseType blob + URL.createObjectURL + window.open, porque o endpoint exige Bearer + X-Tenant e não pode ser aberto direto); coluna Holerite na tabela de lançamentos da FolhaDetailPage com botão PDF por linha (estado de carregando por vínculo). 7 testes novos (472 no total). Guias do operador e do desenvolvedor atualizados. Falta só a Onda 2.7 (paridade Fiorilli) para fechar o Bloco 2."
     },
     {
-      "data": "2026-06-02",
+      "data": "2026-05-30",
       "tipo": "validacao",
       "titulo": "Validação integral antes do v0.11.0 (Onda 2.4)",
       "resumo_executivo": "Rotina de qualidade rodada antes do release. Backend: ruff sem erros, django check sem issues, pytest 465 verde em ~62s (24 testes novos: contribuição RPPS pura flat/progressivo/teto, FAIXA_RPPS via avaliador, bases automáticas por flag, gating por regime estatutário×celetista, FGTS informativo, RPPS progressivo batendo com a função pura, convenção de fase provento→desconto, seed idempotente, API do regime previdenciário com RBAC e validação). Frontend: ESLint 0 erros (6 warnings de HMR inócuos pré-existentes), tsc --noEmit 0 erros, vitest 10/10, build de produção em ~9s. Tipos TypeScript regenerados do OpenAPI. Pronto para tag v0.11.0.",
       "descricao": "Onda 2.4 passou pela rotina padrão de validação integral. Backend (cd backend): ruff check apps/ → 'All checks passed!' (incluindo refatoração de calcular_folha em helpers _fase_proventos/_fase_descontos para respeitar o limite de complexidade ciclomática), python manage.py check → '0 issues', pytest -q → 465 passed (441 anteriores sem regressão + 24 novos), migration payroll.0002 aplicada no tenant de desenvolvimento. Frontend (cd frontend): npm run lint → 0 errors, npx tsc --noEmit → 0 erros, vitest run → 10 passed, npm run build → ✓ built. Os valores esperados de INSS/IRRF nos testes são calculados via apps.calculo.tabelas (não hardcodados) para resistir a mudança das tabelas legais. Pronto para git push + tag v0.11.0 na branch develop."
     },
     {
-      "data": "2026-06-02",
+      "data": "2026-05-30",
       "tipo": "entrega",
       "titulo": "Incidências automáticas: FGTS + previdência própria (RPPS) — Onda 2.4",
       "resumo_executivo": "O cálculo de folha passou a tratar sozinho as incidências. Em cada rubrica, basta marcar sobre quais encargos ela incide (INSS, IRRF, FGTS, RPPS) e o sistema soma os proventos para formar a base de cada um — não é mais preciso reescrever a base em cada fórmula. Entrou o FGTS (8% de encargo, para celetistas) e a previdência municipal própria (RPPS): cada município configura, numa nova aba de Previdência em Configurações, a alíquota do servidor e a patronal, em modo único (ex.: 14%) ou progressivo por faixas. O servidor efetivo passa a contribuir ao regime próprio em vez do INSS, automaticamente conforme o regime do vínculo.",

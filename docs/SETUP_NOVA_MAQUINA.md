@@ -10,7 +10,7 @@
 
 ## 0. Desenvolvimento direto na VPS (ambiente atual)
 
-> A partir de 02/06/2026 o desenvolvimento acontece **na própria VPS**, num
+> A partir de 30/05/2026 o desenvolvimento acontece **na própria VPS**, num
 > diretório **separado** da produção. Não desenvolva dentro de `/opt/arminda`
 > (é o checkout que o `arminda-backend.service` serve em produção, com `.env`
 > de prod e banco `arminda_prod`).
