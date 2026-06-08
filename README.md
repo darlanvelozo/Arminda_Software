@@ -10,9 +10,9 @@ Sistema SaaS de folha de pagamento e gestão de pessoal para prefeituras brasile
 
 🟢 **Em produção** — https://arminda.site (Hostinger VPS, HTTPS, gunicorn + Nginx + systemd).
 
-- **Versão atual:** `v0.10.0` (Onda 1.6b — qualidade cadastral + bulk-edit + importador CSV/XLSX)
-- **Bloco corrente:** Bloco 2 — Engine de cálculo de folha (56% — Ondas 2.1/2.2/2.3/2.6 entregues)
-- **Testes:** 441 backend (pytest) + 10 frontend (vitest) verdes
+- **Versão atual:** `v0.16.0` (Onda 3.3 — férias)
+- **Bloco corrente:** Bloco 3 — Folhas especiais (60% — 13º, rescisão e férias entregues). Bloco 2 a 85% (falta só a 2.7 — paridade Fiorilli)
+- **Testes:** 499 backend (pytest) + 10 frontend (vitest) verdes
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/
 
 O projeto está sendo construído em **11 blocos sequenciais** (0–10). Ver
@@ -136,7 +136,7 @@ Interface em `http://localhost:5173`.
 - **[SETUP_NOVA_MAQUINA.md](docs/SETUP_NOVA_MAQUINA.md)** — checklist passo-a-passo para subir o projeto em máquina nova
 - **[DEPLOY_PRODUCAO.md](docs/DEPLOY_PRODUCAO.md)** — runbook de deploy na VPS (arminda.site)
 - **[MULTI_TENANT_PLAYBOOK.md](docs/MULTI_TENANT_PLAYBOOK.md)** — operação multi-tenant no dia-a-dia
-- **[adr/](docs/adr)** — 12 Architecture Decision Records (decisões técnicas registradas)
+- **[adr/](docs/adr)** — 17 Architecture Decision Records (decisões técnicas registradas)
 
 ---
 

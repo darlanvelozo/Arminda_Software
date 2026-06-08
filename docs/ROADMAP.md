@@ -16,8 +16,8 @@
 
 ## Bloco 0 — Estrutura inicial
 
-**Status:** em andamento
-**Período:** sessão atual
+**Status:** concluído ✅
+**Período:** abril/2026
 
 Setup do repositório, arquitetura base, ambiente de desenvolvimento e documentação fundacional.
 

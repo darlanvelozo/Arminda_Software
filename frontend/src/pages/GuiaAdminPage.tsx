@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-07";
+const LAST_UPDATED = "2026-06-08";
 
 interface TocItem {
   id: string;
@@ -94,7 +94,7 @@ export default function GuiaAdminPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong>
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="info">Onda 1.6b ✓ — qualidade cadastral + bulk-edit + importador</Badge>
+            <Badge variant="info">Bloco 3 em andamento — 13º, rescisão e férias ✓ (v0.16.0)</Badge>
           </span>
         </p>
       </header>
@@ -159,16 +159,16 @@ function SectionPanorama() {
         por papel × município, <strong>audit log</strong> via simple-history.
       </p>
       <p>
-        Entrega por <strong>blocos</strong> (0–7) subdivididos em <strong>ondas</strong>{" "}
+        Entrega por <strong>blocos</strong> (0–10) subdivididos em <strong>ondas</strong>{" "}
         (1.1, 1.2, … 2.1, 2.2). Cada onda fechada = 1 commit + 1 tag anotada
         (versionamento ADR-0010).
       </p>
       <p>
-        Estado atual: Bloco 1 fechado, Bloco 2 em andamento — DSL (Onda 2.1),
-        cálculo mensal (2.2), tabelas legais reais (2.3), incidências
-        FGTS + previdência própria RPPS (2.4 ✓), holerite PDF+JSON (2.5 ✓)
-        e tela operacional de Folha (2.6 ✓) já no ar. Falta só a Onda 2.7
-        (paridade Fiorilli) para fechar o Bloco 2.
+        Estado atual: Blocos 0–1 fechados. Bloco 2 a 85% — DSL (2.1), cálculo
+        mensal (2.2), tabelas legais (2.3), incidências FGTS/RPPS (2.4),
+        holerite PDF+JSON (2.5) e tela de folha (2.6); falta só a 2.7
+        (paridade Fiorilli). Bloco 3 a 60% — 13º (3.1), rescisão (3.2) e
+        férias (3.3) entregues; faltam licença-prêmio e folha complementar.
       </p>
     </Section>
   );
@@ -200,7 +200,7 @@ function SectionEstrutura() {
 │   └── package.json
 │
 ├── docs/
-│   ├── ROADMAP.md                Blocos 0–7, ondas, cronograma
+│   ├── ROADMAP.md                Blocos 0–10, ondas, cronograma
 │   ├── ARCHITECTURE.md           decisões macro
 │   ├── adr/                      ADRs (decisões versionadas)
 │   ├── leiautes/                 layouts externos (MANAD etc.)
@@ -831,7 +831,7 @@ function SectionTestes() {
 source .venv/bin/activate
 ruff check apps/                              # lint
 python manage.py check                        # django
-python -m pytest apps/ -q                     # 466 tests, ~60s
+python -m pytest apps/ -q                     # 499 tests, ~70s
 python -m pytest --cov=apps --cov-report=term-missing apps/`}
       </pre>
 
@@ -1052,7 +1052,7 @@ function SectionDocs() {
       <ul className="list-disc pl-5 space-y-1 text-xs">
         <li>
           <code className="bg-muted px-1 rounded">docs/ROADMAP.md</code> — Blocos
-          0–7 com escopo e critério de aceitação.
+          0–10 com escopo e critério de aceitação.
         </li>
         <li>
           <code className="bg-muted px-1 rounded">docs/ARCHITECTURE.md</code> —

@@ -4,16 +4,16 @@
 > **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
 > as regras de processo (validação integral, guias vivos, etc.).
 >
-> Última atualização: **2026-05-27** · Versão atual: **v0.10.0** ·
-> Bloco corrente: **Bloco 2 — Engine de cálculo de folha (56%)**. Bloco 0
-> e 1 concluídos. No Bloco 2 estão entregues as Ondas **2.1** (DSL de
+> Última atualização: **2026-06-08** · Versão atual: **v0.16.0** ·
+> Bloco corrente: **Bloco 3 — Folhas especiais (60%)**. Blocos 0 e 1
+> concluídos. **Bloco 2 a 85%** — entregues as Ondas **2.1** (DSL de
 > fórmulas via Python AST), **2.2** (cálculo mensal + toposort + endpoint
-> `/calcular/`), **2.3** (tabelas legais INSS/IRRF 2024-2026) e **2.6**
-> (tela operacional `/folha`). Faltam Ondas 2.4 (FGTS/previdência),
-> 2.5 (holerite PDF), 2.7 (paridade Fiorilli). Também entregues fora do
-> Bloco 2: Onda **1.6a** (OrgaoEmissor + Sindicato + tipo_logradouro,
-> pré-eSocial) e Onda **1.6b** (qualidade cadastral + bulk-edit +
-> importador CSV/XLSX). **441 testes backend verde** + 10 frontend.
+> `/calcular/`), **2.3** (tabelas legais INSS/IRRF 2024-2026), **2.4**
+> (incidências FGTS + previdência própria RPPS), **2.5** (holerite PDF/JSON)
+> e **2.6** (tela operacional `/folha`); falta só a **2.7** (paridade
+> Fiorilli). No **Bloco 3** entregues **3.1** (13º salário), **3.2**
+> (rescisão) e **3.3** (férias); faltam licença-prêmio e folha complementar.
+> **499 testes backend verde** + 10 frontend.
 > Em produção desde **maio/2026**: https://arminda.site (Hostinger VPS).
 
 ---
@@ -113,7 +113,7 @@ Arminda_Software/
 │   ├── SETUP_NOVA_MAQUINA.md   ← checklist de bootstrap em máquina nova
 │   ├── DEPLOY_PRODUCAO.md      ← runbook de deploy na VPS
 │   ├── MULTI_TENANT_PLAYBOOK.md ← operação multi-tenant no dia-a-dia
-│   ├── adr/                    ← 12 Architecture Decision Records
+│   ├── adr/                    ← 17 Architecture Decision Records
 │   └── relatorios/             ← entregáveis quinzenais
 ├── status-page/                ← painel público (GH Pages — darlanvelozo.github.io/Arminda_Software)
 └── scripts/                    ← setup.sh e utilitários

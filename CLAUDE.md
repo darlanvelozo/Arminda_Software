@@ -45,7 +45,7 @@ dados de referência. Ver [CHANGELOG.md](CHANGELOG.md).
 3. **[docs/PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 4. **[CHANGELOG.md](CHANGELOG.md)** — memória do projeto, toda alteração registrada
 5. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — racional das decisões de stack
-6. **[docs/adr/](docs/adr/)** — 12 ADRs (decisões formais)
+6. **[docs/adr/](docs/adr/)** — 17 ADRs (decisões formais)
 7. **CONTEXT.md específicos** quando for mexer:
    - Backend: [backend/CONTEXT.md](backend/CONTEXT.md) → [`_MODELS`](backend/CONTEXT_MODELS.md) → [`_SERVICES`](backend/CONTEXT_SERVICES.md) → [`apps/CONTEXT.md`](backend/apps/CONTEXT.md)
    - Frontend: [frontend/CONTEXT.md](frontend/CONTEXT.md) → [`pages/CONTEXT.md`](frontend/src/pages/CONTEXT.md) → [`components/CONTEXT.md`](frontend/src/components/CONTEXT.md)
@@ -226,6 +226,11 @@ Estas ADRs já estão aceitas e implementadas. Reabrir só com motivo forte:
 | 0010 | Versionamento `MAJOR.MINOR.PATCH` (MAJOR = bloco, MINOR = onda) |
 | 0011 | Adaptadores externos configuráveis via admin (`OrgaoEmissor`, `IntegracaoExterna`) |
 | 0012 | DSL de fórmulas via Python AST whitelist (sem `eval`/`exec`) |
+| 0013 | Incidências automáticas (bases por flag) + RPPS por-tenant + cálculo em duas fases |
+| 0014 | Holerite: JSON estruturado + PDF via ReportLab |
+| 0015 | 13º salário: escopo de rubrica por tipo de folha (`tipos_folha`) + avos |
+| 0016 | Rescisão: motivo no vínculo + verbas com gating por motivo |
+| 0017 | Férias: programação por `FeriasItem` na folha + abono pecuniário |
 
 Papéis novos a criar (mapeados em [PERSONAS.md](docs/PERSONAS.md)):
 `gestor_municipio` (Bloco 7), `contador_municipio` (Bloco 9),
