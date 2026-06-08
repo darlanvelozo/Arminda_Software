@@ -138,6 +138,41 @@ class Lancamento(TimeStampedModel):
         return f"{self.servidor.nome} | {self.rubrica.nome}: R$ {self.valor}"
 
 
+class FeriasItem(TimeStampedModel):
+    """
+    Programação de férias de um vínculo numa folha de férias (Onda 3.3).
+
+    O operador adiciona um item por servidor que sai de férias, com os dias de
+    gozo e os dias vendidos (abono pecuniário). O engine calcula a folha de
+    férias a partir destes itens (ver ADR-0017).
+    """
+
+    folha = models.ForeignKey(Folha, on_delete=models.CASCADE, related_name="ferias_itens")
+    vinculo = models.ForeignKey(
+        VinculoFuncional, on_delete=models.PROTECT, related_name="ferias_itens"
+    )
+    dias_gozo = models.PositiveSmallIntegerField(
+        default=30, help_text="Dias de férias gozados (salário de férias + 1/3)."
+    )
+    dias_abono = models.PositiveSmallIntegerField(
+        default=0, help_text="Dias vendidos (abono pecuniário) — até 10."
+    )
+    data_inicio = models.DateField(null=True, blank=True, help_text="Início do gozo (opcional).")
+
+    class Meta:
+        ordering = ["vinculo__servidor__nome"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["folha", "vinculo"], name="ferias_item_unico_por_folha_vinculo"
+            ),
+        ]
+        verbose_name = "item de férias"
+        verbose_name_plural = "itens de férias"
+
+    def __str__(self) -> str:
+        return f"{self.vinculo.servidor.nome}: {self.dias_gozo}d gozo + {self.dias_abono}d abono"
+
+
 class ModoContribuicaoRPPS(models.TextChoices):
     FLAT = "flat", "Alíquota única"
     PROGRESSIVO = "progressivo", "Tabela progressiva (EC 103)"

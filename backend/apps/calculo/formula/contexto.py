@@ -96,4 +96,7 @@ VARIAVEIS_PADRAO = (
     "AVISO_INDENIZADO",     # Decimal 1/0 — aviso prévio indenizado
     "TEM_FERIAS_VENCIDAS",  # Decimal 1/0
     "SALDO_FGTS",           # Decimal — saldo do FGTS (base da multa de 40%)
+    # Férias (Onda 3.3 — ADR-0017), preenchidas na folha de férias por item.
+    "DIAS_FERIAS",          # Decimal — dias de gozo
+    "DIAS_ABONO",           # Decimal — dias vendidos (abono pecuniário)
 )

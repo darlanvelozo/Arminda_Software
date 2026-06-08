@@ -92,7 +92,7 @@
       "data_fim_prevista": "2026-09-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 40,
+      "progresso_pct": 60,
       "entregas": [
         "✅ Cálculo de 13º — 1ª e 2ª parcelas (avos automáticos, escopo de rubrica por tipo de folha, incidências do 13º em separado, ADR-0015) — Onda 3.1",
         "Férias (com abono e adiantamento)",
@@ -252,6 +252,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-06-07",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.16.0 (férias)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 499 verde (5 testes novos de férias: seletor por itens, gozo 30 dias + 1/3 com incidências, abono pecuniário não tributa, RPPS estatutário, API com limite de 10 dias de abono). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Tipos regenerados. Pronto para tag v0.16.0.",
+      "descricao": "Onda 3.3 passou pela validação integral. Migration payroll.0004 (FeriasItem) aplicada no tenant de dev. O engine ganhou o seletor de vínculos da folha de férias (a partir dos itens) sem regressão nas demais. 499 passed (494 + 5)."
+    },
+    {
+      "data": "2026-06-07",
+      "tipo": "entrega",
+      "titulo": "Férias: salário + 1/3 e abono pecuniário (Onda 3.3)",
+      "resumo_executivo": "O sistema passou a calcular férias. Cria-se uma folha do tipo Férias e, na aba Programação, adicionam-se os servidores que vão sair de férias com os dias de gozo e os dias vendidos (abono pecuniário, até 10). Ao calcular, sai o salário de férias mais o 1/3 constitucional — com INSS e Imposto de Renda — e o abono pecuniário com seu 1/3, que é indenizatório e não sofre desconto. O contracheque e os resumos saem como em qualquer folha. Completa o tripé de folhas especiais (13º, rescisão e férias).",
+      "descricao": "Onda 3.3 (ADR-0017) entrega o módulo de férias-gozo. Modelo FeriasItem(folha, vinculo, dias_gozo, dias_abono, data_inicio) registra a programação; o seletor de vínculos da folha de férias vem desses itens (cada vínculo carrega seu item, sem N queries) e o contexto ganha DIAS_FERIAS/DIAS_ABONO. Comando seed_rubricas_ferias cria as rubricas (escopo tipos_folha=ferias), reusando o engine de duas fases: salário de férias e 1/3 têm incide_* (formam as bases → INSS/IRRF/RPPS); abono pecuniário e seu 1/3 são indenizatórios (sem incidência). API REST dos itens (/payroll/ferias-itens/) com limite de 10 dias de abono; no front, a aba Programação na folha de férias (adicionar/remover servidores e dias). 5 testes novos (499 no total). Limitação v1: não valida período aquisitivo/saldo de dias (confia no operador). Guias atualizados. Bloco 3 a 60% — faltam licença-prêmio e folha complementar."
+    },
     {
       "data": "2026-06-07",
       "tipo": "validacao",

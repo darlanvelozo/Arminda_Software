@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import Folha, Lancamento, RegimePrevidenciario, Rubrica
+from .models import FeriasItem, Folha, Lancamento, RegimePrevidenciario, Rubrica
 
 
 class LancamentoInline(admin.TabularInline):
@@ -63,6 +63,14 @@ class RegimePrevidenciarioAdmin(admin.ModelAdmin):
     list_filter = ("modo_contribuicao", "ativo")
     search_fields = ("nome",)
     date_hierarchy = "vigencia_inicio"
+
+
+@admin.register(FeriasItem)
+class FeriasItemAdmin(admin.ModelAdmin):
+    list_display = ("vinculo", "folha", "dias_gozo", "dias_abono", "data_inicio")
+    list_filter = ("folha",)
+    search_fields = ("vinculo__servidor__nome",)
+    raw_id_fields = ("folha", "vinculo")
 
 
 @admin.register(Lancamento)

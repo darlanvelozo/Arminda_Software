@@ -11,6 +11,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Building2,
+  CalendarDays,
   Calculator,
   CircleAlert,
   CircleCheck,
@@ -57,6 +58,8 @@ import {
 } from "@/lib/queries/folhas";
 import type { ResumoAreaLinha } from "@/lib/queries/folhas";
 import type { Folha, Lancamento, RelatorioCalculo } from "@/types";
+
+import { ProgramacaoFeriasTab } from "./ProgramacaoFeriasTab";
 
 const PAGE_SIZE = 50;
 
@@ -234,8 +237,13 @@ export default function FolhaDetailPage() {
 
       {relatorio && <RelatorioCard relatorio={relatorio} onDismiss={() => setRelatorio(null)} />}
 
-      <Tabs defaultValue="servidores">
+      <Tabs defaultValue={folha.tipo === "ferias" ? "programacao" : "servidores"}>
         <TabsList>
+          {folha.tipo === "ferias" && (
+            <TabsTrigger value="programacao" className="gap-2">
+              <CalendarDays className="h-3.5 w-3.5" /> Programação
+            </TabsTrigger>
+          )}
           <TabsTrigger value="servidores" className="gap-2">
             <Users className="h-3.5 w-3.5" /> Servidores
           </TabsTrigger>
@@ -253,6 +261,12 @@ export default function FolhaDetailPage() {
             <Tag className="h-3.5 w-3.5" /> Informações
           </TabsTrigger>
         </TabsList>
+
+        {folha.tipo === "ferias" && id !== null && (
+          <TabsContent value="programacao">
+            <ProgramacaoFeriasTab folhaId={id} />
+          </TabsContent>
+        )}
 
         <TabsContent value="servidores" className="space-y-3">
           <div className="rounded-md border bg-card">

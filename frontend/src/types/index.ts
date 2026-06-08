@@ -70,6 +70,9 @@ export type Lancamento = components["schemas"]["Lancamento"];
 // Regime previdenciário / RPPS (Onda 2.4)
 export type RegimePrevidenciario = components["schemas"]["RegimePrevidenciario"];
 
+// Programação de férias (Onda 3.3)
+export type FeriasItem = components["schemas"]["FeriasItem"];
+
 /**
  * Resposta do POST /api/payroll/folhas/{id}/calcular/.
  *

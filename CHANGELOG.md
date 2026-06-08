@@ -35,6 +35,41 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 3.3 — Férias: salário + 1/3 e abono pecuniário · 2026-06-07
+
+> Terceira onda do Bloco 3 (ADR-0017). Programação por itens na folha; reusa o
+> engine de duas fases. Gozo + 1/3 tributam; abono pecuniário não.
+
+#### Adicionado — Backend
+
+- **feat(payroll):** modelo `FeriasItem(folha, vinculo, dias_gozo, dias_abono,
+  data_inicio)` (+migration), admin e API REST (`/payroll/ferias-itens/`,
+  limite de 10 dias de abono).
+- **feat(payroll.services.ferias):** `vars_ferias` (DIAS_FERIAS/DIAS_ABONO);
+  `calcular_folha` ganha o seletor de vínculos da folha de férias (a partir
+  dos itens), sem afetar as demais folhas.
+- **feat(payroll):** comando `seed_rubricas_ferias` — salário de férias + 1/3
+  (tributáveis) e abono pecuniário + 1/3 (indenizados); INSS/IRRF/RPPS só
+  sobre a parcela tributável.
+
+#### Adicionado — Frontend
+
+- **feat(folha):** aba **Programação** na folha de férias — adicionar/remover
+  servidores com dias de gozo e de abono (seletor de vínculos ativos).
+- **docs:** guias do operador e do dev atualizados. Tipos regenerados.
+
+#### Impacto
+
+- Migration de `payroll` (TENANT) — `migrate_schemas`. Aditiva.
+- v1 não valida período aquisitivo/saldo de dias (confia no operador).
+- 5 testes novos (499 no total).
+
+#### Próximos passos
+
+- Bloco 3: **licença-prêmio** e **folha complementar** fecham o bloco.
+
+---
+
 ### Onda 3.2 — Rescisão: verbas rescisórias · 2026-06-07
 
 > Segunda onda do Bloco 3 (ADR-0016). Reusa o engine de duas fases, as bases

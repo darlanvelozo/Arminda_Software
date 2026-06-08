@@ -33,8 +33,15 @@ from apps.payroll.filters import (
     RegimePrevidenciarioFilter,
     RubricaFilter,
 )
-from apps.payroll.models import Folha, Lancamento, RegimePrevidenciario, Rubrica
+from apps.payroll.models import (
+    FeriasItem,
+    Folha,
+    Lancamento,
+    RegimePrevidenciario,
+    Rubrica,
+)
 from apps.payroll.serializers import (
+    FeriasItemSerializer,
     FolhaDetailSerializer,
     FolhaListSerializer,
     FolhaWriteSerializer,
@@ -329,6 +336,35 @@ class RegimePrevidenciarioViewSet(viewsets.ModelViewSet):
     search_fields = ["nome"]
     ordering_fields = ["vigencia_inicio", "nome", "criado_em"]
     ordering = ["-vigencia_inicio"]
+
+    READ_ACTIONS = {"list", "retrieve"}
+
+    def get_permissions(self):
+        if self.action in self.READ_ACTIONS:
+            return [IsLeituraMunicipio()]
+        return [IsFinanceiroMunicipio()]
+
+
+# ============================================================
+# FeriasItem (Onda 3.3)
+# ============================================================
+
+
+class FeriasItemViewSet(viewsets.ModelViewSet):
+    """
+    CRUD da programação de férias (itens de uma folha de férias).
+
+    Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+    Filtra por ?folha=.
+    """
+
+    queryset = FeriasItem.objects.select_related(
+        "folha", "vinculo__servidor", "vinculo__cargo"
+    ).all()
+    serializer_class = FeriasItemSerializer
+    filterset_fields = ["folha", "vinculo"]
+    ordering_fields = ["vinculo__servidor__nome"]
+    ordering = ["vinculo__servidor__nome"]
 
     READ_ACTIONS = {"list", "retrieve"}
 

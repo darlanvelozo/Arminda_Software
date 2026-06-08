@@ -188,6 +188,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payroll/ferias-itens/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD da programação de férias (itens de uma folha de férias).
+         *
+         *     Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+         *     Filtra por ?folha=.
+         */
+        get: operations["payroll_ferias_itens_list"];
+        put?: never;
+        /**
+         * @description CRUD da programação de férias (itens de uma folha de férias).
+         *
+         *     Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+         *     Filtra por ?folha=.
+         */
+        post: operations["payroll_ferias_itens_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/ferias-itens/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description CRUD da programação de férias (itens de uma folha de férias).
+         *
+         *     Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+         *     Filtra por ?folha=.
+         */
+        get: operations["payroll_ferias_itens_retrieve"];
+        /**
+         * @description CRUD da programação de férias (itens de uma folha de férias).
+         *
+         *     Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+         *     Filtra por ?folha=.
+         */
+        put: operations["payroll_ferias_itens_update"];
+        post?: never;
+        /**
+         * @description CRUD da programação de férias (itens de uma folha de férias).
+         *
+         *     Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+         *     Filtra por ?folha=.
+         */
+        delete: operations["payroll_ferias_itens_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * @description CRUD da programação de férias (itens de uma folha de férias).
+         *
+         *     Leitura para qualquer papel; escrita exige financeiro/admin/staff.
+         *     Filtra por ?folha=.
+         */
+        patch: operations["payroll_ferias_itens_partial_update"];
+        trace?: never;
+    };
     "/api/payroll/folhas/": {
         parameters: {
             query?: never;
@@ -1297,6 +1365,24 @@ export interface components {
          * @enum {string}
          */
         EstadoCivilEnum: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel";
+        /** @description Programação de férias de um vínculo numa folha (Onda 3.3). */
+        FeriasItem: {
+            readonly id: number;
+            folha: number;
+            vinculo: number;
+            readonly servidor_nome: string;
+            readonly servidor_matricula: string;
+            readonly cargo: string;
+            /** @description Dias de férias gozados (salário de férias + 1/3). */
+            dias_gozo?: number;
+            /** @description Dias vendidos (abono pecuniário) — até 10. */
+            dias_abono?: number;
+            /**
+             * Format: date
+             * @description Início do gozo (opcional).
+             */
+            data_inicio?: string | null;
+        };
         /**
          * @description Detalhe completo. Lançamentos consultados em endpoint separado para
          *     permitir paginação e filtros.
@@ -1599,6 +1685,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["DocumentoList"][];
         };
+        PaginatedFeriasItemList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["FeriasItem"][];
+        };
         PaginatedFolhaListList: {
             /** @example 123 */
             count: number;
@@ -1795,6 +1896,24 @@ export interface components {
             descricao?: string;
             /** Format: uri */
             arquivo?: string;
+        };
+        /** @description Programação de férias de um vínculo numa folha (Onda 3.3). */
+        PatchedFeriasItem: {
+            readonly id?: number;
+            folha?: number;
+            vinculo?: number;
+            readonly servidor_nome?: string;
+            readonly servidor_matricula?: string;
+            readonly cargo?: string;
+            /** @description Dias de férias gozados (salário de férias + 1/3). */
+            dias_gozo?: number;
+            /** @description Dias vendidos (abono pecuniário) — até 10. */
+            dias_abono?: number;
+            /**
+             * Format: date
+             * @description Início do gozo (opcional).
+             */
+            data_inicio?: string | null;
         };
         /** @description Criar/editar folha (não calcula — `calcular` é action separada). */
         PatchedFolhaWrite: {
@@ -2783,6 +2902,158 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    payroll_ferias_itens_list: {
+        parameters: {
+            query?: {
+                folha?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+                vinculo?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedFeriasItemList"];
+                };
+            };
+        };
+    };
+    payroll_ferias_itens_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeriasItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["FeriasItem"];
+                "multipart/form-data": components["schemas"]["FeriasItem"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeriasItem"];
+                };
+            };
+        };
+    };
+    payroll_ferias_itens_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de férias. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeriasItem"];
+                };
+            };
+        };
+    };
+    payroll_ferias_itens_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de férias. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeriasItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["FeriasItem"];
+                "multipart/form-data": components["schemas"]["FeriasItem"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeriasItem"];
+                };
+            };
+        };
+    };
+    payroll_ferias_itens_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de férias. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    payroll_ferias_itens_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de férias. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedFeriasItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedFeriasItem"];
+                "multipart/form-data": components["schemas"]["PatchedFeriasItem"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeriasItem"];
+                };
             };
         };
     };

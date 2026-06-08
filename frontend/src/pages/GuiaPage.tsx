@@ -792,6 +792,16 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         e o FGTS + multa de 40% para celetistas sem justa causa.
       </p>
 
+      <h3 className="text-base font-semibold mt-4">Férias (Onda 3.3)</h3>
+      <p>
+        Crie uma folha do tipo <strong>Férias</strong> e use a aba{" "}
+        <strong>Programação</strong> para adicionar os servidores que sairão de
+        férias, com os <strong>dias de gozo</strong> e os <strong>dias vendidos</strong>{" "}
+        (abono pecuniário, até 10). Ao calcular, o sistema gera o salário de férias +
+        1/3 constitucional (com INSS/IRRF) e o abono pecuniário + 1/3 (indenizado, sem
+        desconto). O holerite e os resumos saem como em qualquer folha.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">
         <FlowItem

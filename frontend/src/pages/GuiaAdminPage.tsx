@@ -615,6 +615,21 @@ function SectionCalculo() {
         informado (o sistema ainda não rastreia o saldo do FGTS).
       </p>
 
+      <h3 className="text-base font-semibold mt-4">Férias (Onda 3.3 — ADR-0017)</h3>
+      <p>
+        Modelo <code className="bg-muted px-1 rounded">FeriasItem(folha, vinculo,
+        dias_gozo, dias_abono)</code> dirige a folha de férias. O seletor de vínculos
+        vem dos itens (cada vínculo carrega seu item em{" "}
+        <code className="bg-muted px-1 rounded">_ferias_item</code>);{" "}
+        <code className="bg-muted px-1 rounded">apps.payroll.services.ferias</code>{" "}
+        expõe <code className="bg-muted px-1 rounded">DIAS_FERIAS</code>/
+        <code className="bg-muted px-1 rounded">DIAS_ABONO</code>. Comando{" "}
+        <code className="bg-muted px-1 rounded">seed_rubricas_ferias</code>: salário de
+        férias + 1/3 (tributáveis) e abono pecuniário + 1/3 (indenizados). API{" "}
+        <code className="bg-muted px-1 rounded">/payroll/ferias-itens/?folha=</code>;
+        no front, a aba Programação na folha de férias.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>
         <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}

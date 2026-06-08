@@ -31,8 +31,16 @@ from apps.calculo.dependencias import RubricaParaOrdenar, ordenar_topologicament
 from apps.calculo.formula.avaliador import avaliar
 from apps.calculo.formula.contexto import ContextoFolha
 from apps.calculo.formula.errors import FormulaError
-from apps.payroll.models import Folha, Lancamento, Rubrica, TipoFolha, TipoRubrica
+from apps.payroll.models import (
+    FeriasItem,
+    Folha,
+    Lancamento,
+    Rubrica,
+    TipoFolha,
+    TipoRubrica,
+)
 from apps.payroll.services.decimo import avos_no_ano
+from apps.payroll.services.ferias import vars_ferias
 from apps.payroll.services.previdencia import (
     regime_vigente,
     resolver_previdencia,
@@ -219,10 +227,33 @@ def _vinculos_rescisao(competencia: date):
     )
 
 
+def _vinculos_ferias(folha: Folha):
+    """
+    Vínculos programados na folha de férias (Onda 3.3): vêm dos `FeriasItem`.
+    Cada vínculo carrega seu item em `_ferias_item` (evita N queries).
+    """
+    itens = (
+        FeriasItem.objects.filter(folha=folha)
+        .select_related(
+            "vinculo__servidor", "vinculo__cargo", "vinculo__lotacao",
+            "vinculo__unidade_orcamentaria",
+        )
+        .order_by("vinculo__servidor__nome", "vinculo_id")
+    )
+    vinculos = []
+    for item in itens:
+        v = item.vinculo
+        v._ferias_item = item
+        vinculos.append(v)
+    return vinculos
+
+
 def _vinculos_da_folha(folha: Folha):
     """Seleciona os vínculos conforme o tipo de folha."""
     if folha.tipo == TipoFolha.RESCISAO:
         return _vinculos_rescisao(folha.competencia)
+    if folha.tipo == TipoFolha.FERIAS:
+        return _vinculos_ferias(folha)
     return _vinculos_da_competencia(folha.competencia)
 
 
@@ -427,6 +458,7 @@ def _processar_vinculo(
         **resolver_previdencia(vinculo, regime).como_variaveis(),
         **_vars_decimo(folha, vinculo),
         **vars_rescisao(vinculo),
+        **vars_ferias(vinculo),
     }
 
     total_proventos, bases = _fase_proventos(

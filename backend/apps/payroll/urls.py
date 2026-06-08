@@ -6,6 +6,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from apps.payroll.views import (
+    FeriasItemViewSet,
     FolhaViewSet,
     LancamentoViewSet,
     RegimePrevidenciarioViewSet,
@@ -21,5 +22,6 @@ router.register("lancamentos", LancamentoViewSet, basename="lancamento")
 router.register(
     "regimes-previdenciarios", RegimePrevidenciarioViewSet, basename="regime-previdenciario"
 )
+router.register("ferias-itens", FeriasItemViewSet, basename="ferias-item")
 
 urlpatterns = [path("", include(router.urls))]

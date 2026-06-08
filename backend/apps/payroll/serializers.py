@@ -10,6 +10,7 @@ from __future__ import annotations
 from rest_framework import serializers
 
 from apps.payroll.models import (
+    FeriasItem,
     Folha,
     Lancamento,
     ModoContribuicaoRPPS,
@@ -198,6 +199,36 @@ class RegimePrevidenciarioSerializer(serializers.ModelSerializer):
                 {"vigencia_fim": "Fim da vigência não pode ser antes do início."}
             )
         return attrs
+
+
+class FeriasItemSerializer(serializers.ModelSerializer):
+    """Programação de férias de um vínculo numa folha (Onda 3.3)."""
+
+    servidor_nome = serializers.CharField(source="vinculo.servidor.nome", read_only=True)
+    servidor_matricula = serializers.CharField(
+        source="vinculo.servidor.matricula", read_only=True
+    )
+    cargo = serializers.CharField(source="vinculo.cargo.nome", read_only=True)
+
+    class Meta:
+        model = FeriasItem
+        fields = [
+            "id",
+            "folha",
+            "vinculo",
+            "servidor_nome",
+            "servidor_matricula",
+            "cargo",
+            "dias_gozo",
+            "dias_abono",
+            "data_inicio",
+        ]
+        read_only_fields = ["id", "servidor_nome", "servidor_matricula", "cargo"]
+
+    def validate_dias_abono(self, value: int) -> int:
+        if value > 10:
+            raise serializers.ValidationError("Abono pecuniário é de no máximo 10 dias.")
+        return value
 
 
 class LancamentoSerializer(serializers.ModelSerializer):
