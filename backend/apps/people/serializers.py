@@ -23,6 +23,7 @@ from apps.people.models import (
     Dependente,
     Documento,
     Lotacao,
+    MotivoDemissao,
     OrgaoEmissor,
     Servidor,
     Sindicato,
@@ -448,6 +449,10 @@ class VinculoDetailSerializer(serializers.ModelSerializer):
             "carga_horaria",
             "salario_base",
             "ativo",
+            "motivo_demissao",
+            "aviso_previo_indenizado",
+            "tem_ferias_vencidas",
+            "saldo_fgts",
             "criado_em",
             "atualizado_em",
         ]
@@ -478,6 +483,10 @@ class VinculoWriteSerializer(serializers.ModelSerializer):
             "carga_horaria",
             "salario_base",
             "ativo",
+            "motivo_demissao",
+            "aviso_previo_indenizado",
+            "tem_ferias_vencidas",
+            "saldo_fgts",
         ]
         read_only_fields = ["id"]
 
@@ -662,6 +671,15 @@ class DesligamentoInputSerializer(serializers.Serializer):
 
     data_desligamento = serializers.DateField()
     motivo = serializers.CharField(required=False, allow_blank=True, max_length=500)
+    # Rescisão estruturada (Onda 3.2) — grava nos vínculos para a folha de rescisão.
+    motivo_demissao = serializers.ChoiceField(
+        choices=MotivoDemissao.choices, required=False, allow_blank=True, default=""
+    )
+    aviso_previo_indenizado = serializers.BooleanField(required=False, default=False)
+    tem_ferias_vencidas = serializers.BooleanField(required=False, default=False)
+    saldo_fgts = serializers.DecimalField(
+        max_digits=12, decimal_places=2, required=False, default=0
+    )
 
 
 class TransferenciaInputSerializer(serializers.Serializer):

@@ -595,6 +595,26 @@ function SectionCalculo() {
         proporcional na rescisão (onda futura).
       </p>
 
+      <h3 className="text-base font-semibold mt-4">Rescisão (Onda 3.2 — ADR-0016)</h3>
+      <p>
+        Campos de desligamento no{" "}
+        <code className="bg-muted px-1 rounded">VinculoFuncional</code>:{" "}
+        <code className="bg-muted px-1 rounded">motivo_demissao</code>,{" "}
+        <code className="bg-muted px-1 rounded">aviso_previo_indenizado</code>,{" "}
+        <code className="bg-muted px-1 rounded">tem_ferias_vencidas</code>,{" "}
+        <code className="bg-muted px-1 rounded">saldo_fgts</code> (gravados pelo endpoint{" "}
+        <code className="bg-muted px-1 rounded">/desligar/</code>).{" "}
+        <code className="bg-muted px-1 rounded">apps.payroll.services.rescisao</code>{" "}
+        expõe <code className="bg-muted px-1 rounded">SALDO_DIAS</code>,{" "}
+        <code className="bg-muted px-1 rounded">AVOS_FERIAS</code> e flags de motivo;{" "}
+        <code className="bg-muted px-1 rounded">calcular_folha</code> usa um seletor
+        próprio (vínculos com <code className="bg-muted px-1 rounded">data_demissao</code>{" "}
+        no mês, mesmo inativos). Comando{" "}
+        <code className="bg-muted px-1 rounded">seed_rubricas_rescisao</code>. Limitação:
+        a multa de 40% depende do <code className="bg-muted px-1 rounded">saldo_fgts</code>{" "}
+        informado (o sistema ainda não rastreia o saldo do FGTS).
+      </p>
+
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>
         <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}

@@ -45,6 +45,18 @@ class Regime(models.TextChoices):
     ESTAGIARIO = "estagiario", "Estagiario"
 
 
+class MotivoDemissao(models.TextChoices):
+    """Motivo do desligamento — define as verbas rescisórias (Onda 3.2)."""
+
+    PEDIDO_DEMISSAO = "pedido_demissao", "Pedido de demissão"
+    SEM_JUSTA_CAUSA = "sem_justa_causa", "Dispensa sem justa causa"
+    COM_JUSTA_CAUSA = "com_justa_causa", "Dispensa com justa causa"
+    TERMINO_CONTRATO = "termino_contrato", "Término de contrato"
+    APOSENTADORIA = "aposentadoria", "Aposentadoria"
+    FALECIMENTO = "falecimento", "Falecimento"
+    EXONERACAO = "exoneracao", "Exoneração (estatutário)"
+
+
 class NaturezaLotacao(models.TextChoices):
     """Classificação macro da lotação por secretaria/área de atuação."""
 
@@ -318,6 +330,28 @@ class VinculoFuncional(TimeStampedModel):
     carga_horaria = models.PositiveIntegerField(help_text="Horas semanais", default=40)
     salario_base = models.DecimalField(max_digits=12, decimal_places=2)
     ativo = models.BooleanField(default=True)
+
+    # Rescisão (Onda 3.2 — ADR-0016). Preenchidos no desligamento.
+    motivo_demissao = models.CharField(
+        max_length=20,
+        choices=MotivoDemissao.choices,
+        blank=True,
+        help_text="Motivo do desligamento — define as verbas da folha de rescisão.",
+    )
+    aviso_previo_indenizado = models.BooleanField(
+        default=False,
+        help_text="Aviso prévio indenizado (dispensa sem justa causa, celetista).",
+    )
+    tem_ferias_vencidas = models.BooleanField(
+        default=False,
+        help_text="Tem período aquisitivo de férias completo e não gozado.",
+    )
+    saldo_fgts = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        help_text="Saldo do FGTS acumulado — base da multa de 40% na rescisão.",
+    )
 
     # Campos enriquecidos (Bloco 1.4 — vindos do SIP; opcionais)
     matricula_contrato = models.CharField(

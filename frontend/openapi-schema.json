@@ -3477,6 +3477,22 @@ components:
         motivo:
           type: string
           maxLength: 500
+        motivo_demissao:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/MotivoDemissaoEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        aviso_previo_indenizado:
+          type: boolean
+          default: false
+        tem_ferias_vencidas:
+          type: boolean
+          default: false
+        saldo_fgts:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          default: '0.00'
       required:
       - data_desligamento
     DocumentoDetail:
@@ -3936,6 +3952,24 @@ components:
       description: |-
         * `flat` - Alíquota única
         * `progressivo` - Tabela progressiva (EC 103)
+    MotivoDemissaoEnum:
+      enum:
+      - pedido_demissao
+      - sem_justa_causa
+      - com_justa_causa
+      - termino_contrato
+      - aposentadoria
+      - falecimento
+      - exoneracao
+      type: string
+      description: |-
+        * `pedido_demissao` - Pedido de demissão
+        * `sem_justa_causa` - Dispensa sem justa causa
+        * `com_justa_causa` - Dispensa com justa causa
+        * `termino_contrato` - Término de contrato
+        * `aposentadoria` - Aposentadoria
+        * `falecimento` - Falecimento
+        * `exoneracao` - Exoneração (estatutário)
     NaturezaEnum:
       enum:
       - administracao
@@ -4877,6 +4911,31 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
         ativo:
           type: boolean
+        motivo_demissao:
+          description: |-
+            Motivo do desligamento — define as verbas da folha de rescisão.
+
+            * `pedido_demissao` - Pedido de demissão
+            * `sem_justa_causa` - Dispensa sem justa causa
+            * `com_justa_causa` - Dispensa com justa causa
+            * `termino_contrato` - Término de contrato
+            * `aposentadoria` - Aposentadoria
+            * `falecimento` - Falecimento
+            * `exoneracao` - Exoneração (estatutário)
+          oneOf:
+          - $ref: '#/components/schemas/MotivoDemissaoEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        aviso_previo_indenizado:
+          type: boolean
+          description: Aviso prévio indenizado (dispensa sem justa causa, celetista).
+        tem_ferias_vencidas:
+          type: boolean
+          description: Tem período aquisitivo de férias completo e não gozado.
+        saldo_fgts:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Saldo do FGTS acumulado — base da multa de 40% na rescisão.
     RegimeEnum:
       enum:
       - estatutario
@@ -5644,6 +5703,31 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
         ativo:
           type: boolean
+        motivo_demissao:
+          description: |-
+            Motivo do desligamento — define as verbas da folha de rescisão.
+
+            * `pedido_demissao` - Pedido de demissão
+            * `sem_justa_causa` - Dispensa sem justa causa
+            * `com_justa_causa` - Dispensa com justa causa
+            * `termino_contrato` - Término de contrato
+            * `aposentadoria` - Aposentadoria
+            * `falecimento` - Falecimento
+            * `exoneracao` - Exoneração (estatutário)
+          oneOf:
+          - $ref: '#/components/schemas/MotivoDemissaoEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        aviso_previo_indenizado:
+          type: boolean
+          description: Aviso prévio indenizado (dispensa sem justa causa, celetista).
+        tem_ferias_vencidas:
+          type: boolean
+          description: Tem período aquisitivo de férias completo e não gozado.
+        saldo_fgts:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Saldo do FGTS acumulado — base da multa de 40% na rescisão.
         criado_em:
           type: string
           format: date-time
@@ -5756,6 +5840,31 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
         ativo:
           type: boolean
+        motivo_demissao:
+          description: |-
+            Motivo do desligamento — define as verbas da folha de rescisão.
+
+            * `pedido_demissao` - Pedido de demissão
+            * `sem_justa_causa` - Dispensa sem justa causa
+            * `com_justa_causa` - Dispensa com justa causa
+            * `termino_contrato` - Término de contrato
+            * `aposentadoria` - Aposentadoria
+            * `falecimento` - Falecimento
+            * `exoneracao` - Exoneração (estatutário)
+          oneOf:
+          - $ref: '#/components/schemas/MotivoDemissaoEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        aviso_previo_indenizado:
+          type: boolean
+          description: Aviso prévio indenizado (dispensa sem justa causa, celetista).
+        tem_ferias_vencidas:
+          type: boolean
+          description: Tem período aquisitivo de férias completo e não gozado.
+        saldo_fgts:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Saldo do FGTS acumulado — base da multa de 40% na rescisão.
       required:
       - cargo
       - data_admissao

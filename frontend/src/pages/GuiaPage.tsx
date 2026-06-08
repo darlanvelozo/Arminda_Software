@@ -778,6 +778,20 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         misturam.
       </p>
 
+      <h3 className="text-base font-semibold mt-4">Rescisão (Onda 3.2)</h3>
+      <p>
+        Ao <strong>desligar</strong> um servidor (em{" "}
+        <Link to="/servidores" className="underline">/servidores</Link> → detalhe →
+        Desligar), informe o <strong>motivo</strong> (pedido, dispensa sem/com justa
+        causa, término, aposentadoria, etc.), se há <strong>aviso prévio indenizado</strong>,{" "}
+        <strong>férias vencidas</strong> e o <strong>saldo do FGTS</strong>. Depois crie
+        uma folha do tipo <strong>Rescisão</strong> na competência do desligamento e
+        calcule: o sistema gera as verbas conforme o motivo — saldo de salário, 13º
+        proporcional, férias proporcionais e vencidas + 1/3, aviso indenizado — com
+        INSS/IRRF sobre as parcelas tributáveis (férias e aviso indenizados não tributam)
+        e o FGTS + multa de 40% para celetistas sem justa causa.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">
         <FlowItem

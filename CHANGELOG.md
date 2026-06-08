@@ -35,6 +35,46 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 3.2 — Rescisão: verbas rescisórias · 2026-06-05
+
+> Segunda onda do Bloco 3 (ADR-0016). Reusa o engine de duas fases, as bases
+> automáticas e o `tipos_folha`. As incidências do saldo e do 13º saem em
+> separado; férias e aviso indenizados não tributam.
+
+#### Adicionado — Backend
+
+- **feat(people):** campos de rescisão no `VinculoFuncional` —
+  `motivo_demissao`, `aviso_previo_indenizado`, `tem_ferias_vencidas`,
+  `saldo_fgts` (+migration). Gravados pelo endpoint `/desligar/` (service +
+  serializer estendidos).
+- **feat(payroll.services.rescisao):** `avos_ferias` (período aquisitivo) e
+  `vars_rescisao` (SALDO_DIAS, AVOS_FERIAS, flags de motivo, SALDO_FGTS).
+- **feat(payroll):** `calcular_folha` ganha o seletor de vínculos da rescisão
+  (`data_demissao` no mês, mesmo inativos), sem afetar as demais folhas.
+- **feat(payroll):** comando `seed_rubricas_rescisao` — saldo, 13º prop
+  (INSS/IRRF/RPPS em separado), férias prop/vencidas + 1/3 (indenizadas),
+  aviso prévio indenizado, FGTS + multa 40%; gating por motivo.
+
+#### Adicionado — Frontend
+
+- **feat(servidores):** `DesligamentoDialog` agora captura motivo (select),
+  aviso prévio indenizado, férias vencidas e saldo do FGTS.
+- **docs:** guias do operador e do dev atualizados. Tipos regenerados.
+
+#### Impacto
+
+- Migration de `people` (TENANT) — `migrate_schemas`. Aditiva.
+- ⚠ Multa de 40% usa o `saldo_fgts` informado (o saldo acumulado do FGTS
+  ainda não é rastreado — virá com a integração FGTS/eSocial).
+- 8 testes novos (494 no total).
+
+#### Próximos passos
+
+- Bloco 3 segue com **férias** (módulo de gozo: escala, abono pecuniário) e
+  **licença-prêmio**.
+
+---
+
 ### Onda 3.1 — 13º salário (1ª e 2ª parcelas) · 2026-06-05
 
 > Início do **Bloco 3** (folhas especiais), pelo 13º salário (ADR-0015).

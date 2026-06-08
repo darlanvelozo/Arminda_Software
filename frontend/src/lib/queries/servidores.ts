@@ -217,9 +217,19 @@ async function updateServidor(
   return data;
 }
 
+export interface DesligamentoPayload {
+  data_desligamento: string;
+  motivo?: string;
+  // Rescisão estruturada (Onda 3.2)
+  motivo_demissao?: string;
+  aviso_previo_indenizado?: boolean;
+  tem_ferias_vencidas?: boolean;
+  saldo_fgts?: string;
+}
+
 async function desligarServidor(
   id: number,
-  payload: { data_desligamento: string; motivo?: string },
+  payload: DesligamentoPayload,
 ): Promise<ServidorDetail> {
   const { data } = await api.post<ServidorDetail>(`${BASE}${id}/desligar/`, payload);
   return data;
@@ -285,7 +295,7 @@ export function useDesligarServidor() {
       payload,
     }: {
       id: number;
-      payload: { data_desligamento: string; motivo?: string };
+      payload: DesligamentoPayload;
     }) => desligarServidor(id, payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: servidoresKey(activeTenant) }),
   });

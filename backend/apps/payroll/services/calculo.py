@@ -38,6 +38,7 @@ from apps.payroll.services.previdencia import (
     resolver_previdencia,
     rpps_config_para,
 )
+from apps.payroll.services.rescisao import vars_rescisao
 from apps.people.models import Dependente, VinculoFuncional
 
 if TYPE_CHECKING:
@@ -197,6 +198,32 @@ def _vinculos_da_competencia(competencia: date):
         .select_related("servidor", "cargo", "lotacao", "unidade_orcamentaria")
         .order_by("servidor__nome", "id")
     )
+
+
+def _vinculos_rescisao(competencia: date):
+    """
+    Vínculos desligados no mês da competência (Onda 3.2): `data_demissao`
+    entre o 1º e o último dia do mês — independente de `ativo`, pois o
+    desligado deixa de ser ativo.
+    """
+    import calendar
+
+    ultimo_dia = competencia.replace(day=calendar.monthrange(competencia.year, competencia.month)[1])
+    return (
+        VinculoFuncional.objects.filter(
+            data_demissao__gte=competencia,
+            data_demissao__lte=ultimo_dia,
+        )
+        .select_related("servidor", "cargo", "lotacao", "unidade_orcamentaria")
+        .order_by("servidor__nome", "id")
+    )
+
+
+def _vinculos_da_folha(folha: Folha):
+    """Seleciona os vínculos conforme o tipo de folha."""
+    if folha.tipo == TipoFolha.RESCISAO:
+        return _vinculos_rescisao(folha.competencia)
+    return _vinculos_da_competencia(folha.competencia)
 
 
 def _rubricas_ativas_ordenadas(tipo_folha: str) -> tuple[list[Rubrica], list[str]]:
@@ -395,8 +422,12 @@ def _processar_vinculo(
     Devolve `(total_proventos, total_descontos)` deste vínculo.
     """
     rubricas_calc: dict[str, Decimal] = {}
-    # Variáveis de regime (RGPS/RPPS/FGTS) + variáveis de 13º (avos/base/parcela).
-    vars_regime = {**resolver_previdencia(vinculo, regime).como_variaveis(), **_vars_decimo(folha, vinculo)}
+    # Regime (RGPS/RPPS/FGTS) + 13º (avos/base/parcela) + rescisão (saldo/avos/motivo).
+    vars_regime = {
+        **resolver_previdencia(vinculo, regime).como_variaveis(),
+        **_vars_decimo(folha, vinculo),
+        **vars_rescisao(vinculo),
+    }
 
     total_proventos, bases = _fase_proventos(
         folha=folha,
@@ -483,7 +514,7 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
         # legítimo (município que ainda não cadastrou rubricas).
         return relatorio
 
-    vinculos = list(_vinculos_da_competencia(folha.competencia))
+    vinculos = list(_vinculos_da_folha(folha))
     relatorio.vinculos_processados = len(vinculos)
     relatorio.rubricas_processadas = len(rubricas_ordenadas)
 

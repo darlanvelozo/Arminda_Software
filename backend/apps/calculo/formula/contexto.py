@@ -86,4 +86,14 @@ VARIAVEIS_PADRAO = (
     "AVOS_13",              # Decimal 0-12 — meses trabalhados no ano (≥15 dias)
     "BASE_13",             # Decimal — base do 13º (v1 = SALARIO_BASE)
     "PARCELA_13",           # Decimal — 1 (1ª parcela), 2 (2ª parcela) ou 0
+    # Rescisão (Onda 3.2 — ADR-0016), preenchidas na folha de rescisão.
+    "SALDO_DIAS",           # Decimal — dias trabalhados no mês da demissão
+    "AVOS_FERIAS",          # Decimal 0-12 — avos do período aquisitivo
+    "EH_SEM_JUSTA_CAUSA",   # Decimal 1/0
+    "EH_JUSTA_CAUSA",       # Decimal 1/0
+    "EH_PEDIDO",            # Decimal 1/0 — pedido de demissão
+    "EH_CELETISTA",         # Decimal 1/0
+    "AVISO_INDENIZADO",     # Decimal 1/0 — aviso prévio indenizado
+    "TEM_FERIAS_VENCIDAS",  # Decimal 1/0
+    "SALDO_FGTS",           # Decimal — saldo do FGTS (base da multa de 40%)
 )

@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import date
+from decimal import Decimal
 
 from django.db import transaction
 
@@ -31,6 +32,11 @@ class DadosDesligamento:
     servidor_id: int
     data_desligamento: date
     motivo: str = ""
+    # Rescisão estruturada (Onda 3.2) — gravada nos vínculos encerrados.
+    motivo_demissao: str = ""
+    aviso_previo_indenizado: bool = False
+    tem_ferias_vencidas: bool = False
+    saldo_fgts: Decimal = Decimal(0)
 
 
 @transaction.atomic
@@ -74,7 +80,21 @@ def desligar_servidor(dados: DadosDesligamento) -> Servidor:
     for vinculo in vinculos_ativos:
         vinculo.ativo = False
         vinculo.data_demissao = dados.data_desligamento
-        vinculo.save(update_fields=["ativo", "data_demissao", "atualizado_em"])
+        vinculo.motivo_demissao = dados.motivo_demissao
+        vinculo.aviso_previo_indenizado = dados.aviso_previo_indenizado
+        vinculo.tem_ferias_vencidas = dados.tem_ferias_vencidas
+        vinculo.saldo_fgts = dados.saldo_fgts
+        vinculo.save(
+            update_fields=[
+                "ativo",
+                "data_demissao",
+                "motivo_demissao",
+                "aviso_previo_indenizado",
+                "tem_ferias_vencidas",
+                "saldo_fgts",
+                "atualizado_em",
+            ]
+        )
 
     servidor.ativo = False
     servidor.save(update_fields=["ativo", "atualizado_em"])

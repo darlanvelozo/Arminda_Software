@@ -17,17 +17,17 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.14.0` (Onda 3.1 — 13º salário, início do Bloco 3)
-- **Bloco corrente:** Bloco 3 — Folhas especiais (20% — Onda 3.1/13º entregue; faltam férias, rescisão, licença-prêmio, complementar). Bloco 2 a 85% (falta só a 2.7 — paridade Fiorilli)
+- **Versão atual:** `v0.15.0` (Onda 3.2 — rescisão)
+- **Bloco corrente:** Bloco 3 — Folhas especiais (40% — 13º e rescisão entregues; faltam férias, licença-prêmio, complementar). Bloco 2 a 85% (falta só a 2.7 — paridade Fiorilli)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 486 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 494 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
-Próximas ondas naturais: **Bloco 3** — férias e rescisão (a rescisão paga o 13º
-proporcional de quem saiu no meio do ano); e a **2.7** (paridade Fiorilli) fecha
-o Bloco 2 quando houver dados de referência. Ver [CHANGELOG.md](CHANGELOG.md).
+Próximas ondas naturais: **Bloco 3** — férias (módulo de gozo: escala, abono
+pecuniário) e licença-prêmio; e a **2.7** (paridade Fiorilli) fecha o Bloco 2
+quando houver dados de referência. Ver [CHANGELOG.md](CHANGELOG.md).
 
 > **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
 > **na própria VPS**, em `/opt/arminda-dev` (banco `arminda_dev`, `.env` de dev,

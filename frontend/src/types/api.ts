@@ -1245,6 +1245,17 @@ export interface components {
             /** Format: date */
             data_desligamento: string;
             motivo?: string;
+            /** @default  */
+            motivo_demissao: components["schemas"]["MotivoDemissaoEnum"] | components["schemas"]["BlankEnum"];
+            /** @default false */
+            aviso_previo_indenizado: boolean;
+            /** @default false */
+            tem_ferias_vencidas: boolean;
+            /**
+             * Format: decimal
+             * @default 0.00
+             */
+            saldo_fgts: string;
         };
         /** @description Mesmo que List por ora — todos os campos sao basicos. */
         DocumentoDetail: {
@@ -1439,6 +1450,17 @@ export interface components {
          * @enum {string}
          */
         ModoContribuicaoEnum: "flat" | "progressivo";
+        /**
+         * @description * `pedido_demissao` - Pedido de demissão
+         *     * `sem_justa_causa` - Dispensa sem justa causa
+         *     * `com_justa_causa` - Dispensa com justa causa
+         *     * `termino_contrato` - Término de contrato
+         *     * `aposentadoria` - Aposentadoria
+         *     * `falecimento` - Falecimento
+         *     * `exoneracao` - Exoneração (estatutário)
+         * @enum {string}
+         */
+        MotivoDemissaoEnum: "pedido_demissao" | "sem_justa_causa" | "com_justa_causa" | "termino_contrato" | "aposentadoria" | "falecimento" | "exoneracao";
         /**
          * @description * `administracao` - Administração
          *     * `saude` - Saúde
@@ -1970,6 +1992,27 @@ export interface components {
             /** Format: decimal */
             salario_base?: string;
             ativo?: boolean;
+            /**
+             * @description Motivo do desligamento — define as verbas da folha de rescisão.
+             *
+             *     * `pedido_demissao` - Pedido de demissão
+             *     * `sem_justa_causa` - Dispensa sem justa causa
+             *     * `com_justa_causa` - Dispensa com justa causa
+             *     * `termino_contrato` - Término de contrato
+             *     * `aposentadoria` - Aposentadoria
+             *     * `falecimento` - Falecimento
+             *     * `exoneracao` - Exoneração (estatutário)
+             */
+            motivo_demissao?: components["schemas"]["MotivoDemissaoEnum"] | components["schemas"]["BlankEnum"];
+            /** @description Aviso prévio indenizado (dispensa sem justa causa, celetista). */
+            aviso_previo_indenizado?: boolean;
+            /** @description Tem período aquisitivo de férias completo e não gozado. */
+            tem_ferias_vencidas?: boolean;
+            /**
+             * Format: decimal
+             * @description Saldo do FGTS acumulado — base da multa de 40% na rescisão.
+             */
+            saldo_fgts?: string;
         };
         /**
          * @description * `estatutario` - Efetivo (concursado)
@@ -2338,6 +2381,27 @@ export interface components {
             /** Format: decimal */
             salario_base: string;
             ativo?: boolean;
+            /**
+             * @description Motivo do desligamento — define as verbas da folha de rescisão.
+             *
+             *     * `pedido_demissao` - Pedido de demissão
+             *     * `sem_justa_causa` - Dispensa sem justa causa
+             *     * `com_justa_causa` - Dispensa com justa causa
+             *     * `termino_contrato` - Término de contrato
+             *     * `aposentadoria` - Aposentadoria
+             *     * `falecimento` - Falecimento
+             *     * `exoneracao` - Exoneração (estatutário)
+             */
+            motivo_demissao?: components["schemas"]["MotivoDemissaoEnum"] | components["schemas"]["BlankEnum"];
+            /** @description Aviso prévio indenizado (dispensa sem justa causa, celetista). */
+            aviso_previo_indenizado?: boolean;
+            /** @description Tem período aquisitivo de férias completo e não gozado. */
+            tem_ferias_vencidas?: boolean;
+            /**
+             * Format: decimal
+             * @description Saldo do FGTS acumulado — base da multa de 40% na rescisão.
+             */
+            saldo_fgts?: string;
             /** Format: date-time */
             readonly criado_em: string;
             /** Format: date-time */
@@ -2374,6 +2438,27 @@ export interface components {
             /** Format: decimal */
             salario_base: string;
             ativo?: boolean;
+            /**
+             * @description Motivo do desligamento — define as verbas da folha de rescisão.
+             *
+             *     * `pedido_demissao` - Pedido de demissão
+             *     * `sem_justa_causa` - Dispensa sem justa causa
+             *     * `com_justa_causa` - Dispensa com justa causa
+             *     * `termino_contrato` - Término de contrato
+             *     * `aposentadoria` - Aposentadoria
+             *     * `falecimento` - Falecimento
+             *     * `exoneracao` - Exoneração (estatutário)
+             */
+            motivo_demissao?: components["schemas"]["MotivoDemissaoEnum"] | components["schemas"]["BlankEnum"];
+            /** @description Aviso prévio indenizado (dispensa sem justa causa, celetista). */
+            aviso_previo_indenizado?: boolean;
+            /** @description Tem período aquisitivo de férias completo e não gozado. */
+            tem_ferias_vencidas?: boolean;
+            /**
+             * Format: decimal
+             * @description Saldo do FGTS acumulado — base da multa de 40% na rescisão.
+             */
+            saldo_fgts?: string;
         };
         /** @description Embutido em ServidorDetailSerializer. */
         _DependenteEmbutido: {
