@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Relatório quinzenal de desenvolvimento do Arminda — terceira quinzena (25/05 a 07/06/2026)." />
+    <meta name="robots" content="noindex" />
+    <title>Arminda — Relatório Quinzenal #3 (25/05 – 07/06/2026)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+
+    <style>
+      .doc {
+        max-width: 820px;
+        margin: 64px auto;
+        padding: 0 24px;
+      }
+      .doc h1 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+      }
+      .doc .meta {
+        color: var(--cor-texto-fraco, #6b6b73);
+        font-size: 14px;
+        margin: 0 0 40px;
+      }
+      .doc h2 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(22px, 3vw, 30px);
+        font-weight: 600;
+        margin: 56px 0 16px;
+        letter-spacing: -0.015em;
+      }
+      .doc h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 32px 0 12px;
+      }
+      .doc p {
+        font-size: 16px;
+        line-height: 1.7;
+        margin: 12px 0;
+      }
+      .doc ul {
+        font-size: 16px;
+        line-height: 1.7;
+        padding-left: 22px;
+      }
+      .doc li {
+        margin: 6px 0;
+      }
+      .doc .resumo {
+        background: var(--cor-fundo-alt, #f7f6f3);
+        border-left: 3px solid var(--cor-marca, #2d3142);
+        padding: 20px 24px;
+        margin: 32px 0;
+        font-size: 15.5px;
+      }
+      .doc .tabela {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 32px;
+        font-size: 14.5px;
+      }
+      .doc .tabela th,
+      .doc .tabela td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--cor-borda, #e5e3dd);
+      }
+      .doc .tabela th {
+        font-weight: 600;
+        background: var(--cor-fundo-alt, #f7f6f3);
+      }
+      .doc .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin: 20px 0 40px;
+      }
+      .doc .kpi {
+        border: 1px solid var(--cor-borda, #e5e3dd);
+        border-radius: 6px;
+        padding: 16px 18px;
+      }
+      .doc .kpi-valor {
+        font-family: "Fraunces", serif;
+        font-size: 32px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .doc .kpi-label {
+        font-size: 12px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .doc .voltar {
+        display: inline-block;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        text-decoration: none;
+      }
+      .doc .voltar:hover {
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge-prod {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .doc footer {
+        margin: 80px 0 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--cor-borda, #e5e3dd);
+        font-size: 13px;
+        color: var(--cor-texto-fraco, #6b6b73);
+      }
+      .doc code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.92em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="doc">
+      <a href="../index.html#relatorios" class="voltar">← Acompanhamento do desenvolvimento</a>
+
+      <h1>Relatório Quinzenal #3</h1>
+      <p class="meta">
+        Período: <strong>25/05/2026 a 07/06/2026</strong> · Publicado em 07/06/2026 ·
+        <span class="badge">Bloco 2 → Bloco 3</span>
+        <span class="badge badge-prod">v0.16.0 em produção</span>
+      </p>
+
+      <div class="resumo">
+        <strong>Resumo executivo.</strong> A quinzena mais produtiva do projeto:
+        <strong>oito releases</strong> entregues e colocadas em produção. O
+        <strong>Bloco 2 (engine de cálculo)</strong> chegou a 85% — entraram as
+        incidências automáticas (INSS, IRRF, FGTS e a previdência própria do
+        município, o RPPS) e o contracheque (holerite) em PDF. Em seguida, o
+        <strong>Bloco 3 (folhas especiais)</strong> abriu e já fechou três frentes:
+        <strong>13º salário</strong>, <strong>rescisão</strong> e <strong>férias</strong>.
+        Antes disso, ainda na virada da quinzena, saíram as ferramentas de
+        qualidade cadastral pré-eSocial (1.6a/1.6b). Resultado: o sistema calcula
+        hoje praticamente todos os tipos de folha de uma prefeitura, com as
+        incidências legais corretas, e emite o holerite — tudo no ar em
+        <code>https://arminda.site</code>. O Bloco 3 está em <strong>60%</strong>.
+      </div>
+
+      <h2>O que foi entregue</h2>
+
+      <h3>Para o usuário-operador</h3>
+      <ul>
+        <li>
+          <strong>Cálculo automático dos encargos da folha.</strong> Em cada rubrica
+          basta marcar sobre quais encargos ela incide (INSS, IRRF, FGTS, RPPS) e o
+          sistema soma a base de cada um sozinho. Entrou o <strong>FGTS</strong> (8%,
+          para celetistas) e a <strong>previdência própria do município (RPPS)</strong>,
+          configurável numa nova aba de Previdência em Configurações — alíquota única
+          ou progressiva. O servidor efetivo passa a contribuir ao regime próprio em
+          vez do INSS, automaticamente conforme o vínculo.
+        </li>
+        <li>
+          <strong>Contracheque (holerite) em PDF e JSON.</strong> Depois de calcular a
+          folha, cada servidor tem o holerite imprimível — cabeçalho do município,
+          proventos, descontos, totais e líquido. Disponível na tela da folha.
+        </li>
+        <li>
+          <strong>13º salário.</strong> 1ª parcela (adiantamento de 50%) e 2ª parcela
+          (13º integral, com INSS/IRRF/previdência em separado e abatimento do
+          adiantamento). Os avos (meses trabalhados no ano) são calculados sozinhos —
+          quem entrou no meio do ano recebe o proporcional.
+        </li>
+        <li>
+          <strong>Rescisão.</strong> Ao desligar um servidor, informa-se o motivo
+          (pedido, dispensa sem/com justa causa, término, aposentadoria…); o sistema
+          gera as verbas conforme o motivo: saldo de salário, 13º proporcional, férias
+          proporcionais e vencidas + 1/3, aviso prévio indenizado, FGTS e multa de 40%
+          (celetistas sem justa causa). A justa causa reduz as verbas automaticamente.
+        </li>
+        <li>
+          <strong>Férias.</strong> Numa folha de Férias, a aba Programação permite
+          adicionar os servidores com os dias de gozo e os dias vendidos (abono
+          pecuniário). Sai o salário de férias + 1/3 (com INSS/IRRF) e o abono + 1/3
+          (indenizatório, sem desconto).
+        </li>
+        <li>
+          <strong>Folha mais clara.</strong> A tela da folha ganhou uma aba
+          <strong>Servidores</strong> (uma linha por pessoa, com o holerite ali) e uma
+          aba <strong>Por área</strong> (totais por lotação/secretaria e por órgão).
+        </li>
+        <li>
+          <strong>Qualidade cadastral em lote</strong> (1.6b): painel com nota de 0 a
+          100 por município, edição em massa de servidores e importador de planilha
+          (CSV/Excel) com pré-visualização — acelera a corrida pré-eSocial.
+        </li>
+      </ul>
+
+      <h3>Para o município-piloto</h3>
+      <ul>
+        <li>
+          <strong>Cobertura quase completa das folhas.</strong> Mensal, 13º (duas
+          parcelas), rescisão e férias já são calculáveis de ponta a ponta, com as
+          incidências legais reais por regime (RGPS/INSS, RPPS, FGTS). Falta apenas a
+          conferência comparativa contra o sistema atual para o cálculo de folha estar
+          fechado.
+        </li>
+        <li>
+          <strong>Cadastros pré-eSocial</strong> (1.6a): órgão emissor (CNPJ próprio de
+          cada entidade — Prefeitura, Câmara, Fundos) e sindicato, com os campos que o
+          eSocial exige, prontos para o preenchimento em massa.
+        </li>
+      </ul>
+
+      <h3>Para a operação do projeto</h3>
+      <ul>
+        <li>
+          <strong>Oito releases em produção na quinzena</strong> (v0.9.0 → v0.16.0),
+          cada uma com a rotina de validação integral (lint, type-check, testes
+          back+front, build) e registro público no painel. Zero dívida técnica
+          acumulada — todos os checks verdes a cada subida.
+        </li>
+        <li>
+          <strong>Desenvolvimento migrado para a própria VPS</strong>, em diretório e
+          banco isolados da produção, com fluxo de promoção dev → main → deploy
+          documentado.
+        </li>
+        <li>
+          <strong>Painel de acompanhamento aprimorado</strong>: correção da ordenação
+          do changelog e alinhamento de datas às entregas reais.
+        </li>
+      </ul>
+
+      <h2>Indicadores técnicos</h2>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-valor">499</div>
+          <div class="kpi-label">testes backend verde</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">10</div>
+          <div class="kpi-label">testes frontend verde</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">17</div>
+          <div class="kpi-label">ADRs publicadas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">8</div>
+          <div class="kpi-label">releases na quinzena</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">6</div>
+          <div class="kpi-label">apps Django</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-valor">60%</div>
+          <div class="kpi-label">Bloco 3 concluído</div>
+        </div>
+      </div>
+
+      <h2>Marcos da quinzena</h2>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Versão</th>
+            <th>Entrega</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>27/05</td>
+            <td>v0.9.0</td>
+            <td>Onda 1.6a — cadastros pré-eSocial (órgão emissor + sindicato + tipo de logradouro)</td>
+          </tr>
+          <tr>
+            <td>27/05</td>
+            <td>v0.10.0</td>
+            <td>Onda 1.6b — qualidade cadastral + edição em lote + importador CSV/XLSX</td>
+          </tr>
+          <tr>
+            <td>30/05</td>
+            <td>v0.11.0</td>
+            <td>Onda 2.4 — incidências automáticas: FGTS + previdência própria (RPPS)</td>
+          </tr>
+          <tr>
+            <td>30/05</td>
+            <td>v0.12.0</td>
+            <td>Onda 2.5 — holerite (contracheque) em PDF + JSON</td>
+          </tr>
+          <tr>
+            <td>02/06</td>
+            <td>v0.13.0</td>
+            <td>Refinos da folha — aba Servidores (resumo por servidor) + totais por área</td>
+          </tr>
+          <tr>
+            <td>05/06</td>
+            <td>v0.14.0</td>
+            <td>Onda 3.1 — 13º salário (1ª e 2ª parcelas) · início do Bloco 3</td>
+          </tr>
+          <tr>
+            <td>07/06</td>
+            <td>v0.15.0</td>
+            <td>Onda 3.2 — rescisão (verbas rescisórias com gating por motivo)</td>
+          </tr>
+          <tr>
+            <td>07/06</td>
+            <td>v0.16.0</td>
+            <td>Onda 3.3 — férias (salário + 1/3 e abono pecuniário)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Decisões técnicas registradas</h2>
+      <p>
+        Cinco novas ADRs (Architecture Decision Records) consolidadas nesta quinzena,
+        ampliando o conjunto de 12 para 17:
+      </p>
+      <ul>
+        <li>
+          <strong>ADR-0013</strong> — Incidências automáticas. Bases formadas por
+          flag na rubrica, previdência própria (RPPS) por município, cálculo da folha
+          em duas fases (proventos → bases → descontos), engine mantido puro.
+        </li>
+        <li>
+          <strong>ADR-0014</strong> — Holerite: JSON estruturado + PDF via ReportLab
+          (pure-Python, sem dependências de sistema na VPS).
+        </li>
+        <li>
+          <strong>ADR-0015</strong> — 13º salário: escopo de rubrica por tipo de folha
+          (campo <code>tipos_folha</code>) + avos automáticos.
+        </li>
+        <li>
+          <strong>ADR-0016</strong> — Rescisão: motivo do desligamento no vínculo +
+          verbas com gating por motivo; incidências do saldo e do 13º em separado.
+        </li>
+        <li>
+          <strong>ADR-0017</strong> — Férias: programação por itens na folha
+          (<code>FeriasItem</code>) + abono pecuniário indenizatório.
+        </li>
+      </ul>
+
+      <h2>O que ficou pendente</h2>
+      <ul>
+        <li>
+          <strong>Onda 2.7 — paridade contra o Fiorilli.</strong> É o critério de
+          qualidade que fecha o Bloco 2: comparar o cálculo do Arminda com valores
+          reais do sistema atual. Depende de dados de referência (base do município ou
+          planilha de casos esperados).
+        </li>
+        <li>
+          <strong>Multa de 40% do FGTS na rescisão</strong> usa o saldo informado no
+          desligamento — o sistema ainda não rastreia o saldo acumulado do FGTS (virá
+          com a integração FGTS/eSocial).
+        </li>
+        <li>
+          <strong>Fundação a endurecer</strong>: cálculo assíncrono (para municípios
+          grandes), backup automatizado do banco de produção, observabilidade (Sentry)
+          e reforço dos testes de frontend.
+        </li>
+        <li>
+          <strong>Produção segue com tenant de demonstração</strong> (dados curados);
+          a entrada de um município real depende de provisionamento e migração.
+        </li>
+      </ul>
+
+      <h2>Próxima quinzena (08/06 a 21/06)</h2>
+      <ul>
+        <li>
+          <strong>Fechar o Bloco 3</strong> — licença-prêmio e folha complementar.
+        </li>
+        <li>
+          <strong>Onda 2.7 — paridade Fiorilli</strong> assim que houver dados de
+          referência (fecha o Bloco 2).
+        </li>
+        <li>
+          <strong>Endurecimento de produção</strong> — backup automatizado e cálculo
+          assíncrono como prioridades operacionais.
+        </li>
+      </ul>
+
+      <h2>Saúde do projeto</h2>
+      <p>
+        Foi a quinzena de maior throughput até aqui: o motor de cálculo deixou de
+        fazer só a folha mensal e passou a cobrir as incidências completas, o
+        contracheque e as três folhas especiais mais comuns (13º, rescisão e férias).
+        A arquitetura provou-se: cada nova folha entrou reaproveitando o mesmo engine
+        (cálculo em duas fases + bases automáticas), com pouco código novo e sempre
+        com testes — o backend passou de ~440 para <strong>499 testes verdes</strong>.
+      </p>
+      <p>
+        Tudo continua passando pela rotina de validação integral antes de ir ao ar, e
+        cada entrega tem resumo executivo e detalhe técnico no painel público. Em
+        números: <strong>Bloco 2 a 85%</strong>, <strong>Bloco 3 a 60%</strong>,
+        <strong>v0.16.0 em produção</strong>, 17 ADRs registrando as decisões
+        arquiteturais, e zero dívida técnica acumulada (ruff/check/pytest/tsc/eslint/
+        vitest todos verde).
+      </p>
+      <p>
+        <strong>Próximo relatório quinzenal:</strong> previsto para 21/06/2026,
+        cobrindo o fechamento do Bloco 3 (licença-prêmio e folha complementar) e o
+        início do endurecimento de produção.
+      </p>
+
+      <footer>
+        Arminda — Acompanhamento do desenvolvimento ·
+        <a href="../index.html">Voltar ao painel</a>
+      </footer>
+    </div>
+  </body>
+</html>
