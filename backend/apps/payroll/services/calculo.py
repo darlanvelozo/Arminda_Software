@@ -31,16 +31,10 @@ from apps.calculo.dependencias import RubricaParaOrdenar, ordenar_topologicament
 from apps.calculo.formula.avaliador import avaliar
 from apps.calculo.formula.contexto import ContextoFolha
 from apps.calculo.formula.errors import FormulaError
-from apps.payroll.models import (
-    FeriasItem,
-    Folha,
-    Lancamento,
-    Rubrica,
-    TipoFolha,
-    TipoRubrica,
-)
+from apps.payroll.models import Folha, Lancamento, Rubrica, TipoFolha, TipoRubrica
 from apps.payroll.services.decimo import avos_no_ano
 from apps.payroll.services.ferias import vars_ferias
+from apps.payroll.services.licenca_premio import vars_licenca_premio
 from apps.payroll.services.previdencia import (
     regime_vigente,
     resolver_previdencia,
@@ -227,13 +221,11 @@ def _vinculos_rescisao(competencia: date):
     )
 
 
-def _vinculos_ferias(folha: Folha):
-    """
-    Vínculos programados na folha de férias (Onda 3.3): vêm dos `FeriasItem`.
-    Cada vínculo carrega seu item em `_ferias_item` (evita N queries).
-    """
+def _vinculos_por_itens(folha: Folha, manager_name: str, attr: str):
+    """Vínculos vindos de itens da folha (férias / licença-prêmio).
+    Anexa o item ao vínculo em `attr` para evitar N queries."""
     itens = (
-        FeriasItem.objects.filter(folha=folha)
+        getattr(folha, manager_name)
         .select_related(
             "vinculo__servidor", "vinculo__cargo", "vinculo__lotacao",
             "vinculo__unidade_orcamentaria",
@@ -243,7 +235,7 @@ def _vinculos_ferias(folha: Folha):
     vinculos = []
     for item in itens:
         v = item.vinculo
-        v._ferias_item = item
+        setattr(v, attr, item)
         vinculos.append(v)
     return vinculos
 
@@ -253,7 +245,9 @@ def _vinculos_da_folha(folha: Folha):
     if folha.tipo == TipoFolha.RESCISAO:
         return _vinculos_rescisao(folha.competencia)
     if folha.tipo == TipoFolha.FERIAS:
-        return _vinculos_ferias(folha)
+        return _vinculos_por_itens(folha, "ferias_itens", "_ferias_item")
+    if folha.tipo == TipoFolha.LICENCA_PREMIO:
+        return _vinculos_por_itens(folha, "lp_itens", "_lp_item")
     return _vinculos_da_competencia(folha.competencia)
 
 
@@ -459,6 +453,7 @@ def _processar_vinculo(
         **_vars_decimo(folha, vinculo),
         **vars_rescisao(vinculo),
         **vars_ferias(vinculo),
+        **vars_licenca_premio(vinculo),
     }
 
     total_proventos, bases = _fase_proventos(

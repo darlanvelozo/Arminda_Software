@@ -630,6 +630,20 @@ function SectionCalculo() {
         no front, a aba Programação na folha de férias.
       </p>
 
+      <h3 className="text-base font-semibold mt-4">Licença-prêmio (Onda 3.4 — ADR-0018)</h3>
+      <p>
+        Novo <code className="bg-muted px-1 rounded">TipoFolha.LICENCA_PREMIO</code> +
+        modelo <code className="bg-muted px-1 rounded">LicencaPremioItem(folha, vinculo,
+        meses, dias)</code> (mesmo padrão de itens das férias; seletor genérico{" "}
+        <code className="bg-muted px-1 rounded">_vinculos_por_itens</code>). Contexto:{" "}
+        <code className="bg-muted px-1 rounded">MESES_LP</code>/
+        <code className="bg-muted px-1 rounded">DIAS_LP</code>. Comando{" "}
+        <code className="bg-muted px-1 rounded">seed_rubricas_licenca_premio</code>:
+        rubrica única <code className="bg-muted px-1 rounded">LP_INDENIZ</code> (provento
+        sem incidência — indenizatória). API{" "}
+        <code className="bg-muted px-1 rounded">/payroll/licenca-premio-itens/</code>.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>
         <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}

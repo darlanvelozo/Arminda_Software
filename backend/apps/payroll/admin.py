@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import FeriasItem, Folha, Lancamento, RegimePrevidenciario, Rubrica
+from .models import (
+    FeriasItem,
+    Folha,
+    Lancamento,
+    LicencaPremioItem,
+    RegimePrevidenciario,
+    Rubrica,
+)
 
 
 class LancamentoInline(admin.TabularInline):
@@ -68,6 +75,14 @@ class RegimePrevidenciarioAdmin(admin.ModelAdmin):
 @admin.register(FeriasItem)
 class FeriasItemAdmin(admin.ModelAdmin):
     list_display = ("vinculo", "folha", "dias_gozo", "dias_abono", "data_inicio")
+    list_filter = ("folha",)
+    search_fields = ("vinculo__servidor__nome",)
+    raw_id_fields = ("folha", "vinculo")
+
+
+@admin.register(LicencaPremioItem)
+class LicencaPremioItemAdmin(admin.ModelAdmin):
+    list_display = ("vinculo", "folha", "meses", "dias")
     list_filter = ("folha",)
     search_fields = ("vinculo__servidor__nome",)
     raw_id_fields = ("folha", "vinculo")

@@ -49,6 +49,7 @@ const TIPOS = [
   { value: "13_segunda", label: "13º — 2ª parcela" },
   { value: "ferias", label: "Férias" },
   { value: "rescisao", label: "Rescisão" },
+  { value: "licenca_premio", label: "Licença-prêmio (indenização)" },
   { value: "complementar", label: "Complementar" },
 ] as const;
 
@@ -63,6 +64,7 @@ const folhaSchema = z.object({
     "13_segunda",
     "ferias",
     "rescisao",
+    "licenca_premio",
     "complementar",
   ]),
   observacoes: z.string(),

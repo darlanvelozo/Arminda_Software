@@ -28,6 +28,7 @@ class TipoFolha(models.TextChoices):
     DECIMO_SEGUNDO = "13_segunda", "13o - 2a parcela"
     FERIAS = "ferias", "Ferias"
     RESCISAO = "rescisao", "Rescisao"
+    LICENCA_PREMIO = "licenca_premio", "Licença-prêmio (indenização)"
     COMPLEMENTAR = "complementar", "Complementar"
 
 
@@ -171,6 +172,33 @@ class FeriasItem(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.vinculo.servidor.nome}: {self.dias_gozo}d gozo + {self.dias_abono}d abono"
+
+
+class LicencaPremioItem(TimeStampedModel):
+    """
+    Programação de indenização de licença-prêmio de um vínculo numa folha
+    de licença-prêmio (Onda 3.4 — ADR-0018). Verba indenizatória.
+    """
+
+    folha = models.ForeignKey(Folha, on_delete=models.CASCADE, related_name="lp_itens")
+    vinculo = models.ForeignKey(
+        VinculoFuncional, on_delete=models.PROTECT, related_name="lp_itens"
+    )
+    meses = models.PositiveSmallIntegerField(default=0, help_text="Meses de licença-prêmio indenizados.")
+    dias = models.PositiveSmallIntegerField(default=0, help_text="Dias adicionais indenizados (0-29).")
+
+    class Meta:
+        ordering = ["vinculo__servidor__nome"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["folha", "vinculo"], name="lp_item_unico_por_folha_vinculo"
+            ),
+        ]
+        verbose_name = "item de licença-prêmio"
+        verbose_name_plural = "itens de licença-prêmio"
+
+    def __str__(self) -> str:
+        return f"{self.vinculo.servidor.nome}: {self.meses}m + {self.dias}d"
 
 
 class ModoContribuicaoRPPS(models.TextChoices):

@@ -504,6 +504,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payroll/licenca-premio-itens/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=. */
+        get: operations["payroll_licenca_premio_itens_list"];
+        put?: never;
+        /** @description CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=. */
+        post: operations["payroll_licenca_premio_itens_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/licenca-premio-itens/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=. */
+        get: operations["payroll_licenca_premio_itens_retrieve"];
+        /** @description CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=. */
+        put: operations["payroll_licenca_premio_itens_update"];
+        post?: never;
+        /** @description CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=. */
+        delete: operations["payroll_licenca_premio_itens_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=. */
+        patch: operations["payroll_licenca_premio_itens_partial_update"];
+        trace?: never;
+    };
     "/api/payroll/regimes-previdenciarios/": {
         parameters: {
             query?: never;
@@ -1395,7 +1433,7 @@ export interface components {
              */
             readonly competencia: string;
             /** @default mensal */
-            readonly tipo: components["schemas"]["TipoD83Enum"];
+            readonly tipo: components["schemas"]["Tipo995Enum"];
             readonly tipo_display: string;
             readonly status: components["schemas"]["StatusEnum"];
             readonly status_display: string;
@@ -1421,7 +1459,7 @@ export interface components {
              */
             readonly competencia: string;
             /** @default mensal */
-            readonly tipo: components["schemas"]["TipoD83Enum"];
+            readonly tipo: components["schemas"]["Tipo995Enum"];
             readonly tipo_display: string;
             readonly status: components["schemas"]["StatusEnum"];
             readonly status_display: string;
@@ -1444,7 +1482,7 @@ export interface components {
              */
             competencia: string;
             /** @default mensal */
-            tipo: components["schemas"]["TipoD83Enum"];
+            tipo: components["schemas"]["Tipo995Enum"];
             observacoes?: string;
         };
         /** @description Lançamento individual + dados básicos do servidor/rubrica. */
@@ -1466,6 +1504,19 @@ export interface components {
             readonly referencia: string;
             /** Format: decimal */
             readonly valor: string;
+        };
+        /** @description Programação de indenização de licença-prêmio numa folha (Onda 3.4). */
+        LicencaPremioItem: {
+            readonly id: number;
+            folha: number;
+            vinculo: number;
+            readonly servidor_nome: string;
+            readonly servidor_matricula: string;
+            readonly cargo: string;
+            /** @description Meses de licença-prêmio indenizados. */
+            meses?: number;
+            /** @description Dias adicionais indenizados (0-29). */
+            dias?: number;
         };
         /** @description Versao completa com resumo do pai. */
         LotacaoDetail: {
@@ -1730,6 +1781,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Lancamento"][];
         };
+        PaginatedLicencaPremioItemList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["LicencaPremioItem"][];
+        };
         PaginatedLotacaoListList: {
             /** @example 123 */
             count: number;
@@ -1924,8 +1990,21 @@ export interface components {
              */
             competencia?: string;
             /** @default mensal */
-            tipo: components["schemas"]["TipoD83Enum"];
+            tipo: components["schemas"]["Tipo995Enum"];
             observacoes?: string;
+        };
+        /** @description Programação de indenização de licença-prêmio numa folha (Onda 3.4). */
+        PatchedLicencaPremioItem: {
+            readonly id?: number;
+            folha?: number;
+            vinculo?: number;
+            readonly servidor_nome?: string;
+            readonly servidor_matricula?: string;
+            readonly cargo?: string;
+            /** @description Meses de licença-prêmio indenizados. */
+            meses?: number;
+            /** @description Dias adicionais indenizados (0-29). */
+            dias?: number;
         };
         /** @description Versao para create/update. */
         PatchedLotacaoWrite: {
@@ -2407,6 +2486,17 @@ export interface components {
          */
         Tipo721Enum: "provento" | "desconto" | "informativa";
         /**
+         * @description * `mensal` - Mensal
+         *     * `13_primeira` - 13o - 1a parcela
+         *     * `13_segunda` - 13o - 2a parcela
+         *     * `ferias` - Ferias
+         *     * `rescisao` - Rescisao
+         *     * `licenca_premio` - Licença-prêmio (indenização)
+         *     * `complementar` - Complementar
+         * @enum {string}
+         */
+        Tipo995Enum: "mensal" | "13_primeira" | "13_segunda" | "ferias" | "rescisao" | "licenca_premio" | "complementar";
+        /**
          * @description * `rg` - RG
          *     * `cpf` - CPF
          *     * `titulo_eleitor` - Titulo de eleitor
@@ -2417,16 +2507,6 @@ export interface components {
          * @enum {string}
          */
         TipoC3eEnum: "rg" | "cpf" | "titulo_eleitor" | "carteira_trabalho" | "certificado" | "comprovante_residencia" | "outro";
-        /**
-         * @description * `mensal` - Mensal
-         *     * `13_primeira` - 13o - 1a parcela
-         *     * `13_segunda` - 13o - 2a parcela
-         *     * `ferias` - Ferias
-         *     * `rescisao` - Rescisao
-         *     * `complementar` - Complementar
-         * @enum {string}
-         */
-        TipoD83Enum: "mensal" | "13_primeira" | "13_segunda" | "ferias" | "rescisao" | "complementar";
         /**
          * @description * `rua` - Rua
          *     * `avenida` - Avenida
@@ -3084,9 +3164,10 @@ export interface operations {
                  *     * `13_segunda` - 13o - 2a parcela
                  *     * `ferias` - Ferias
                  *     * `rescisao` - Rescisao
+                 *     * `licenca_premio` - Licença-prêmio (indenização)
                  *     * `complementar` - Complementar
                  */
-                tipo?: "13_primeira" | "13_segunda" | "complementar" | "ferias" | "mensal" | "rescisao";
+                tipo?: "13_primeira" | "13_segunda" | "complementar" | "ferias" | "licenca_premio" | "mensal" | "rescisao";
             };
             header?: never;
             path?: never;
@@ -3394,6 +3475,158 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Lancamento"];
+                };
+            };
+        };
+    };
+    payroll_licenca_premio_itens_list: {
+        parameters: {
+            query?: {
+                folha?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+                vinculo?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedLicencaPremioItemList"];
+                };
+            };
+        };
+    };
+    payroll_licenca_premio_itens_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicencaPremioItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["LicencaPremioItem"];
+                "multipart/form-data": components["schemas"]["LicencaPremioItem"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicencaPremioItem"];
+                };
+            };
+        };
+    };
+    payroll_licenca_premio_itens_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de licença-prêmio. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicencaPremioItem"];
+                };
+            };
+        };
+    };
+    payroll_licenca_premio_itens_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de licença-prêmio. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicencaPremioItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["LicencaPremioItem"];
+                "multipart/form-data": components["schemas"]["LicencaPremioItem"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicencaPremioItem"];
+                };
+            };
+        };
+    };
+    payroll_licenca_premio_itens_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de licença-prêmio. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    payroll_licenca_premio_itens_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item de licença-prêmio. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedLicencaPremioItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedLicencaPremioItem"];
+                "multipart/form-data": components["schemas"]["PatchedLicencaPremioItem"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicencaPremioItem"];
                 };
             };
         };

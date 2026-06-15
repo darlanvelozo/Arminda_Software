@@ -569,6 +569,7 @@ paths:
           - 13_segunda
           - complementar
           - ferias
+          - licenca_premio
           - mensal
           - rescisao
         description: |-
@@ -577,6 +578,7 @@ paths:
           * `13_segunda` - 13o - 2a parcela
           * `ferias` - Ferias
           * `rescisao` - Rescisao
+          * `licenca_premio` - Licença-prêmio (indenização)
           * `complementar` - Complementar
       tags:
       - payroll
@@ -1007,6 +1009,190 @@ paths:
               schema:
                 $ref: '#/components/schemas/Lancamento'
           description: ''
+  /api/payroll/licenca-premio-itens/:
+    get:
+      operationId: payroll_licenca_premio_itens_list
+      description: CRUD da programação de licença-prêmio (itens da folha). Filtra
+        por ?folha=.
+      parameters:
+      - in: query
+        name: folha
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: vinculo
+        schema:
+          type: integer
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLicencaPremioItemList'
+          description: ''
+    post:
+      operationId: payroll_licenca_premio_itens_create
+      description: CRUD da programação de licença-prêmio (itens da folha). Filtra
+        por ?folha=.
+      tags:
+      - payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicencaPremioItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LicencaPremioItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LicencaPremioItem'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicencaPremioItem'
+          description: ''
+  /api/payroll/licenca-premio-itens/{id}/:
+    get:
+      operationId: payroll_licenca_premio_itens_retrieve
+      description: CRUD da programação de licença-prêmio (itens da folha). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item de licença-prêmio.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicencaPremioItem'
+          description: ''
+    put:
+      operationId: payroll_licenca_premio_itens_update
+      description: CRUD da programação de licença-prêmio (itens da folha). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item de licença-prêmio.
+        required: true
+      tags:
+      - payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicencaPremioItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LicencaPremioItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LicencaPremioItem'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicencaPremioItem'
+          description: ''
+    patch:
+      operationId: payroll_licenca_premio_itens_partial_update
+      description: CRUD da programação de licença-prêmio (itens da folha). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item de licença-prêmio.
+        required: true
+      tags:
+      - payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLicencaPremioItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLicencaPremioItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLicencaPremioItem'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicencaPremioItem'
+          description: ''
+    delete:
+      operationId: payroll_licenca_premio_itens_destroy
+      description: CRUD da programação de licença-prêmio (itens da folha). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item de licença-prêmio.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/payroll/regimes-previdenciarios/:
     get:
       operationId: payroll_regimes_previdenciarios_list
@@ -3861,7 +4047,7 @@ components:
           description: Primeiro dia do mes de referencia
         tipo:
           allOf:
-          - $ref: '#/components/schemas/TipoD83Enum'
+          - $ref: '#/components/schemas/Tipo995Enum'
           readOnly: true
           default: mensal
         tipo_display:
@@ -3931,7 +4117,7 @@ components:
           description: Primeiro dia do mes de referencia
         tipo:
           allOf:
-          - $ref: '#/components/schemas/TipoD83Enum'
+          - $ref: '#/components/schemas/Tipo995Enum'
           readOnly: true
           default: mensal
         tipo_display:
@@ -3991,7 +4177,7 @@ components:
           description: Primeiro dia do mes de referencia
         tipo:
           allOf:
-          - $ref: '#/components/schemas/TipoD83Enum'
+          - $ref: '#/components/schemas/Tipo995Enum'
           default: mensal
         observacoes:
           type: string
@@ -4055,6 +4241,43 @@ components:
       - servidor_matricula
       - servidor_nome
       - valor
+      - vinculo
+    LicencaPremioItem:
+      type: object
+      description: Programação de indenização de licença-prêmio numa folha (Onda 3.4).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        folha:
+          type: integer
+        vinculo:
+          type: integer
+        servidor_nome:
+          type: string
+          readOnly: true
+        servidor_matricula:
+          type: string
+          readOnly: true
+        cargo:
+          type: string
+          readOnly: true
+        meses:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: Meses de licença-prêmio indenizados.
+        dias:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: Dias adicionais indenizados (0-29).
+      required:
+      - cargo
+      - folha
+      - id
+      - servidor_matricula
+      - servidor_nome
       - vinculo
     LotacaoDetail:
       type: object
@@ -4556,6 +4779,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Lancamento'
+    PaginatedLicencaPremioItemList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LicencaPremioItem'
     PaginatedLotacaoListList:
       type: object
       required:
@@ -4876,10 +5122,40 @@ components:
           description: Primeiro dia do mes de referencia
         tipo:
           allOf:
-          - $ref: '#/components/schemas/TipoD83Enum'
+          - $ref: '#/components/schemas/Tipo995Enum'
           default: mensal
         observacoes:
           type: string
+    PatchedLicencaPremioItem:
+      type: object
+      description: Programação de indenização de licença-prêmio numa folha (Onda 3.4).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        folha:
+          type: integer
+        vinculo:
+          type: integer
+        servidor_nome:
+          type: string
+          readOnly: true
+        servidor_matricula:
+          type: string
+          readOnly: true
+        cargo:
+          type: string
+          readOnly: true
+        meses:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: Meses de licença-prêmio indenizados.
+        dias:
+          type: integer
+          maximum: 32767
+          minimum: 0
+          description: Dias adicionais indenizados (0-29).
     PatchedLotacaoWrite:
       type: object
       description: Versao para create/update.
@@ -5815,6 +6091,24 @@ components:
         * `provento` - Provento
         * `desconto` - Desconto
         * `informativa` - Informativa
+    Tipo995Enum:
+      enum:
+      - mensal
+      - 13_primeira
+      - 13_segunda
+      - ferias
+      - rescisao
+      - licenca_premio
+      - complementar
+      type: string
+      description: |-
+        * `mensal` - Mensal
+        * `13_primeira` - 13o - 1a parcela
+        * `13_segunda` - 13o - 2a parcela
+        * `ferias` - Ferias
+        * `rescisao` - Rescisao
+        * `licenca_premio` - Licença-prêmio (indenização)
+        * `complementar` - Complementar
     TipoC3eEnum:
       enum:
       - rg
@@ -5833,22 +6127,6 @@ components:
         * `certificado` - Certificado/Diploma
         * `comprovante_residencia` - Comprovante de residencia
         * `outro` - Outro
-    TipoD83Enum:
-      enum:
-      - mensal
-      - 13_primeira
-      - 13_segunda
-      - ferias
-      - rescisao
-      - complementar
-      type: string
-      description: |-
-        * `mensal` - Mensal
-        * `13_primeira` - 13o - 1a parcela
-        * `13_segunda` - 13o - 2a parcela
-        * `ferias` - Ferias
-        * `rescisao` - Rescisao
-        * `complementar` - Complementar
     TipoLogradouroEnum:
       enum:
       - rua

@@ -802,6 +802,16 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         desconto). O holerite e os resumos saem como em qualquer folha.
       </p>
 
+      <h3 className="text-base font-semibold mt-4">Licença-prêmio (Onda 3.4)</h3>
+      <p>
+        Para pagar a <strong>indenização</strong> de licença-prêmio não gozada, crie
+        uma folha do tipo <strong>Licença-prêmio</strong> e, na aba{" "}
+        <strong>Programação</strong>, adicione os servidores com os meses (e dias) a
+        indenizar. O valor é <code>salário × meses (+ salário/30 × dias)</code>, verba
+        indenizatória — sem INSS nem IRRF. (Licença-prêmio gozada é a folha mensal
+        normal.)
+      </p>
+
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">
         <FlowItem

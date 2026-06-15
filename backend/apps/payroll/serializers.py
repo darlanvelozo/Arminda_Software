@@ -13,6 +13,7 @@ from apps.payroll.models import (
     FeriasItem,
     Folha,
     Lancamento,
+    LicencaPremioItem,
     ModoContribuicaoRPPS,
     RegimePrevidenciario,
     Rubrica,
@@ -228,6 +229,29 @@ class FeriasItemSerializer(serializers.ModelSerializer):
     def validate_dias_abono(self, value: int) -> int:
         if value > 10:
             raise serializers.ValidationError("Abono pecuniário é de no máximo 10 dias.")
+        return value
+
+
+class LicencaPremioItemSerializer(serializers.ModelSerializer):
+    """Programação de indenização de licença-prêmio numa folha (Onda 3.4)."""
+
+    servidor_nome = serializers.CharField(source="vinculo.servidor.nome", read_only=True)
+    servidor_matricula = serializers.CharField(
+        source="vinculo.servidor.matricula", read_only=True
+    )
+    cargo = serializers.CharField(source="vinculo.cargo.nome", read_only=True)
+
+    class Meta:
+        model = LicencaPremioItem
+        fields = [
+            "id", "folha", "vinculo", "servidor_nome", "servidor_matricula",
+            "cargo", "meses", "dias",
+        ]
+        read_only_fields = ["id", "servidor_nome", "servidor_matricula", "cargo"]
+
+    def validate_dias(self, value: int) -> int:
+        if value > 29:
+            raise serializers.ValidationError("Dias adicionais é de no máximo 29 (use meses).")
         return value
 
 

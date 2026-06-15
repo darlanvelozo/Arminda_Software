@@ -35,6 +35,40 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 3.4 — Licença-prêmio: indenização · 2026-06-08
+
+> Quarta onda do Bloco 3 (ADR-0018). Folha de licença-prêmio indenizada:
+> programação por itens (mesmo padrão das férias), verba indenizatória (sem
+> incidência). Reusa o engine de duas fases. Bloco 3 → 80% (falta complementar).
+
+#### Adicionado — Backend
+
+- **feat(payroll):** novo `TipoFolha.LICENCA_PREMIO` e modelo
+  `LicencaPremioItem(folha, vinculo, meses, dias)` (+migration 0005), admin e
+  API REST (`/payroll/licenca-premio-itens/`, máx. 29 dias).
+- **feat(payroll.services.licenca_premio):** `vars_licenca_premio`
+  (MESES_LP/DIAS_LP). Seletor de vínculos por itens generalizado em
+  `_vinculos_por_itens` (atende férias e licença-prêmio).
+- **feat(payroll):** comando `seed_rubricas_licenca_premio` — rubrica
+  `LP_INDENIZ` (`SALARIO_BASE * MESES_LP + SALARIO_BASE / 30 * DIAS_LP`),
+  provento sem incidência (indenizatória — sem INSS/IRRF).
+
+#### Adicionado — Frontend
+
+- **feat(folha):** aba Programação na folha de licença-prêmio
+  (`ProgramacaoLicencaPremioTab`), reusando o seletor de vínculos ativos;
+  query `licenca-premio`, tipo `licenca_premio` no formulário de folha.
+
+#### Por quê
+
+- ADR-0018: licença-prêmio adquirida por tempo de serviço, quando convertida
+  em pecúnia, é indenização — não tributa. O gozo continua sendo a folha
+  mensal normal; o saldo por quinquênio fica para o Bloco 8.
+
+#### Impacto
+
+- Migration `payroll.0005`. 3 testes novos (502 no total). Guias atualizados.
+
 ### Onda 3.3 — Férias: salário + 1/3 e abono pecuniário · 2026-06-07
 
 > Terceira onda do Bloco 3 (ADR-0017). Programação por itens na folha; reusa o

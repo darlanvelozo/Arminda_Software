@@ -9,6 +9,7 @@ from apps.payroll.views import (
     FeriasItemViewSet,
     FolhaViewSet,
     LancamentoViewSet,
+    LicencaPremioItemViewSet,
     RegimePrevidenciarioViewSet,
     RubricaViewSet,
 )
@@ -23,5 +24,6 @@ router.register(
     "regimes-previdenciarios", RegimePrevidenciarioViewSet, basename="regime-previdenciario"
 )
 router.register("ferias-itens", FeriasItemViewSet, basename="ferias-item")
+router.register("licenca-premio-itens", LicencaPremioItemViewSet, basename="licenca-premio-item")
 
 urlpatterns = [path("", include(router.urls))]

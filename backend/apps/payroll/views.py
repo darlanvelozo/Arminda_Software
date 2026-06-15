@@ -37,6 +37,7 @@ from apps.payroll.models import (
     FeriasItem,
     Folha,
     Lancamento,
+    LicencaPremioItem,
     RegimePrevidenciario,
     Rubrica,
 )
@@ -46,6 +47,7 @@ from apps.payroll.serializers import (
     FolhaListSerializer,
     FolhaWriteSerializer,
     LancamentoSerializer,
+    LicencaPremioItemSerializer,
     RegimePrevidenciarioSerializer,
     RubricaDetailSerializer,
     RubricaListSerializer,
@@ -362,6 +364,25 @@ class FeriasItemViewSet(viewsets.ModelViewSet):
         "folha", "vinculo__servidor", "vinculo__cargo"
     ).all()
     serializer_class = FeriasItemSerializer
+    filterset_fields = ["folha", "vinculo"]
+    ordering_fields = ["vinculo__servidor__nome"]
+    ordering = ["vinculo__servidor__nome"]
+
+    READ_ACTIONS = {"list", "retrieve"}
+
+    def get_permissions(self):
+        if self.action in self.READ_ACTIONS:
+            return [IsLeituraMunicipio()]
+        return [IsFinanceiroMunicipio()]
+
+
+class LicencaPremioItemViewSet(viewsets.ModelViewSet):
+    """CRUD da programação de licença-prêmio (itens da folha). Filtra por ?folha=."""
+
+    queryset = LicencaPremioItem.objects.select_related(
+        "folha", "vinculo__servidor", "vinculo__cargo"
+    ).all()
+    serializer_class = LicencaPremioItemSerializer
     filterset_fields = ["folha", "vinculo"]
     ordering_fields = ["vinculo__servidor__nome"]
     ordering = ["vinculo__servidor__nome"]

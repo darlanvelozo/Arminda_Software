@@ -99,4 +99,7 @@ VARIAVEIS_PADRAO = (
     # Férias (Onda 3.3 — ADR-0017), preenchidas na folha de férias por item.
     "DIAS_FERIAS",          # Decimal — dias de gozo
     "DIAS_ABONO",           # Decimal — dias vendidos (abono pecuniário)
+    # Licença-prêmio (Onda 3.4 — ADR-0018), na folha de licença-prêmio por item.
+    "MESES_LP",             # Decimal — meses de licença-prêmio indenizados
+    "DIAS_LP",              # Decimal — dias adicionais indenizados
 )

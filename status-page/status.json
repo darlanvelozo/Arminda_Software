@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-06-07",
+  "ultima_atualizacao": "2026-06-08",
   "bloco_atual": 2,
   "progresso_geral_pct": 27,
   "blocos": [
@@ -92,13 +92,13 @@
       "data_fim_prevista": "2026-09-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 60,
+      "progresso_pct": 80,
       "entregas": [
-        "✅ Cálculo de 13º — 1ª e 2ª parcelas (avos automáticos, escopo de rubrica por tipo de folha, incidências do 13º em separado, ADR-0015) — Onda 3.1",
-        "Férias (com abono e adiantamento)",
-        "Rescisões",
-        "Licença-prêmio",
-        "Folha complementar"
+        "✅ Cálculo de 13º — 1ª e 2ª parcelas (avos automáticos, incidências em separado, ADR-0015) — Onda 3.1",
+        "✅ Rescisão — verbas rescisórias (saldo, 13º prop, férias prop/vencidas + 1/3, aviso, FGTS+multa) com gating por motivo, ADR-0016 — Onda 3.2",
+        "✅ Férias — salário + 1/3 e abono pecuniário (programação por itens, incidências corretas, ADR-0017) — Onda 3.3",
+        "✅ Licença-prêmio — indenização (programação por itens, verba indenizatória, ADR-0018) — Onda 3.4",
+        "Folha complementar — fecha o Bloco 3"
       ]
     },
     {
@@ -252,6 +252,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-06-08",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.17.0 (licença-prêmio)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 502 verde (3 testes novos de licença-prêmio: seletor por itens, indenização meses+dias sem incidência, API). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Tipos regenerados. Também corrigida a lista de entregas do Bloco 3 no painel (rescisão e férias estavam sem o ✅). Pronto para tag v0.17.0.",
+      "descricao": "Onda 3.4 passou pela validação integral. Migration payroll.0005 (novo tipo de folha + LicencaPremioItem) aplicada no tenant de dev. O seletor de vínculos por itens foi generalizado (férias + licença-prêmio). 502 passed (499 + 3)."
+    },
+    {
+      "data": "2026-06-08",
+      "tipo": "entrega",
+      "titulo": "Licença-prêmio: indenização (Onda 3.4)",
+      "resumo_executivo": "O sistema passou a calcular a indenização de licença-prêmio (a licença adquirida por tempo de serviço, quando convertida em dinheiro em vez de gozada). Cria-se uma folha do tipo Licença-prêmio e, na aba Programação, adiciona-se cada servidor com os meses (e dias) a indenizar. O valor é salário × meses (mais a fração de dias) e, por ser verba indenizatória, não sofre INSS nem Imposto de Renda. Com isso o Bloco 3 (folhas especiais) chega a 80% — falta apenas a folha complementar.",
+      "descricao": "Onda 3.4 (ADR-0018) entrega a indenização de licença-prêmio. Novo TipoFolha.LICENCA_PREMIO e modelo LicencaPremioItem(folha, vinculo, meses, dias), no mesmo padrão de itens das férias; o seletor de vínculos por itens foi generalizado (_vinculos_por_itens). Contexto ganha MESES_LP/DIAS_LP; comando seed_rubricas_licenca_premio cria a rubrica LP_INDENIZ (provento sem incidência). API REST dos itens e, no front, a aba Programação na folha de licença-prêmio (reusa o seletor de vínculos ativos das férias). Licença-prêmio gozada continua sendo a folha mensal normal; o controle de saldo por quinquênio fica para o Bloco 8 (RH operacional). 3 testes novos (502 no total). Corrigida também a lista de entregas do Bloco 3 no painel. Guias atualizados."
+    },
     {
       "data": "2026-06-07",
       "tipo": "validacao",

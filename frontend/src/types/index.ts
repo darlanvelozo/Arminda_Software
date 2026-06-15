@@ -73,6 +73,9 @@ export type RegimePrevidenciario = components["schemas"]["RegimePrevidenciario"]
 // Programação de férias (Onda 3.3)
 export type FeriasItem = components["schemas"]["FeriasItem"];
 
+// Programação de licença-prêmio (Onda 3.4)
+export type LicencaPremioItem = components["schemas"]["LicencaPremioItem"];
+
 /**
  * Resposta do POST /api/payroll/folhas/{id}/calcular/.
  *
