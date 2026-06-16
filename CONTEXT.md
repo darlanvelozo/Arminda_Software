@@ -4,16 +4,16 @@
 > **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
 > as regras de processo (validação integral, guias vivos, etc.).
 >
-> Última atualização: **2026-06-08** · Versão atual: **v0.16.0** ·
-> Bloco corrente: **Bloco 3 — Folhas especiais (60%)**. Blocos 0 e 1
+> Última atualização: **2026-06-15** · Versão atual: **v0.18.0** ·
+> **Bloco 3 — Folhas especiais: concluído (100%)**. Blocos 0 e 1
 > concluídos. **Bloco 2 a 85%** — entregues as Ondas **2.1** (DSL de
 > fórmulas via Python AST), **2.2** (cálculo mensal + toposort + endpoint
 > `/calcular/`), **2.3** (tabelas legais INSS/IRRF 2024-2026), **2.4**
 > (incidências FGTS + previdência própria RPPS), **2.5** (holerite PDF/JSON)
 > e **2.6** (tela operacional `/folha`); falta só a **2.7** (paridade
 > Fiorilli). No **Bloco 3** entregues **3.1** (13º salário), **3.2**
-> (rescisão) e **3.3** (férias); faltam licença-prêmio e folha complementar.
-> **499 testes backend verde** + 10 frontend.
+> (rescisão), **3.3** (férias), **3.4** (licença-prêmio) e **3.5** (folha
+> complementar) — bloco fechado. **505 testes backend verde** + 10 frontend.
 > Em produção desde **maio/2026**: https://arminda.site (Hostinger VPS).
 
 ---
@@ -245,8 +245,8 @@ por bloco em [docs/PERSONAS.md](docs/PERSONAS.md). Snapshot:
 |-------|------|--------|
 | 0 | Estrutura inicial | ✅ Concluído (abr/2026) |
 | 1 | Fundação multi-tenant e cadastros (inclui Ondas 1.1 a 1.6b) | ✅ Concluído (mai/2026) |
-| 2 | Engine de cálculo + DSL de rubricas | 🟡 Em andamento — 56% (Ondas 2.1, 2.2, 2.3, 2.6 prontas; faltam 2.4, 2.5, 2.7) |
-| 3 | Folhas especiais (13º, férias, rescisão) | ⏳ Set/2026 |
+| 2 | Engine de cálculo + DSL de rubricas | 🟡 Em andamento — 85% (Ondas 2.1–2.6 prontas; falta só a 2.7 — paridade Fiorilli) |
+| 3 | Folhas especiais (13º, rescisão, férias, licença-prêmio, complementar) | ✅ Concluído (jun/2026, antecipado) |
 | 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF, MANAD) | ⏳ Out-Nov/2026 |
 | 5 | Integração TCE (MA, PB, framework outros) | ⏳ Dez/2026 |
 | 6 | MVP piloto em produção (gate crítico) | ⏳ Jan/2027 |

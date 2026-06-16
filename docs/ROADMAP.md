@@ -35,6 +35,8 @@ Setup do repositório, arquitetura base, ambiente de desenvolvimento e documenta
 
 ## Bloco 1 — Fundação multi-tenant e cadastros
 
+**Status:** concluído ✅
+
 **Período estimado:** meses 1–2
 
 A camada de identidade do sistema. Tudo nos blocos seguintes depende disso.
@@ -55,6 +57,8 @@ A camada de identidade do sistema. Tudo nos blocos seguintes depende disso.
 ---
 
 ## Bloco 2 — Engine de cálculo + DSL de rubricas
+
+**Status:** em andamento (85% — falta só a 2.7, paridade Fiorilli, que depende de base real do SIP)
 
 **Período estimado:** meses 3–4
 
@@ -77,20 +81,26 @@ O coração do produto. É aqui que o trabalho pesado acontece.
 
 ## Bloco 3 — Folhas especiais
 
+**Status:** concluído ✅ (v0.18.0, antecipado)
+
 **Período estimado:** mês 5
 
 Cobertura completa dos eventos de folha não-ordinários.
 
 **Escopo**
-- 13º salário (parcelas 1 e 2, com adiantamento e ajuste)
-- Férias (com abono pecuniário, adiantamento e antecipação de 13º)
-- Rescisão (todas as modalidades com cálculo de verbas)
-- Licença-prêmio
-- Folha complementar e adiantamento
+- ✅ 13º salário (parcelas 1 e 2, avos automáticos, incidências em separado) — Onda 3.1, ADR-0015
+- ✅ Férias (salário + 1/3 e abono pecuniário, programação por itens) — Onda 3.3, ADR-0017
+- ✅ Rescisão (verbas com gating por motivo de desligamento) — Onda 3.2, ADR-0016
+- ✅ Licença-prêmio (indenização, verba indenizatória) — Onda 3.4, ADR-0018
+- ✅ Folha complementar (lançamentos explícitos; gancho `folha_origem` para o modo acumulado) — Onda 3.5, ADR-0019
 
 **Critério de aceitação**
-- Cada tipo de folha tem cenários de teste cobrindo as principais variações
-- Paridade contra Fiorilli em base real
+- ✅ Cada tipo de folha tem cenários de teste cobrindo as principais variações
+- ⏳ Paridade contra Fiorilli em base real — depende de base do SIP (alinhado com a 2.7)
+
+> **Dívida mapeada:** folha complementar com **modo acumulado** (recálculo
+> delta + incidência sobre a base da folha mensal, via `Folha.folha_origem`);
+> e adiantamento, que entram como evolução futura (ADR-0019).
 
 ---
 
