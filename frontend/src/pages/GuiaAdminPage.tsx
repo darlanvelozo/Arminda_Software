@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-08";
+const LAST_UPDATED = "2026-06-15";
 
 interface TocItem {
   id: string;
@@ -642,6 +642,24 @@ function SectionCalculo() {
         rubrica única <code className="bg-muted px-1 rounded">LP_INDENIZ</code> (provento
         sem incidência — indenizatória). API{" "}
         <code className="bg-muted px-1 rounded">/payroll/licenca-premio-itens/</code>.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Folha complementar (Onda 3.5 — ADR-0019)</h3>
+      <p>
+        Reusa <code className="bg-muted px-1 rounded">TipoFolha.COMPLEMENTAR</code> +
+        modelo <code className="bg-muted px-1 rounded">ComplementarItem(folha, vinculo,
+        rubrica, valor)</code> (único por folha+vínculo+rubrica). Para folhas
+        complementares o engine tem caminho próprio{" "}
+        <code className="bg-muted px-1 rounded">_calcular_complementar</code>: materializa
+        cada item como <code className="bg-muted px-1 rounded">Lancamento</code> com o
+        valor informado, <strong>sem rodar fórmulas e sem incidência automática</strong>
+        (proventos/descontos somam pelo tipo da rubrica). FK opcional{" "}
+        <code className="bg-muted px-1 rounded">Folha.folha_origem</code> (self-FK) é o
+        gancho para o futuro <em>modo acumulado</em> (delta + incidência sobre a base do
+        mês), sem migration quebrada. API{" "}
+        <code className="bg-muted px-1 rounded">/payroll/complementar-itens/</code>.
+        Incidência isolada foi descartada por ser ativamente incorreta (faixa de
+        IRRF / teto de INSS) — ver ADR-0019.
       </p>
 
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>

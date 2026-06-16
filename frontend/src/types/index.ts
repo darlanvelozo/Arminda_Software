@@ -76,6 +76,9 @@ export type FeriasItem = components["schemas"]["FeriasItem"];
 // Programação de licença-prêmio (Onda 3.4)
 export type LicencaPremioItem = components["schemas"]["LicencaPremioItem"];
 
+// Lançamentos de folha complementar (Onda 3.5)
+export type ComplementarItem = components["schemas"]["ComplementarItem"];
+
 /**
  * Resposta do POST /api/payroll/folhas/{id}/calcular/.
  *

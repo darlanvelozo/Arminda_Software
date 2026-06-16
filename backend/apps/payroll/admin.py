@@ -5,6 +5,7 @@ from __future__ import annotations
 from django.contrib import admin
 
 from .models import (
+    ComplementarItem,
     FeriasItem,
     Folha,
     Lancamento,
@@ -86,6 +87,14 @@ class LicencaPremioItemAdmin(admin.ModelAdmin):
     list_filter = ("folha",)
     search_fields = ("vinculo__servidor__nome",)
     raw_id_fields = ("folha", "vinculo")
+
+
+@admin.register(ComplementarItem)
+class ComplementarItemAdmin(admin.ModelAdmin):
+    list_display = ("vinculo", "folha", "rubrica", "valor")
+    list_filter = ("folha", "rubrica__tipo")
+    search_fields = ("vinculo__servidor__nome", "rubrica__codigo")
+    raw_id_fields = ("folha", "vinculo", "rubrica")
 
 
 @admin.register(Lancamento)

@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-08";
+const LAST_UPDATED = "2026-06-15";
 
 interface TocItem {
   id: string;
@@ -810,6 +810,17 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         indenizar. O valor é <code>salário × meses (+ salário/30 × dias)</code>, verba
         indenizatória — sem INSS nem IRRF. (Licença-prêmio gozada é a folha mensal
         normal.)
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Folha complementar (Onda 3.5)</h3>
+      <p>
+        Para pagar <strong>diferenças</strong> de uma competência que já foi fechada
+        (reajuste retroativo, rubrica esquecida, correção), crie uma folha do tipo{" "}
+        <strong>Complementar</strong> e, na aba <strong>Programação</strong>, lance
+        para cada servidor a rubrica e o <strong>valor</strong> à mão. Os valores são
+        explícitos — <strong>não há incidência automática</strong>: se houver INSS/IRRF
+        complementar devido, lance-o também como desconto. (O cálculo automático da
+        diferença e das incidências sobre a base do mês fica para uma evolução futura.)
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

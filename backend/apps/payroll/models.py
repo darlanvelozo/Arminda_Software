@@ -94,6 +94,17 @@ class Folha(TimeStampedModel):
     total_descontos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_liquido = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     observacoes = models.TextField(blank=True)
+    folha_origem = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="complementares",
+        help_text=(
+            "Folha mensal de origem (apenas para folhas complementares). "
+            "Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019."
+        ),
+    )
 
     class Meta:
         ordering = ["-competencia"]
@@ -199,6 +210,43 @@ class LicencaPremioItem(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.vinculo.servidor.nome}: {self.meses}m + {self.dias}d"
+
+
+class ComplementarItem(TimeStampedModel):
+    """
+    Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019).
+
+    O operador escolhe o servidor, a rubrica (provento ou desconto) e informa
+    o valor à mão. O engine materializa cada item como `Lancamento` sem rodar
+    fórmulas e sem incidência automática (ver ADR-0019).
+    """
+
+    folha = models.ForeignKey(
+        Folha, on_delete=models.CASCADE, related_name="complementar_itens"
+    )
+    vinculo = models.ForeignKey(
+        VinculoFuncional, on_delete=models.PROTECT, related_name="complementar_itens"
+    )
+    rubrica = models.ForeignKey(
+        Rubrica, on_delete=models.PROTECT, related_name="complementar_itens"
+    )
+    valor = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="Valor explícito do lançamento (> 0)."
+    )
+
+    class Meta:
+        ordering = ["vinculo__servidor__nome", "rubrica__codigo"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["folha", "vinculo", "rubrica"],
+                name="complementar_item_unico_por_folha_vinculo_rubrica",
+            ),
+        ]
+        verbose_name = "item complementar"
+        verbose_name_plural = "itens complementares"
+
+    def __str__(self) -> str:
+        return f"{self.vinculo.servidor.nome} | {self.rubrica.codigo}: R$ {self.valor}"
 
 
 class ModoContribuicaoRPPS(models.TextChoices):

@@ -35,6 +35,44 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 3.5 — Folha complementar: lançamentos explícitos · 2026-06-15
+
+> Quinta e última onda do Bloco 3 (ADR-0019) — **fecha o Bloco 3** (folhas
+> especiais → 100%). Folha complementar por lançamentos explícitos por
+> servidor; sem incidência automática (escolha de design, ver ADR). Gancho
+> `folha_origem` para o futuro modo acumulado.
+
+#### Adicionado — Backend
+
+- **feat(payroll):** modelo `ComplementarItem(folha, vinculo, rubrica, valor)`
+  (único por folha+vínculo+rubrica) e FK opcional `Folha.folha_origem`
+  (self-FK, gancho para o modo acumulado) — migration 0006. Admin e API REST
+  (`/payroll/complementar-itens/`, valor > 0).
+- **feat(payroll.services.calculo):** caminho próprio `_calcular_complementar`
+  para folhas `COMPLEMENTAR` — materializa cada item como `Lancamento` com o
+  valor informado, sem fórmulas e sem incidência automática; proventos/
+  descontos somam pelo tipo da rubrica. Seletor `_vinculos_complementar`.
+- 3 testes novos (505 no total).
+
+#### Adicionado — Frontend
+
+- **feat(folha):** aba Programação na folha complementar
+  (`ProgramacaoComplementarTab`) — seletor de servidor + rubrica + valor;
+  query `complementar`, `folha_origem` exposto nos serializers de folha.
+
+#### Por quê
+
+- ADR-0019: complementar paga diferenças de uma competência já fechada. INSS/
+  IRRF são cumulativos no mês; calcular a incidência do complemento isolada
+  daria faixa/teto errados (ativamente incorreto). O v1 usa valores explícitos
+  (nunca erra) e deixa `folha_origem` como costura para o modo acumulado.
+
+#### Impacto
+
+- Migration `payroll.0006`. **Bloco 3 (folhas especiais) → 100%.** Guias
+  atualizados. Recálculo automático (delta) e modo acumulado ficam mapeados
+  para onda futura.
+
 ### Onda 3.4 — Licença-prêmio: indenização · 2026-06-08
 
 > Quarta onda do Bloco 3 (ADR-0018). Folha de licença-prêmio indenizada:

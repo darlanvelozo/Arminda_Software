@@ -251,6 +251,66 @@ def _vinculos_da_folha(folha: Folha):
     return _vinculos_da_competencia(folha.competencia)
 
 
+def _vinculos_complementar(folha: Folha):
+    """Vínculos com itens complementares (Onda 3.5 — ADR-0019). Agrupa os
+    itens por vínculo e anexa a lista em `_complementar_itens` (evita N
+    queries na materialização)."""
+    itens = folha.complementar_itens.select_related(
+        "vinculo__servidor", "vinculo__cargo", "vinculo__lotacao",
+        "vinculo__unidade_orcamentaria", "rubrica",
+    ).order_by("vinculo__servidor__nome", "vinculo_id", "rubrica__codigo")
+    por_vinculo: dict[int, tuple[VinculoFuncional, list]] = {}
+    for item in itens:
+        if item.vinculo_id not in por_vinculo:
+            por_vinculo[item.vinculo_id] = (item.vinculo, [])
+        por_vinculo[item.vinculo_id][1].append(item)
+    vinculos = []
+    for vinculo, lista in por_vinculo.values():
+        vinculo._complementar_itens = lista
+        vinculos.append(vinculo)
+    return vinculos
+
+
+def _calcular_complementar(folha: Folha, relatorio: RelatorioCalculo) -> RelatorioCalculo:
+    """Folha complementar (Onda 3.5 — ADR-0019): lançamentos explícitos por
+    servidor, sem fórmulas e sem incidência automática. Cada item vira um
+    `Lancamento` com o valor informado; proventos/descontos somam pelo tipo
+    da rubrica. Idempotente: re-rodar produz o mesmo estado."""
+    vinculos = _vinculos_complementar(folha)
+    relatorio.vinculos_processados = len(vinculos)
+    pares_processados: set[tuple[int, int]] = set()
+    total_proventos = Decimal("0")
+    total_descontos = Decimal("0")
+
+    with transaction.atomic():
+        for vinculo in vinculos:
+            for item in vinculo._complementar_itens:
+                _, criado = Lancamento.objects.update_or_create(
+                    folha=folha,
+                    vinculo=vinculo,
+                    rubrica=item.rubrica,
+                    defaults={
+                        "servidor": vinculo.servidor,
+                        "referencia": Decimal(0),
+                        "valor": item.valor,
+                    },
+                )
+                if criado:
+                    relatorio.lancamentos_criados += 1
+                else:
+                    relatorio.lancamentos_atualizados += 1
+                pares_processados.add((vinculo.id, item.rubrica_id))
+                if item.rubrica.tipo == TipoRubrica.PROVENTO:
+                    total_proventos += item.valor
+                elif item.rubrica.tipo == TipoRubrica.DESCONTO:
+                    total_descontos += item.valor
+
+        _limpar_orfaos_e_fechar(
+            folha, pares_processados, total_proventos, total_descontos, relatorio
+        )
+    return relatorio
+
+
 def _rubricas_ativas_ordenadas(tipo_folha: str) -> tuple[list[Rubrica], list[str]]:
     """
     Carrega rubricas ativas **do tipo de folha**, ordena topologicamente pela
@@ -533,6 +593,12 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
             abortada.
     """
     relatorio = RelatorioCalculo(folha_id=folha.id, competencia=folha.competencia)
+
+    # Folha complementar (Onda 3.5 — ADR-0019): caminho próprio, sem fórmulas
+    # — os valores vêm dos itens lançados à mão.
+    if folha.tipo == TipoFolha.COMPLEMENTAR:
+        return _calcular_complementar(folha, relatorio)
+
     rubricas_ordenadas, ordem = _rubricas_ativas_ordenadas(folha.tipo)
     relatorio.ordem_rubricas = ordem
 

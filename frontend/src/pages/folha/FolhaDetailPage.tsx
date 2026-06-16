@@ -59,6 +59,7 @@ import {
 import type { ResumoAreaLinha } from "@/lib/queries/folhas";
 import type { Folha, Lancamento, RelatorioCalculo } from "@/types";
 
+import { ProgramacaoComplementarTab } from "./ProgramacaoComplementarTab";
 import { ProgramacaoFeriasTab } from "./ProgramacaoFeriasTab";
 import { ProgramacaoLicencaPremioTab } from "./ProgramacaoLicencaPremioTab";
 
@@ -240,13 +241,17 @@ export default function FolhaDetailPage() {
 
       <Tabs
         defaultValue={
-          folha.tipo === "ferias" || folha.tipo === "licenca_premio"
+          folha.tipo === "ferias" ||
+          folha.tipo === "licenca_premio" ||
+          folha.tipo === "complementar"
             ? "programacao"
             : "servidores"
         }
       >
         <TabsList>
-          {(folha.tipo === "ferias" || folha.tipo === "licenca_premio") && (
+          {(folha.tipo === "ferias" ||
+            folha.tipo === "licenca_premio" ||
+            folha.tipo === "complementar") && (
             <TabsTrigger value="programacao" className="gap-2">
               <CalendarDays className="h-3.5 w-3.5" /> Programação
             </TabsTrigger>
@@ -277,6 +282,11 @@ export default function FolhaDetailPage() {
         {folha.tipo === "licenca_premio" && id !== null && (
           <TabsContent value="programacao">
             <ProgramacaoLicencaPremioTab folhaId={id} />
+          </TabsContent>
+        )}
+        {folha.tipo === "complementar" && id !== null && (
+          <TabsContent value="programacao">
+            <ProgramacaoComplementarTab folhaId={id} />
           </TabsContent>
         )}
 

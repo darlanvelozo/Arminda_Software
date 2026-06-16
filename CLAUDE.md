@@ -17,16 +17,18 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.17.0` (Onda 3.4 — licença-prêmio)
-- **Bloco corrente:** Bloco 3 — Folhas especiais (80% — 13º, rescisão, férias e licença-prêmio entregues; falta só a folha complementar). Bloco 2 a 85% (falta só a 2.7 — paridade Fiorilli)
+- **Versão atual:** `v0.18.0` (Onda 3.5 — folha complementar)
+- **Bloco corrente:** **Bloco 3 — Folhas especiais: 100% (concluído)** — 13º, rescisão, férias, licença-prêmio e folha complementar entregues. Bloco 2 a 85% (falta só a 2.7 — paridade Fiorilli)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 502 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 505 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
-Próxima onda natural: **Bloco 3** — folha complementar (fecha o bloco); e a
-**2.7** (paridade Fiorilli) fecha o Bloco 2 quando houver dados de referência.
+Próximos passos naturais: a **2.7** (paridade Fiorilli) fecha o Bloco 2 quando
+houver dados de referência; ou iniciar o **Bloco 4** (ver [ROADMAP.md](docs/ROADMAP.md)).
+Dívida mapeada do Bloco 3: folha complementar com **modo acumulado** (recálculo
+delta + incidência sobre a base do mês, via `Folha.folha_origem` — ADR-0019).
 Ver [CHANGELOG.md](CHANGELOG.md).
 
 > **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
@@ -45,7 +47,7 @@ Ver [CHANGELOG.md](CHANGELOG.md).
 3. **[docs/PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 4. **[CHANGELOG.md](CHANGELOG.md)** — memória do projeto, toda alteração registrada
 5. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — racional das decisões de stack
-6. **[docs/adr/](docs/adr/)** — 18 ADRs (decisões formais)
+6. **[docs/adr/](docs/adr/)** — 19 ADRs (decisões formais)
 7. **CONTEXT.md específicos** quando for mexer:
    - Backend: [backend/CONTEXT.md](backend/CONTEXT.md) → [`_MODELS`](backend/CONTEXT_MODELS.md) → [`_SERVICES`](backend/CONTEXT_SERVICES.md) → [`apps/CONTEXT.md`](backend/apps/CONTEXT.md)
    - Frontend: [frontend/CONTEXT.md](frontend/CONTEXT.md) → [`pages/CONTEXT.md`](frontend/src/pages/CONTEXT.md) → [`components/CONTEXT.md`](frontend/src/components/CONTEXT.md)
@@ -232,6 +234,7 @@ Estas ADRs já estão aceitas e implementadas. Reabrir só com motivo forte:
 | 0016 | Rescisão: motivo no vínculo + verbas com gating por motivo |
 | 0017 | Férias: programação por `FeriasItem` na folha + abono pecuniário |
 | 0018 | Licença-prêmio: indenização por `LicencaPremioItem` (verba indenizatória) |
+| 0019 | Folha complementar: lançamentos explícitos (`ComplementarItem`), `folha_origem` como gancho do modo acumulado |
 
 Papéis novos a criar (mapeados em [PERSONAS.md](docs/PERSONAS.md)):
 `gestor_municipio` (Bloco 7), `contador_municipio` (Bloco 9),
@@ -283,10 +286,12 @@ Procedimento:
 
 Se estiver retomando o projeto:
 
-- **Onda 3.5 — Folha complementar** — fecha o Bloco 3 (folhas especiais)
+- **Bloco 3 — concluído** (13º, rescisão, férias, licença-prêmio, complementar)
 - **Onda 2.7 — Testes de paridade contra Fiorilli** (fecha Bloco 2) — quando
   houver dados de referência do SIP
-- Depois: **Bloco 4** conforme [ROADMAP.md](docs/ROADMAP.md)
+- Ou iniciar o **Bloco 4** conforme [ROADMAP.md](docs/ROADMAP.md)
+- Dívida do Bloco 3: folha complementar **modo acumulado** (recálculo delta +
+  incidência sobre a base do mês, via `Folha.folha_origem` — ADR-0019)
 
 Bug pendente conhecido: nenhum.
 

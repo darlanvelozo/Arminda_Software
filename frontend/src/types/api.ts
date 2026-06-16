@@ -188,6 +188,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payroll/complementar-itens/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=. */
+        get: operations["payroll_complementar_itens_list"];
+        put?: never;
+        /** @description CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=. */
+        post: operations["payroll_complementar_itens_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/complementar-itens/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=. */
+        get: operations["payroll_complementar_itens_retrieve"];
+        /** @description CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=. */
+        put: operations["payroll_complementar_itens_update"];
+        post?: never;
+        /** @description CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=. */
+        delete: operations["payroll_complementar_itens_destroy"];
+        options?: never;
+        head?: never;
+        /** @description CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=. */
+        patch: operations["payroll_complementar_itens_partial_update"];
+        trace?: never;
+    };
     "/api/payroll/ferias-itens/": {
         parameters: {
             query?: never;
@@ -1305,6 +1343,24 @@ export interface components {
             nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
             ativo?: boolean;
         };
+        /** @description Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019). */
+        ComplementarItem: {
+            readonly id: number;
+            folha: number;
+            vinculo: number;
+            rubrica: number;
+            readonly servidor_nome: string;
+            readonly servidor_matricula: string;
+            readonly cargo: string;
+            readonly rubrica_codigo: string;
+            readonly rubrica_nome: string;
+            readonly rubrica_tipo: string;
+            /**
+             * Format: decimal
+             * @description Valor explícito do lançamento (> 0).
+             */
+            valor: string;
+        };
         DependenteDetail: {
             readonly id: number;
             servidor: number;
@@ -1444,6 +1500,8 @@ export interface components {
             /** Format: decimal */
             readonly total_liquido: string;
             readonly lancamentos_count: number;
+            /** @description Folha mensal de origem (apenas para folhas complementares). Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019. */
+            readonly folha_origem: number | null;
             /** Format: date-time */
             readonly atualizado_em: string;
             readonly observacoes: string;
@@ -1470,6 +1528,8 @@ export interface components {
             /** Format: decimal */
             readonly total_liquido: string;
             readonly lancamentos_count: number;
+            /** @description Folha mensal de origem (apenas para folhas complementares). Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019. */
+            readonly folha_origem: number | null;
             /** Format: date-time */
             readonly atualizado_em: string;
         };
@@ -1484,6 +1544,8 @@ export interface components {
             /** @default mensal */
             tipo: components["schemas"]["Tipo995Enum"];
             observacoes?: string;
+            /** @description Folha mensal de origem (apenas para folhas complementares). Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019. */
+            folha_origem?: number | null;
         };
         /** @description Lançamento individual + dados básicos do servidor/rubrica. */
         Lancamento: {
@@ -1705,6 +1767,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["CargoList"][];
+        };
+        PaginatedComplementarItemList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["ComplementarItem"][];
         };
         PaginatedDependenteListList: {
             /** @example 123 */
@@ -1943,6 +2020,24 @@ export interface components {
             nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
             ativo?: boolean;
         };
+        /** @description Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019). */
+        PatchedComplementarItem: {
+            readonly id?: number;
+            folha?: number;
+            vinculo?: number;
+            rubrica?: number;
+            readonly servidor_nome?: string;
+            readonly servidor_matricula?: string;
+            readonly cargo?: string;
+            readonly rubrica_codigo?: string;
+            readonly rubrica_nome?: string;
+            readonly rubrica_tipo?: string;
+            /**
+             * Format: decimal
+             * @description Valor explícito do lançamento (> 0).
+             */
+            valor?: string;
+        };
         PatchedDependenteWrite: {
             readonly id?: number;
             servidor?: number;
@@ -1992,6 +2087,8 @@ export interface components {
             /** @default mensal */
             tipo: components["schemas"]["Tipo995Enum"];
             observacoes?: string;
+            /** @description Folha mensal de origem (apenas para folhas complementares). Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019. */
+            folha_origem?: number | null;
         };
         /** @description Programação de indenização de licença-prêmio numa folha (Onda 3.4). */
         PatchedLicencaPremioItem: {
@@ -2982,6 +3079,159 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    payroll_complementar_itens_list: {
+        parameters: {
+            query?: {
+                folha?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                rubrica?: number;
+                /** @description A search term. */
+                search?: string;
+                vinculo?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedComplementarItemList"];
+                };
+            };
+        };
+    };
+    payroll_complementar_itens_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComplementarItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["ComplementarItem"];
+                "multipart/form-data": components["schemas"]["ComplementarItem"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplementarItem"];
+                };
+            };
+        };
+    };
+    payroll_complementar_itens_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item complementar. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplementarItem"];
+                };
+            };
+        };
+    };
+    payroll_complementar_itens_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item complementar. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComplementarItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["ComplementarItem"];
+                "multipart/form-data": components["schemas"]["ComplementarItem"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplementarItem"];
+                };
+            };
+        };
+    };
+    payroll_complementar_itens_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item complementar. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    payroll_complementar_itens_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this item complementar. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedComplementarItem"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedComplementarItem"];
+                "multipart/form-data": components["schemas"]["PatchedComplementarItem"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplementarItem"];
+                };
             };
         };
     };

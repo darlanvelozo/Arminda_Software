@@ -10,6 +10,7 @@ from __future__ import annotations
 from rest_framework import serializers
 
 from apps.payroll.models import (
+    ComplementarItem,
     FeriasItem,
     Folha,
     Lancamento,
@@ -104,6 +105,7 @@ class FolhaListSerializer(serializers.ModelSerializer):
             "total_descontos",
             "total_liquido",
             "lancamentos_count",
+            "folha_origem",
             "atualizado_em",
         ]
         read_only_fields = fields
@@ -126,7 +128,7 @@ class FolhaWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folha
-        fields = ["id", "competencia", "tipo", "observacoes"]
+        fields = ["id", "competencia", "tipo", "observacoes", "folha_origem"]
         read_only_fields = ["id"]
 
 
@@ -252,6 +254,36 @@ class LicencaPremioItemSerializer(serializers.ModelSerializer):
     def validate_dias(self, value: int) -> int:
         if value > 29:
             raise serializers.ValidationError("Dias adicionais é de no máximo 29 (use meses).")
+        return value
+
+
+class ComplementarItemSerializer(serializers.ModelSerializer):
+    """Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019)."""
+
+    servidor_nome = serializers.CharField(source="vinculo.servidor.nome", read_only=True)
+    servidor_matricula = serializers.CharField(
+        source="vinculo.servidor.matricula", read_only=True
+    )
+    cargo = serializers.CharField(source="vinculo.cargo.nome", read_only=True)
+    rubrica_codigo = serializers.CharField(source="rubrica.codigo", read_only=True)
+    rubrica_nome = serializers.CharField(source="rubrica.nome", read_only=True)
+    rubrica_tipo = serializers.CharField(source="rubrica.tipo", read_only=True)
+
+    class Meta:
+        model = ComplementarItem
+        fields = [
+            "id", "folha", "vinculo", "rubrica", "servidor_nome",
+            "servidor_matricula", "cargo", "rubrica_codigo", "rubrica_nome",
+            "rubrica_tipo", "valor",
+        ]
+        read_only_fields = [
+            "id", "servidor_nome", "servidor_matricula", "cargo",
+            "rubrica_codigo", "rubrica_nome", "rubrica_tipo",
+        ]
+
+    def validate_valor(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("O valor deve ser maior que zero.")
         return value
 
 

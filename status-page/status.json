@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-06-08",
+  "ultima_atualizacao": "2026-06-15",
   "bloco_atual": 2,
-  "progresso_geral_pct": 27,
+  "progresso_geral_pct": 29,
   "blocos": [
     {
       "numero": 0,
@@ -90,15 +90,15 @@
       "periodo": "Setembro 2026 (antecipado)",
       "data_inicio": "2026-06-05",
       "data_fim_prevista": "2026-09-30",
-      "data_fim_real": null,
-      "status": "em_andamento",
-      "progresso_pct": 80,
+      "data_fim_real": "2026-06-15",
+      "status": "concluido",
+      "progresso_pct": 100,
       "entregas": [
         "✅ Cálculo de 13º — 1ª e 2ª parcelas (avos automáticos, incidências em separado, ADR-0015) — Onda 3.1",
         "✅ Rescisão — verbas rescisórias (saldo, 13º prop, férias prop/vencidas + 1/3, aviso, FGTS+multa) com gating por motivo, ADR-0016 — Onda 3.2",
         "✅ Férias — salário + 1/3 e abono pecuniário (programação por itens, incidências corretas, ADR-0017) — Onda 3.3",
         "✅ Licença-prêmio — indenização (programação por itens, verba indenizatória, ADR-0018) — Onda 3.4",
-        "Folha complementar — fecha o Bloco 3"
+        "✅ Folha complementar — lançamentos explícitos por servidor (gancho para modo acumulado, ADR-0019) — Onda 3.5"
       ]
     },
     {
@@ -252,6 +252,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-06-15",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.18.0 (folha complementar)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 505 verde (3 testes novos de folha complementar: só vínculos com itens entram; proventos/descontos explícitos somam certo e idempotência; API cria item e rejeita valor zero). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Tipos regenerados. Pronto para tag v0.18.0 — fecha o Bloco 3.",
+      "descricao": "Onda 3.5 passou pela validação integral. Migration payroll.0006 (novo modelo de item + folha_origem) aplicada no tenant de dev. 505 passed (502 + 3)."
+    },
+    {
+      "data": "2026-06-15",
+      "tipo": "entrega",
+      "titulo": "Folha complementar: lançamentos explícitos (Onda 3.5)",
+      "resumo_executivo": "O sistema passou a emitir folha complementar — usada para pagar diferenças de um mês que já foi fechado (um reajuste aplicado com atraso, uma rubrica esquecida, uma correção). Cria-se uma folha do tipo Complementar e, na aba Programação, lança-se para cada servidor a rubrica e o valor a pagar (ou descontar). Os valores são informados à mão e não passam por cálculo automático de INSS/IRRF; quando há imposto complementar devido, ele é lançado explicitamente. Com isso o Bloco 3 (folhas especiais) chega a 100%: 13º, rescisão, férias, licença-prêmio e complementar — todos entregues.",
+      "descricao": "Onda 3.5 (ADR-0019) fecha o Bloco 3. Novo modelo ComplementarItem(folha, vinculo, rubrica, valor) e um caminho próprio no engine (_calcular_complementar) que materializa cada item como lançamento, sem rodar fórmulas e sem incidência automática — proventos e descontos somam pelo tipo da rubrica. A incidência isolada foi descartada por ser ativamente incorreta (faixa de IRRF e teto de INSS são cumulativos no mês); a forma correta (modo acumulado, considerando a base da folha mensal) fica para uma evolução futura, com o vínculo folha_origem já preparado como gancho. API REST dos itens e aba Programação na folha complementar (seletor de servidor + rubrica + valor). Guias atualizados."
+    },
     {
       "data": "2026-06-08",
       "tipo": "validacao",

@@ -291,6 +291,194 @@ paths:
       responses:
         '200':
           description: No response body
+  /api/payroll/complementar-itens/:
+    get:
+      operationId: payroll_complementar_itens_list
+      description: CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra
+        por ?folha=.
+      parameters:
+      - in: query
+        name: folha
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: rubrica
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: vinculo
+        schema:
+          type: integer
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedComplementarItemList'
+          description: ''
+    post:
+      operationId: payroll_complementar_itens_create
+      description: CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra
+        por ?folha=.
+      tags:
+      - payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplementarItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComplementarItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComplementarItem'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplementarItem'
+          description: ''
+  /api/payroll/complementar-itens/{id}/:
+    get:
+      operationId: payroll_complementar_itens_retrieve
+      description: CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item complementar.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplementarItem'
+          description: ''
+    put:
+      operationId: payroll_complementar_itens_update
+      description: CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item complementar.
+        required: true
+      tags:
+      - payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplementarItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ComplementarItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ComplementarItem'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplementarItem'
+          description: ''
+    patch:
+      operationId: payroll_complementar_itens_partial_update
+      description: CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item complementar.
+        required: true
+      tags:
+      - payroll
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedComplementarItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedComplementarItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedComplementarItem'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplementarItem'
+          description: ''
+    delete:
+      operationId: payroll_complementar_itens_destroy
+      description: CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra
+        por ?folha=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this item complementar.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/payroll/ferias-itens/:
     get:
       operationId: payroll_ferias_itens_list
@@ -3742,6 +3930,54 @@ components:
       - codigo
       - id
       - nome
+    ComplementarItem:
+      type: object
+      description: Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        folha:
+          type: integer
+        vinculo:
+          type: integer
+        rubrica:
+          type: integer
+        servidor_nome:
+          type: string
+          readOnly: true
+        servidor_matricula:
+          type: string
+          readOnly: true
+        cargo:
+          type: string
+          readOnly: true
+        rubrica_codigo:
+          type: string
+          readOnly: true
+        rubrica_nome:
+          type: string
+          readOnly: true
+        rubrica_tipo:
+          type: string
+          readOnly: true
+        valor:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Valor explícito do lançamento (> 0).
+      required:
+      - cargo
+      - folha
+      - id
+      - rubrica
+      - rubrica_codigo
+      - rubrica_nome
+      - rubrica_tipo
+      - servidor_matricula
+      - servidor_nome
+      - valor
+      - vinculo
     DependenteDetail:
       type: object
       properties:
@@ -4078,6 +4314,12 @@ components:
         lancamentos_count:
           type: integer
           readOnly: true
+        folha_origem:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Folha mensal de origem (apenas para folhas complementares).
+            Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019.
         atualizado_em:
           type: string
           format: date-time
@@ -4093,6 +4335,7 @@ components:
       - atualizado_em
       - competencia
       - criado_em
+      - folha_origem
       - id
       - lancamentos_count
       - observacoes
@@ -4148,6 +4391,12 @@ components:
         lancamentos_count:
           type: integer
           readOnly: true
+        folha_origem:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Folha mensal de origem (apenas para folhas complementares).
+            Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019.
         atualizado_em:
           type: string
           format: date-time
@@ -4155,6 +4404,7 @@ components:
       required:
       - atualizado_em
       - competencia
+      - folha_origem
       - id
       - lancamentos_count
       - status
@@ -4181,6 +4431,11 @@ components:
           default: mensal
         observacoes:
           type: string
+        folha_origem:
+          type: integer
+          nullable: true
+          description: Folha mensal de origem (apenas para folhas complementares).
+            Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019.
       required:
       - competencia
       - id
@@ -4664,6 +4919,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CargoList'
+    PaginatedComplementarItemList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplementarItem'
     PaginatedDependenteListList:
       type: object
       required:
@@ -5034,6 +5312,42 @@ components:
           $ref: '#/components/schemas/NivelEscolaridadeEnum'
         ativo:
           type: boolean
+    PatchedComplementarItem:
+      type: object
+      description: Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        folha:
+          type: integer
+        vinculo:
+          type: integer
+        rubrica:
+          type: integer
+        servidor_nome:
+          type: string
+          readOnly: true
+        servidor_matricula:
+          type: string
+          readOnly: true
+        cargo:
+          type: string
+          readOnly: true
+        rubrica_codigo:
+          type: string
+          readOnly: true
+        rubrica_nome:
+          type: string
+          readOnly: true
+        rubrica_tipo:
+          type: string
+          readOnly: true
+        valor:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          description: Valor explícito do lançamento (> 0).
     PatchedDependenteWrite:
       type: object
       properties:
@@ -5126,6 +5440,11 @@ components:
           default: mensal
         observacoes:
           type: string
+        folha_origem:
+          type: integer
+          nullable: true
+          description: Folha mensal de origem (apenas para folhas complementares).
+            Rastreabilidade hoje; base do modo acumulado no futuro — ADR-0019.
     PatchedLicencaPremioItem:
       type: object
       description: Programação de indenização de licença-prêmio numa folha (Onda 3.4).

@@ -34,6 +34,7 @@ from apps.payroll.filters import (
     RubricaFilter,
 )
 from apps.payroll.models import (
+    ComplementarItem,
     FeriasItem,
     Folha,
     Lancamento,
@@ -42,6 +43,7 @@ from apps.payroll.models import (
     Rubrica,
 )
 from apps.payroll.serializers import (
+    ComplementarItemSerializer,
     FeriasItemSerializer,
     FolhaDetailSerializer,
     FolhaListSerializer,
@@ -386,6 +388,25 @@ class LicencaPremioItemViewSet(viewsets.ModelViewSet):
     filterset_fields = ["folha", "vinculo"]
     ordering_fields = ["vinculo__servidor__nome"]
     ordering = ["vinculo__servidor__nome"]
+
+    READ_ACTIONS = {"list", "retrieve"}
+
+    def get_permissions(self):
+        if self.action in self.READ_ACTIONS:
+            return [IsLeituraMunicipio()]
+        return [IsFinanceiroMunicipio()]
+
+
+class ComplementarItemViewSet(viewsets.ModelViewSet):
+    """CRUD dos lançamentos de uma folha complementar (Onda 3.5). Filtra por ?folha=."""
+
+    queryset = ComplementarItem.objects.select_related(
+        "folha", "vinculo__servidor", "vinculo__cargo", "rubrica"
+    ).all()
+    serializer_class = ComplementarItemSerializer
+    filterset_fields = ["folha", "vinculo", "rubrica"]
+    ordering_fields = ["vinculo__servidor__nome", "rubrica__codigo"]
+    ordering = ["vinculo__servidor__nome", "rubrica__codigo"]
 
     READ_ACTIONS = {"list", "retrieve"}
 
