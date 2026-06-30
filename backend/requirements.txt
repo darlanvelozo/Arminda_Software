@@ -45,6 +45,9 @@ openpyxl==3.1.5
 # Geração de holerite em PDF — Onda 2.5 (ADR-0014). Pure-Python, sem libs de sistema.
 reportlab==4.2.5
 
+# Geração/validação de XML do eSocial contra XSD oficial — Bloco 4 (ADR-0020).
+lxml==6.1.1
+
 # ============================================================
 # Dev dependencies
 # ============================================================

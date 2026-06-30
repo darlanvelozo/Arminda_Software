@@ -48,6 +48,7 @@ const QualidadeCadastralPage = lazy(
   () => import("@/pages/qualidade/QualidadeCadastralPage"),
 );
 const ImportarPage = lazy(() => import("@/pages/importar/ImportarPage"));
+const EsocialPage = lazy(() => import("@/pages/esocial/EsocialPage"));
 
 function PageFallback() {
   return (
@@ -104,6 +105,7 @@ function App() {
         <Route path="rubricas" element={lazyRoute(<RubricasListPage />)} />
         <Route path="qualidade-cadastral" element={lazyRoute(<QualidadeCadastralPage />)} />
         <Route path="importar" element={lazyRoute(<ImportarPage />)} />
+        <Route path="esocial" element={lazyRoute(<EsocialPage />)} />
         <Route path="relatorios" element={<EmConstrucaoPage area="Relatórios" />} />
         <Route path="configuracoes" element={lazyRoute(<ConfiguracoesPage />)} />
         <Route path="guia" element={lazyRoute(<GuiaPage />)} />

@@ -35,6 +35,45 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.1 — eSocial: fundação + eventos de tabela · 2026-06-29
+
+> Primeira onda do **Bloco 4** (obrigações legais federais), ADR-0020. Camada
+> de geração de XML do eSocial + validação contra o XSD oficial (S-1.3).
+> Assinatura digital e transmissão entram em ondas seguintes.
+
+#### Adicionado — Backend
+
+- **feat(esocial):** app novo `apps.esocial`. Modelo genérico
+  `EventoESocial(tipo, orgao_emissor, id_evento, xml, status, …)` auditado
+  (migration 0001), gerado por órgão emissor (CNPJ).
+- **feat(esocial.services):** geração de XML com `lxml` para **S-1000**
+  (`evtInfoEmpregador`) e **S-1005** (`evtTabEstab`) a partir do
+  `OrgaoEmissor`; ID do evento no padrão eSocial (36 chars). Validação contra
+  o **XSD oficial S-1.3** versionado em `apps/esocial/schemas/v_S_01_03_00/`
+  (evtInfoEmpregador, evtTabEstab, tipos, xmldsig-core). Como a onda não
+  assina, o validador marca só o `ds:Signature` como opcional ao compilar o
+  schema; o resto é o XSD oficial.
+- **feat(esocial):** API REST `/esocial/eventos/` + actions `gerar` (gera,
+  valida, persiste) e `{id}/baixar` (XML). Admin. `lxml==6.1.1` no requirements.
+- 5 testes novos (510 no total).
+
+#### Adicionado — Frontend
+
+- **feat(esocial):** tela `/esocial` — seleciona órgão emissor, gera S-1000/
+  S-1005, lista eventos com status e baixa o XML. Item no menu lateral.
+
+#### Por quê
+
+- ADR-0020: o eSocial é a espinha dorsal do Bloco 4. As camadas de assinatura
+  (certificado ICP-Brasil) e transmissão (ambiente do governo) dependem de
+  pré-requisitos externos; a camada de geração+validação é desbloqueada e
+  100% testável offline, e destrava o resto do bloco.
+
+#### Impacto
+
+- Nova dependência `lxml` (precisa `pip install -r requirements.txt` no deploy).
+- Migration `esocial.0001`. **Bloco 4 iniciado.** Guias atualizados.
+
 ### Onda 3.5 — Folha complementar: lançamentos explícitos · 2026-06-15
 
 > Quinta e última onda do Bloco 3 (ADR-0019) — **fecha o Bloco 3** (folhas

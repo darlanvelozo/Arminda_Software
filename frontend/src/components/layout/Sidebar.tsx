@@ -15,6 +15,7 @@ import {
   Briefcase,
   Building2,
   ChevronRight,
+  FileCode2,
   FileSpreadsheet,
   FileText,
   Home,
@@ -49,6 +50,7 @@ const ITENS: ItemNav[] = [
   { label: "Rubricas", to: "/rubricas", icon: Tag },
   { label: "Qualidade cadastral", to: "/qualidade-cadastral", icon: ShieldCheck },
   { label: "Importar", to: "/importar", icon: FileSpreadsheet },
+  { label: "eSocial", to: "/esocial", icon: FileCode2 },
   { label: "Relatórios", to: "/relatorios", icon: FileText },
 ];
 

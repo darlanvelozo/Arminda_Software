@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-15";
+const LAST_UPDATED = "2026-06-29";
 
 interface TocItem {
   id: string;
@@ -821,6 +821,19 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         explícitos — <strong>não há incidência automática</strong>: se houver INSS/IRRF
         complementar devido, lance-o também como desconto. (O cálculo automático da
         diferença e das incidências sobre a base do mês fica para uma evolução futura.)
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">eSocial — primeiros eventos (Onda 4.1)</h3>
+      <p>
+        Começou o <strong>eSocial</strong>. No menu <strong>eSocial</strong>, escolha um{" "}
+        <strong>órgão emissor</strong> (cada CNPJ tem o seu) e gere os eventos de
+        tabela <strong>S-1000</strong> (informações do empregador) e{" "}
+        <strong>S-1005</strong> (estabelecimentos). Cada evento gerado é{" "}
+        <strong>validado contra o XSD oficial</strong> (layout S-1.3) e pode ser
+        baixado em XML. Nesta etapa o sistema <strong>gera e valida</strong> o XML;
+        a <strong>assinatura digital</strong> e o <strong>envio</strong> ao governo
+        entram nas próximas ondas (dependem de certificado e acesso ao ambiente do
+        eSocial).
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

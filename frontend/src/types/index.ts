@@ -79,6 +79,9 @@ export type LicencaPremioItem = components["schemas"]["LicencaPremioItem"];
 // Lançamentos de folha complementar (Onda 3.5)
 export type ComplementarItem = components["schemas"]["ComplementarItem"];
 
+// eSocial — eventos (Onda 4.1)
+export type EventoESocial = components["schemas"]["EventoESocial"];
+
 /**
  * Resposta do POST /api/payroll/folhas/{id}/calcular/.
  *

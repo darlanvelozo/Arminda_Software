@@ -96,4 +96,5 @@ urlpatterns = [
     path("api/payroll/", include("apps.payroll.urls")),
     path("api/reports/", include("apps.reports.urls")),
     path("api/imports/", include("apps.imports.urls")),
+    path("api/esocial/", include("apps.esocial.urls")),
 ]

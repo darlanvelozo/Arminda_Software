@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-06-15",
-  "bloco_atual": 2,
-  "progresso_geral_pct": 29,
+  "ultima_atualizacao": "2026-06-29",
+  "bloco_atual": 4,
+  "progresso_geral_pct": 31,
   "blocos": [
     {
       "numero": 0,
@@ -106,20 +106,17 @@
       "titulo": "Obrigações legais federais",
       "descricao": "Integração com órgãos federais: eSocial, SEFIP, CAGED, RAIS, DIRF e demais obrigações acessórias.",
       "periodo": "Outubro – Novembro 2026",
-      "data_inicio": "2026-10-01",
+      "data_inicio": "2026-06-29",
       "data_fim_prevista": "2026-11-30",
       "data_fim_real": null,
-      "status": "previsto",
-      "progresso_pct": 0,
+      "status": "em_andamento",
+      "progresso_pct": 12,
       "entregas": [
-        "Envio de eventos eSocial (S-1000, S-1010, S-1020, S-1200, S-1210, S-2200, S-2299, S-2300, etc.)",
-        "Geração de SEFIP",
-        "Geração de CAGED",
-        "Geração de RAIS e DIRF",
-        "Informe de rendimentos do servidor",
-        "DCTFWeb",
-        "Geração de MANAD (auditoria Receita/INSS) — por CNPJ de cada órgão emissor",
-        "Modelo OrgaoEmissor por CNPJ (Prefeitura + Fundos + Câmara) — pré-requisito de eSocial e MANAD"
+        "✅ eSocial — fundação: app, evento genérico, geração de XML (S-1000/S-1005) e validação contra XSD oficial S-1.3 (ADR-0020) — Onda 4.1",
+        "Assinatura digital (XML-DSig, certificado ICP-Brasil) — onda futura",
+        "Transmissão ao ambiente do governo + reconciliação de retornos — onda futura",
+        "Demais eventos: S-1010, S-1020, S-2200/S-2299, S-1200/S-1210, etc.",
+        "SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD"
       ]
     },
     {
@@ -252,6 +249,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-06-29",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.19.0 (eSocial — fundação)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 510 verde (5 testes novos de eSocial: ID do evento bem formado, S-1000 e S-1005 válidos contra o XSD oficial, tipo não suportado barrado, API gerar+baixar). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Tipos regenerados. Pronto para tag v0.19.0 — início do Bloco 4.",
+      "descricao": "Onda 4.1 passou pela validação integral. Nova dependência lxml (validação XSD). Migration esocial.0001. Os XSDs oficiais S-1.3 ficam versionados no repo; ambos os eventos compilam e validam. 510 passed (505 + 5)."
+    },
+    {
+      "data": "2026-06-29",
+      "tipo": "entrega",
+      "titulo": "eSocial: primeiros eventos com validação oficial (Onda 4.1)",
+      "resumo_executivo": "Começou o eSocial — a obrigação federal que padroniza o envio das informações trabalhistas ao governo. Nesta primeira etapa, o sistema gera os eventos de tabela S-1000 (informações do empregador) e S-1005 (estabelecimentos) para cada órgão emissor (cada CNPJ da prefeitura), e valida cada um contra o esquema oficial do eSocial (layout S-1.3) — garantindo que o arquivo está estruturalmente correto antes de qualquer envio. O XML pode ser baixado. A assinatura digital e a transmissão ao governo, que dependem de certificado e de acesso ao ambiente oficial, entram nas próximas etapas. Com isso o Bloco 4 (obrigações legais federais) foi iniciado.",
+      "descricao": "Onda 4.1 (ADR-0020) entrega a fundação do eSocial: app dedicado, modelo genérico de evento (gerado por órgão emissor/CNPJ), geração de XML com lxml para S-1000 e S-1005 a partir do cadastro de órgãos, ID de evento no padrão eSocial e validação contra o XSD oficial S-1.3 versionado no repositório. Como esta onda não assina, o validador trata apenas a assinatura como opcional ao compilar o schema — o restante é o XSD oficial. API REST para gerar/listar/baixar e tela dedicada no sistema. Assinatura (XML-DSig) e transmissão ficam para ondas seguintes, por dependerem de certificado ICP-Brasil e acesso ao ambiente restrito do governo."
+    },
     {
       "data": "2026-06-15",
       "tipo": "validacao",

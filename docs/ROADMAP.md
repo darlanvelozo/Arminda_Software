@@ -106,12 +106,15 @@ Cobertura completa dos eventos de folha não-ordinários.
 
 ## Bloco 4 — Obrigações legais federais
 
+**Status:** em andamento (~12% — Onda 4.1 entregue: eSocial fundação, geração de XML S-1000/S-1005 + validação XSD oficial S-1.3, ADR-0020)
+
 **Período estimado:** meses 6–7
 
 A camada que ninguém vê mas que, se quebrar, derruba o produto.
 
 **Escopo**
 - eSocial (S-1.3 ou layout vigente): eventos S-1000, S-1005, S-1010, S-1020, S-1200, S-1210, S-1280, S-2200, S-2299, S-2300, S-2399, S-2400 e relacionados
+  - ✅ Onda 4.1: fundação + geração de **S-1000/S-1005** com validação contra o XSD oficial (camada de geração; assinatura e transmissão nas próximas ondas)
 - SEFIP (enquanto coexistir)
 - CAGED (enquanto coexistir)
 - RAIS

@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-15";
+const LAST_UPDATED = "2026-06-29";
 
 interface TocItem {
   id: string;
@@ -660,6 +660,28 @@ function SectionCalculo() {
         <code className="bg-muted px-1 rounded">/payroll/complementar-itens/</code>.
         Incidência isolada foi descartada por ser ativamente incorreta (faixa de
         IRRF / teto de INSS) — ver ADR-0019.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">eSocial — fundação (Onda 4.1 — ADR-0020)</h3>
+      <p>
+        Novo app <code className="bg-muted px-1 rounded">apps/esocial</code>. Modelo
+        genérico <code className="bg-muted px-1 rounded">EventoESocial(tipo,
+        orgao_emissor, id_evento, xml, status, …)</code> — um por evento, gerado{" "}
+        <strong>por órgão emissor</strong> (CNPJ). Serviço{" "}
+        <code className="bg-muted px-1 rounded">services.geracao</code> monta o XML
+        com <code className="bg-muted px-1 rounded">lxml</code> (S-1000{" "}
+        <code className="bg-muted px-1 rounded">evtInfoEmpregador</code> e S-1005{" "}
+        <code className="bg-muted px-1 rounded">evtTabEstab</code>) e valida contra o{" "}
+        <strong>XSD oficial S-1.3</strong> versionado em{" "}
+        <code className="bg-muted px-1 rounded">apps/esocial/schemas/v_S_01_03_00/</code>.
+        Como a 4.1 não assina, o validador marca só o{" "}
+        <code className="bg-muted px-1 rounded">ds:Signature</code> como{" "}
+        <code className="bg-muted px-1 rounded">minOccurs=0</code> ao compilar o schema
+        — o resto é o XSD oficial. API{" "}
+        <code className="bg-muted px-1 rounded">/esocial/eventos/</code> +{" "}
+        <code className="bg-muted px-1 rounded">/gerar/</code> e{" "}
+        <code className="bg-muted px-1 rounded">/{"{id}"}/baixar/</code>. Assinatura
+        (XML-DSig) e transmissão entram em ondas seguintes.
       </p>
 
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>

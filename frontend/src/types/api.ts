@@ -162,6 +162,74 @@ export interface paths {
         patch: operations["core_usuarios_partial_update"];
         trace?: never;
     };
+    "/api/esocial/eventos/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=. */
+        get: operations["esocial_eventos_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/esocial/eventos/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=. */
+        get: operations["esocial_eventos_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/esocial/eventos/{id}/baixar/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=. */
+        get: operations["esocial_eventos_baixar_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/esocial/eventos/gerar/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=. */
+        post: operations["esocial_eventos_gerar_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/imports/csv/servidores/": {
         parameters: {
             query?: never;
@@ -1459,6 +1527,42 @@ export interface components {
          * @enum {string}
          */
         EstadoCivilEnum: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel";
+        /** @description Lista/detalhe de evento. O XML completo vem no endpoint `baixar`. */
+        EventoESocial: {
+            readonly id: number;
+            readonly tipo: components["schemas"]["EventoESocialTipoEnum"];
+            readonly tipo_display: string;
+            readonly orgao_emissor: number;
+            readonly orgao_nome: string;
+            readonly orgao_cnpj: string;
+            /**
+             * ID do evento
+             * @description ID único do eSocial (ID + inscrição + timestamp + sequencial).
+             */
+            readonly id_evento: string;
+            readonly versao_layout: string;
+            readonly status: components["schemas"]["EventoESocialStatusEnum"];
+            readonly status_display: string;
+            readonly lote: string;
+            /** Format: date-time */
+            readonly criado_em: string;
+        };
+        /**
+         * @description * `gerado` - Gerado
+         *     * `validado` - Validado (XSD)
+         *     * `assinado` - Assinado
+         *     * `enviado` - Enviado
+         *     * `processado` - Processado
+         *     * `rejeitado` - Rejeitado
+         * @enum {string}
+         */
+        EventoESocialStatusEnum: "gerado" | "validado" | "assinado" | "enviado" | "processado" | "rejeitado";
+        /**
+         * @description * `S-1000` - S-1000 — Informações do empregador
+         *     * `S-1005` - S-1005 — Tabela de estabelecimentos
+         * @enum {string}
+         */
+        EventoESocialTipoEnum: "S-1000" | "S-1005";
         /** @description Programação de férias de um vínculo numa folha (Onda 3.3). */
         FeriasItem: {
             readonly id: number;
@@ -1491,7 +1595,7 @@ export interface components {
             /** @default mensal */
             readonly tipo: components["schemas"]["Tipo995Enum"];
             readonly tipo_display: string;
-            readonly status: components["schemas"]["StatusEnum"];
+            readonly status: components["schemas"]["Status765Enum"];
             readonly status_display: string;
             /** Format: decimal */
             readonly total_proventos: string;
@@ -1519,7 +1623,7 @@ export interface components {
             /** @default mensal */
             readonly tipo: components["schemas"]["Tipo995Enum"];
             readonly tipo_display: string;
-            readonly status: components["schemas"]["StatusEnum"];
+            readonly status: components["schemas"]["Status765Enum"];
             readonly status_display: string;
             /** Format: decimal */
             readonly total_proventos: string;
@@ -1812,6 +1916,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["DocumentoList"][];
+        };
+        PaginatedEventoESocialList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["EventoESocial"][];
         };
         PaginatedFeriasItemList: {
             /** @example 123 */
@@ -2574,7 +2693,7 @@ export interface components {
          *     * `fechada` - Fechada
          * @enum {string}
          */
-        StatusEnum: "aberta" | "calculada" | "conferida" | "fechada";
+        Status765Enum: "aberta" | "calculada" | "conferida" | "fechada";
         /**
          * @description * `provento` - Provento
          *     * `desconto` - Desconto
@@ -3060,6 +3179,116 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsuarioMunicipioPapelUpdate"];
+                };
+            };
+        };
+    };
+    esocial_eventos_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                orgao_emissor?: number;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `gerado` - Gerado
+                 *     * `validado` - Validado (XSD)
+                 *     * `assinado` - Assinado
+                 *     * `enviado` - Enviado
+                 *     * `processado` - Processado
+                 *     * `rejeitado` - Rejeitado
+                 */
+                status?: "assinado" | "enviado" | "gerado" | "processado" | "rejeitado" | "validado";
+                /**
+                 * @description * `S-1000` - S-1000 — Informações do empregador
+                 *     * `S-1005` - S-1005 — Tabela de estabelecimentos
+                 */
+                tipo?: "S-1000" | "S-1005";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedEventoESocialList"];
+                };
+            };
+        };
+    };
+    esocial_eventos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this evento eSocial. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoESocial"];
+                };
+            };
+        };
+    };
+    esocial_eventos_baixar_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this evento eSocial. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoESocial"];
+                };
+            };
+        };
+    };
+    esocial_eventos_gerar_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EventoESocial"];
+                "application/x-www-form-urlencoded": components["schemas"]["EventoESocial"];
+                "multipart/form-data": components["schemas"]["EventoESocial"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoESocial"];
                 };
             };
         };

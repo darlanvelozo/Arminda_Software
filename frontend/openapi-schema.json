@@ -271,6 +271,146 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/esocial/eventos/:
+    get:
+      operationId: esocial_eventos_list
+      description: Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: orgao_emissor
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - assinado
+          - enviado
+          - gerado
+          - processado
+          - rejeitado
+          - validado
+        description: |-
+          * `gerado` - Gerado
+          * `validado` - Validado (XSD)
+          * `assinado` - Assinado
+          * `enviado` - Enviado
+          * `processado` - Processado
+          * `rejeitado` - Rejeitado
+      - in: query
+        name: tipo
+        schema:
+          type: string
+          enum:
+          - S-1000
+          - S-1005
+        description: |-
+          * `S-1000` - S-1000 — Informações do empregador
+          * `S-1005` - S-1005 — Tabela de estabelecimentos
+      tags:
+      - esocial
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEventoESocialList'
+          description: ''
+  /api/esocial/eventos/{id}/:
+    get:
+      operationId: esocial_eventos_retrieve
+      description: Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this evento eSocial.
+        required: true
+      tags:
+      - esocial
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoESocial'
+          description: ''
+  /api/esocial/eventos/{id}/baixar/:
+    get:
+      operationId: esocial_eventos_baixar_retrieve
+      description: Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this evento eSocial.
+        required: true
+      tags:
+      - esocial
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoESocial'
+          description: ''
+  /api/esocial/eventos/gerar/:
+    post:
+      operationId: esocial_eventos_gerar_create
+      description: Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=.
+      tags:
+      - esocial
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoESocial'
+          description: ''
   /api/imports/csv/servidores/:
     post:
       operationId: imports_csv_servidores_create
@@ -4225,6 +4365,88 @@ components:
         * `divorciado` - Divorciado(a)
         * `viuvo` - Viuvo(a)
         * `uniao_estavel` - Uniao estavel
+    EventoESocial:
+      type: object
+      description: Lista/detalhe de evento. O XML completo vem no endpoint `baixar`.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tipo:
+          allOf:
+          - $ref: '#/components/schemas/EventoESocialTipoEnum'
+          readOnly: true
+        tipo_display:
+          type: string
+          readOnly: true
+        orgao_emissor:
+          type: integer
+          readOnly: true
+        orgao_nome:
+          type: string
+          readOnly: true
+        orgao_cnpj:
+          type: string
+          readOnly: true
+        id_evento:
+          type: string
+          readOnly: true
+          title: ID do evento
+          description: ID único do eSocial (ID + inscrição + timestamp + sequencial).
+        versao_layout:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EventoESocialStatusEnum'
+          readOnly: true
+        status_display:
+          type: string
+          readOnly: true
+        lote:
+          type: string
+          readOnly: true
+        criado_em:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - criado_em
+      - id
+      - id_evento
+      - lote
+      - orgao_cnpj
+      - orgao_emissor
+      - orgao_nome
+      - status
+      - status_display
+      - tipo
+      - tipo_display
+      - versao_layout
+    EventoESocialStatusEnum:
+      enum:
+      - gerado
+      - validado
+      - assinado
+      - enviado
+      - processado
+      - rejeitado
+      type: string
+      description: |-
+        * `gerado` - Gerado
+        * `validado` - Validado (XSD)
+        * `assinado` - Assinado
+        * `enviado` - Enviado
+        * `processado` - Processado
+        * `rejeitado` - Rejeitado
+    EventoESocialTipoEnum:
+      enum:
+      - S-1000
+      - S-1005
+      type: string
+      description: |-
+        * `S-1000` - S-1000 — Informações do empregador
+        * `S-1005` - S-1005 — Tabela de estabelecimentos
     FeriasItem:
       type: object
       description: Programação de férias de um vínculo numa folha (Onda 3.3).
@@ -4291,7 +4513,7 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/Status765Enum'
           readOnly: true
         status_display:
           type: string
@@ -4368,7 +4590,7 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusEnum'
+          - $ref: '#/components/schemas/Status765Enum'
           readOnly: true
         status_display:
           type: string
@@ -4988,6 +5210,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DocumentoList'
+    PaginatedEventoESocialList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventoESocial'
     PaginatedFeriasItemList:
       type: object
       required:
@@ -6388,7 +6633,7 @@ components:
       - cnpj
       - id
       - nome
-    StatusEnum:
+    Status765Enum:
       enum:
       - aberta
       - calculada
