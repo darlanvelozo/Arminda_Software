@@ -290,9 +290,14 @@ Se estiver retomando o projeto:
 
 - **Bloco 3 — concluído** (13º, rescisão, férias, licença-prêmio, complementar)
 - **Bloco 4 — iniciado** (Onda 4.1: eSocial fundação — XML S-1000/S-1005 + XSD).
-  Próximas ondas: **assinatura** (XML-DSig, certificado ICP-Brasil),
-  **transmissão** (web service do governo + reconciliação), e os **demais
-  eventos** (S-1010, S-1020, S-2200/S-2299, S-1200/S-1210…)
+  Próximas ondas: **4.2 — cofre de certificados A1 por órgão** (fundação da
+  assinatura/transmissão e de qualquer integração com a Receita);
+  **assinatura** (XML-DSig), **transmissão** (web service do governo +
+  reconciliação), e os **demais eventos** (S-1010, S-1020, S-2200/S-2299,
+  S-1200/S-1210…)
+- **Bloco 10 — novo item mapeado:** monitoramento fiscal na Receita
+  (intimações no e-CAC/DTE, prazos de recurso, malha fiscal) por prefeitura —
+  depende do cofre de certificados (4.2) + canal SERPRO (Integra Contador/DTE)
 - **Onda 2.7 — Testes de paridade contra Fiorilli** (fecha Bloco 2) — quando
   houver dados de referência do SIP
 - Dívida do Bloco 3: folha complementar **modo acumulado** (recálculo delta +

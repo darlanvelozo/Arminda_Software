@@ -93,14 +93,19 @@ Thumbs.db
 docker-compose.override.yml
 
 # ---------- Dados sensíveis e backups ----------
+# NUNCA commitar base real do Fiorilli/SIP nem dumps (PII/LGPD — CLAUDE.md §7).
 *.fdb
 *.FDB
 *.bak
 *.dump
 *.sql.gz
+*.7z
+*.zip
+*SIP*.FDB*
 backups/
 dumps/
 data/
+sip-bases/
 uploads/
 tmp/
 

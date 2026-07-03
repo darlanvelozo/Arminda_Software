@@ -58,7 +58,7 @@ A camada de identidade do sistema. Tudo nos blocos seguintes depende disso.
 
 ## Bloco 2 — Engine de cálculo + DSL de rubricas
 
-**Status:** em andamento (85% — falta só a 2.7, paridade Fiorilli, que depende de base real do SIP)
+**Status:** em andamento (85% — falta só a 2.7, paridade Fiorilli). **A base real do SIP já está disponível** (São João Batista-MA), então a 2.7 está desbloqueada — comparar cálculo Arminda × `MOVIMENTO`/`BASES` reais, uso PII-safe (ADR-0021).
 
 **Período estimado:** meses 3–4
 
@@ -115,6 +115,25 @@ A camada que ninguém vê mas que, se quebrar, derruba o produto.
 **Escopo**
 - eSocial (S-1.3 ou layout vigente): eventos S-1000, S-1005, S-1010, S-1020, S-1200, S-1210, S-1280, S-2200, S-2299, S-2300, S-2399, S-2400 e relacionados
   - ✅ Onda 4.1: fundação + geração de **S-1000/S-1005** com validação contra o XSD oficial (camada de geração; assinatura e transmissão nas próximas ondas)
+  - **Onda 4.3 — Natureza de rubrica eSocial (Tabela 3) + S-1010.** De-para na
+    `Rubrica` (natureza + códigos de incidência CP/IRRF/FGTS) e geração do
+    evento **S-1010** (tabela de rubricas). É o **pré-requisito dos eventos
+    periódicos** (ADR-0021).
+  - **Onda 4.4 — Snapshot de incidência ao fechar folha + `ResumoFolha`.**
+    Congela o contexto fiscal por lançamento (o `MOVIMENTO` do legado) e
+    persiste o resumo por vínculo × competência com bases por obrigação e
+    flags de exclusão por evento (o `BASES` do legado) — ADR-0021.
+  - **Onda 4.5 — Eventos periódicos S-1200 + S-1202 (RPPS) + S-1210.** O
+    coração do eSocial público; S-1202 (remuneração de estatutário/RPPS) é o
+    diferencial do setor público. S-1010/S-1020 de tabela conforme necessário.
+  - **Qualificação cadastral** (consulta gratuita à Receita: CPF+Nome+Nascimento)
+    — antecipável, melhora a qualidade de dados antes de qualquer evento.
+- **Cofre de certificados digitais por órgão (Onda 4.2)** — armazenamento
+  seguro (criptografado) do certificado **e-CNPJ A1** de cada `OrgaoEmissor`.
+  É a fundação da **assinatura** (XML-DSig do eSocial) e da **transmissão** ao
+  governo, e também o pré-requisito de qualquer integração com a Receita
+  (ver Bloco 10 — monitoramento fiscal). Certificado A1 (arquivo `.pfx`/`.p12`)
+  para automação server-side; A3 (token) fica para uso assistido.
 - SEFIP (enquanto coexistir)
 - CAGED (enquanto coexistir)
 - RAIS
@@ -289,6 +308,18 @@ Sem isso, está em risco regulatório mesmo com a folha funcionando.
   sensíveis, exclusão sob demanda do titular (Lei 13.709/2018).
 - **Certificação digital A1/A3** — assinatura eletrônica em
   declarações, contracheques e contratos oficiais (MP 2.200-2/2001).
+  Reutiliza o **cofre de certificados por órgão** entregue no Bloco 4 (4.2).
+- **Monitoramento fiscal na Receita Federal (por prefeitura)** — usando o
+  certificado próprio de cada órgão, integrar-se aos serviços da Receita para:
+  (a) **consultar intimações** na Caixa Postal do e-CAC / **DTE** (Domicílio
+  Tributário Eletrônico); (b) **monitorar prazos de recurso administrativo**
+  derivados de cada intimação, com alertas antes do vencimento; (c) **puxar
+  pendências da malha fiscal** (situação fiscal do CNPJ). Integrado à folha
+  que originou a obrigação (eSocial/DCTFWeb → intimação → prazo). **Depende**
+  do cofre de certificados (4.2) e de um **canal oficial de integração**
+  (SERPRO — Integra Contador / API DTE; contrato à parte, pois a Receita não
+  expõe API pública aberta para isso). Alternativa de contingência: automação
+  assistida do e-CAC (frágil, sujeita aos termos de uso).
 - **Auditoria avançada com UI navegável** — timeline de quem editou
   o quê e quando, com diff campo a campo (UI do simple-history que
   já existe no backend).
