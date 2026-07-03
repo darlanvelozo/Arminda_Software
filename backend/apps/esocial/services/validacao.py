@@ -28,6 +28,7 @@ XS = "http://www.w3.org/2001/XMLSchema"
 XSD_POR_TIPO = {
     "S-1000": "evtInfoEmpregador.xsd",
     "S-1005": "evtTabEstab.xsd",
+    "S-1010": "evtTabRubrica.xsd",
 }
 
 

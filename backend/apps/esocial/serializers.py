@@ -14,13 +14,14 @@ class EventoESocialSerializer(serializers.ModelSerializer):
     status_display = serializers.CharField(source="get_status_display", read_only=True)
     orgao_nome = serializers.CharField(source="orgao_emissor.nome", read_only=True)
     orgao_cnpj = serializers.CharField(source="orgao_emissor.cnpj", read_only=True)
+    rubrica_codigo = serializers.CharField(source="rubrica.codigo", read_only=True, default=None)
 
     class Meta:
         model = EventoESocial
         fields = [
             "id", "tipo", "tipo_display", "orgao_emissor", "orgao_nome",
-            "orgao_cnpj", "id_evento", "versao_layout", "status",
-            "status_display", "lote", "criado_em",
+            "orgao_cnpj", "rubrica", "rubrica_codigo", "id_evento",
+            "versao_layout", "status", "status_display", "lote", "criado_em",
         ]
         read_only_fields = fields
 
@@ -30,5 +31,6 @@ class GerarEventoSerializer(serializers.Serializer):
 
     tipo = serializers.ChoiceField(choices=EventoESocial._meta.get_field("tipo").choices)
     orgao_emissor = serializers.IntegerField()
+    rubrica = serializers.IntegerField(required=False)
     competencia = serializers.DateField(required=False)
     class_trib = serializers.CharField(required=False, default="60", max_length=2)

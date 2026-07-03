@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-29";
+const LAST_UPDATED = "2026-07-03";
 
 interface TocItem {
   id: string;
@@ -82,8 +82,8 @@ export default function GuiaPage() {
         <p className="text-xs text-muted-foreground">
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
           <span className="ml-1 inline-flex items-center gap-2">
-            <Badge variant="success">Blocos 0–1 entregues · Bloco 2 (folha) ✓</Badge>
-            <Badge variant="info">Bloco 3 em andamento — 13º, rescisão e férias ✓ (v0.16.0)</Badge>
+            <Badge variant="success">Blocos 0–1 · Bloco 2 (folha) · Bloco 3 (folhas especiais) ✓</Badge>
+            <Badge variant="info">Bloco 4 em andamento — eSocial S-1000/S-1005/S-1010 ✓ (v0.20.0)</Badge>
           </span>
         </p>
       </header>
@@ -834,6 +834,14 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         a <strong>assinatura digital</strong> e o <strong>envio</strong> ao governo
         entram nas próximas ondas (dependem de certificado e acesso ao ambiente do
         eSocial).
+      </p>
+      <p>
+        <strong>Tabela de rubricas (S-1010, Onda 4.3):</strong> cada rubrica agora
+        pode receber a <strong>natureza eSocial (Tabela 3)</strong> e os códigos de
+        incidência (previdência/IRRF/FGTS/RPPS) na tela de <strong>Rubricas</strong>.
+        Com a natureza preenchida, gere o evento <strong>S-1010</strong> da rubrica no
+        menu eSocial — também validado contra o XSD. Isso é o pré-requisito dos
+        eventos de remuneração (S-1200/S-1202) que virão.
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

@@ -19,6 +19,7 @@ from lxml import etree
 
 from apps.esocial.models import EventoESocial, StatusEvento, TipoEvento
 from apps.esocial.services.validacao import validar_xml
+from apps.payroll.models import Rubrica, TipoRubrica
 from apps.people.models import OrgaoEmissor
 
 VERSAO = "v_S_01_03_00"
@@ -27,10 +28,19 @@ VER_PROC = "Arminda"
 NS_POR_TIPO = {
     TipoEvento.S_1000: f"http://www.esocial.gov.br/schema/evt/evtInfoEmpregador/{VERSAO}",
     TipoEvento.S_1005: f"http://www.esocial.gov.br/schema/evt/evtTabEstab/{VERSAO}",
+    TipoEvento.S_1010: f"http://www.esocial.gov.br/schema/evt/evtTabRubrica/{VERSAO}",
 }
 RAIZ_POR_TIPO = {
     TipoEvento.S_1000: "evtInfoEmpregador",
     TipoEvento.S_1005: "evtTabEstab",
+    TipoEvento.S_1010: "evtTabRubrica",
+}
+
+# Rubrica interna → tpRubr do eSocial (1=vencimento, 2=desconto, 3=informativa).
+TP_RUBR = {
+    TipoRubrica.PROVENTO: "1",
+    TipoRubrica.DESCONTO: "2",
+    TipoRubrica.INFORMATIVA: "3",
 }
 
 
@@ -113,9 +123,43 @@ def construir_s1005(orgao: OrgaoEmissor, *, id_evento: str, tp_amb: int,
     return raiz
 
 
+def construir_s1010(orgao: OrgaoEmissor, *, rubrica: Rubrica, id_evento: str,
+                    tp_amb: int, competencia: date | None,
+                    ide_tab_rubr: str = "1") -> etree._Element:
+    ns = NS_POR_TIPO[TipoEvento.S_1010]
+    raiz = etree.Element("eSocial", nsmap={None: ns})
+    evt = _sub(raiz, "evtTabRubrica")
+    evt.set("Id", id_evento)
+
+    _ide_evento(evt, tp_amb)
+
+    ide_emp = _sub(evt, "ideEmpregador")
+    _sub(ide_emp, "tpInsc", 1)
+    _sub(ide_emp, "nrInsc", so_digitos(orgao.cnpj)[:8])
+
+    info = _sub(evt, "infoRubrica")
+    inclusao = _sub(info, "inclusao")
+    ide_rubrica = _sub(inclusao, "ideRubrica")
+    _sub(ide_rubrica, "codRubr", rubrica.codigo)
+    _sub(ide_rubrica, "ideTabRubr", ide_tab_rubr)
+    _sub(ide_rubrica, "iniValid", _periodo(competencia))
+    dados = _sub(inclusao, "dadosRubrica")
+    _sub(dados, "dscRubr", rubrica.nome)
+    _sub(dados, "natRubr", rubrica.natureza_esocial)
+    _sub(dados, "tpRubr", TP_RUBR.get(rubrica.tipo, "1"))
+    # Códigos de incidência: em branco vira "00" (não é base) — sempre exigidos.
+    _sub(dados, "codIncCP", rubrica.cod_inc_cp or "00")
+    _sub(dados, "codIncIRRF", rubrica.cod_inc_irrf or "00")
+    _sub(dados, "codIncFGTS", rubrica.cod_inc_fgts or "00")
+    if rubrica.cod_inc_cprp:
+        _sub(dados, "codIncCPRP", rubrica.cod_inc_cprp)
+    return raiz
+
+
 _CONSTRUTORES = {
     TipoEvento.S_1000: construir_s1000,
     TipoEvento.S_1005: construir_s1005,
+    TipoEvento.S_1010: construir_s1010,
 }
 
 
@@ -126,21 +170,32 @@ def gerar_evento(
     tp_amb: int = 2,
     competencia: date | None = None,
     class_trib: str = "60",
+    rubrica: Rubrica | None = None,
     sequencial: int = 1,
 ) -> EventoESocial:
     """Gera, valida (XSD) e persiste um `EventoESocial`.
 
     `class_trib` default "60" (ente público — Tabela 08). `tp_amb` default 2
-    (produção restrita), já que esta onda não transmite.
+    (produção restrita), já que esta onda não transmite. `rubrica` é
+    obrigatória para S-1010 (o evento é por rubrica).
     """
     if tipo not in _CONSTRUTORES:
         raise ValueError(f"Tipo de evento não suportado: {tipo!r}")
+    if tipo == TipoEvento.S_1010:
+        if rubrica is None:
+            raise ValueError("S-1010 exige uma rubrica.")
+        if not rubrica.natureza_esocial:
+            raise ValueError(
+                f"Rubrica {rubrica.codigo} sem natureza eSocial (Tabela 3)."
+            )
 
     id_evento = gerar_id_evento(orgao, sequencial=sequencial)
     construtor = _CONSTRUTORES[tipo]
     kwargs = {"id_evento": id_evento, "tp_amb": tp_amb, "competencia": competencia}
     if tipo == TipoEvento.S_1000:
         kwargs["class_trib"] = class_trib
+    if tipo == TipoEvento.S_1010:
+        kwargs["rubrica"] = rubrica
     raiz = construtor(orgao, **kwargs)
 
     xml = etree.tostring(raiz, xml_declaration=True, encoding="UTF-8", pretty_print=True)
@@ -149,6 +204,7 @@ def gerar_evento(
     return EventoESocial.objects.create(
         tipo=tipo,
         orgao_emissor=orgao,
+        rubrica=rubrica,
         id_evento=id_evento,
         versao_layout=VERSAO,
         xml=xml.decode("utf-8"),

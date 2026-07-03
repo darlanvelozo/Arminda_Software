@@ -35,6 +35,40 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.3 — eSocial: natureza de rubrica (Tabela 3) + S-1010 · 2026-07-03
+
+> Segunda onda do Bloco 4 (ADR-0021, derivada da engenharia reversa da base
+> real do Fiorilli). De-para eSocial na `Rubrica` + evento S-1010. É o
+> pré-requisito dos eventos periódicos (S-1200/S-1202).
+
+#### Adicionado — Backend
+
+- **feat(payroll):** `Rubrica` ganha o de-para eSocial — `natureza_esocial`
+  (Tabela 3, 4 dígitos) + `cod_inc_cp/irrf/fgts/cprp` (migration 0007).
+- **feat(esocial):** tipo `S-1010` + FK opcional `EventoESocial.rubrica`
+  (migration 0002); geração do `evtTabRubrica` a partir da rubrica, validada
+  contra o XSD oficial. XSD `evtTabRubrica.xsd` versionado; patch em
+  `tipos.xsd` para o `TS_natRubr` ausente no snapshot do mirror (documentado).
+- **feat(esocial):** `gerar_evento` aceita `rubrica`; exige natureza no S-1010.
+  API `/esocial/eventos/gerar/` estendida. 2 testes novos (512 no total).
+
+#### Adicionado — Frontend
+
+- **feat(rubricas):** seção eSocial no formulário da rubrica (natureza +
+  códigos de incidência).
+- **feat(esocial):** opção S-1010 na tela de eSocial, com seletor de rubrica
+  (indicando quais já têm natureza).
+
+#### Por quê
+
+- ADR-0021: a base real do Fiorilli confirmou que cada rubrica precisa da
+  natureza oficial (Tabela 3) para os eventos periódicos serem aceitos.
+
+#### Impacto
+
+- Migrations `payroll.0007` e `esocial.0002`. **Bloco 4 avança.** Também: base
+  bruta do SIP protegida (fora do git, LGPD); `docs/referencia/` + ADR-0021.
+
 ### Onda 4.1 — eSocial: fundação + eventos de tabela · 2026-06-29
 
 > Primeira onda do **Bloco 4** (obrigações legais federais), ADR-0020. Camada

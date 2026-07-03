@@ -9,8 +9,9 @@ import { useAuth } from "@/lib/auth-context";
 import type { EventoESocial, Paginated } from "@/types";
 
 export interface GerarEventoInput {
-  tipo: "S-1000" | "S-1005";
+  tipo: "S-1000" | "S-1005" | "S-1010";
   orgao_emissor: number;
+  rubrica?: number;
   competencia?: string;
   class_trib?: string;
 }

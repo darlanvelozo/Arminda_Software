@@ -17,11 +17,11 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.19.0` (Onda 4.1 — eSocial: fundação)
-- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: iniciado (~12%)** — eSocial fundação (geração de XML S-1000/S-1005 + validação XSD oficial S-1.3). Bloco 3 concluído. Bloco 2 a 85% (falta só a 2.7 — paridade Fiorilli)
+- **Versão atual:** `v0.20.0` (Onda 4.3 — eSocial: natureza de rubrica + S-1010)
+- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~20%)** — eSocial: S-1000/S-1005 (4.1) + natureza de rubrica (Tabela 3) e S-1010 (4.3), geração de XML validada contra o XSD oficial S-1.3. Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 510 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 512 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
@@ -48,7 +48,7 @@ Ver [CHANGELOG.md](CHANGELOG.md).
 3. **[docs/PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 4. **[CHANGELOG.md](CHANGELOG.md)** — memória do projeto, toda alteração registrada
 5. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — racional das decisões de stack
-6. **[docs/adr/](docs/adr/)** — 20 ADRs (decisões formais)
+6. **[docs/adr/](docs/adr/)** — 21 ADRs (decisões formais)
 7. **CONTEXT.md específicos** quando for mexer:
    - Backend: [backend/CONTEXT.md](backend/CONTEXT.md) → [`_MODELS`](backend/CONTEXT_MODELS.md) → [`_SERVICES`](backend/CONTEXT_SERVICES.md) → [`apps/CONTEXT.md`](backend/apps/CONTEXT.md)
    - Frontend: [frontend/CONTEXT.md](frontend/CONTEXT.md) → [`pages/CONTEXT.md`](frontend/src/pages/CONTEXT.md) → [`components/CONTEXT.md`](frontend/src/components/CONTEXT.md)
@@ -237,6 +237,7 @@ Estas ADRs já estão aceitas e implementadas. Reabrir só com motivo forte:
 | 0018 | Licença-prêmio: indenização por `LicencaPremioItem` (verba indenizatória) |
 | 0019 | Folha complementar: lançamentos explícitos (`ComplementarItem`), `folha_origem` como gancho do modo acumulado |
 | 0020 | eSocial: app `esocial`, modelo genérico `EventoESocial`, geração XML + validação XSD oficial (S-1.3); assinatura/transmissão depois |
+| 0021 | Lições da base real Fiorilli: snapshot de incidência, natureza de rubrica (Tabela 3), `ResumoFolha`/BASES, S-1202 RPPS; base bruta fora do git (PII) |
 
 Papéis novos a criar (mapeados em [PERSONAS.md](docs/PERSONAS.md)):
 `gestor_municipio` (Bloco 7), `contador_municipio` (Bloco 9),
@@ -289,17 +290,18 @@ Procedimento:
 Se estiver retomando o projeto:
 
 - **Bloco 3 — concluído** (13º, rescisão, férias, licença-prêmio, complementar)
-- **Bloco 4 — iniciado** (Onda 4.1: eSocial fundação — XML S-1000/S-1005 + XSD).
-  Próximas ondas: **4.2 — cofre de certificados A1 por órgão** (fundação da
-  assinatura/transmissão e de qualquer integração com a Receita);
-  **assinatura** (XML-DSig), **transmissão** (web service do governo +
-  reconciliação), e os **demais eventos** (S-1010, S-1020, S-2200/S-2299,
-  S-1200/S-1210…)
+- **Bloco 4 — em andamento** (4.1: S-1000/S-1005; 4.3: natureza de rubrica +
+  S-1010). Próximas ondas (reordenadas por ADR-0021):
+  **4.4 — snapshot de incidência ao fechar folha + `ResumoFolha`/BASES**;
+  **4.5 — periódicos S-1200 + S-1202 (RPPS) + S-1210**; **4.2 — cofre de
+  certificados A1** (fundação de assinatura/transmissão e da integração
+  Receita); depois **assinatura** (XML-DSig) e **transmissão**.
 - **Bloco 10 — novo item mapeado:** monitoramento fiscal na Receita
   (intimações no e-CAC/DTE, prazos de recurso, malha fiscal) por prefeitura —
   depende do cofre de certificados (4.2) + canal SERPRO (Integra Contador/DTE)
-- **Onda 2.7 — Testes de paridade contra Fiorilli** (fecha Bloco 2) — quando
-  houver dados de referência do SIP
+- **Onda 2.7 — Testes de paridade contra Fiorilli** (fecha Bloco 2) —
+  **desbloqueada**: base real do SIP (São João Batista-MA) disponível em
+  `/opt/sip-bases` (fora do git); uso PII-safe (ADR-0021)
 - Dívida do Bloco 3: folha complementar **modo acumulado** (recálculo delta +
   incidência sobre a base do mês, via `Folha.folha_origem` — ADR-0019)
 

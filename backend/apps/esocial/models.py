@@ -18,6 +18,7 @@ from apps.people.models import OrgaoEmissor
 class TipoEvento(models.TextChoices):
     S_1000 = "S-1000", "S-1000 — Informações do empregador"
     S_1005 = "S-1005", "S-1005 — Tabela de estabelecimentos"
+    S_1010 = "S-1010", "S-1010 — Tabela de rubricas"
 
 
 class StatusEvento(models.TextChoices):
@@ -35,6 +36,13 @@ class EventoESocial(TimeStampedModel):
     tipo = models.CharField(max_length=10, choices=TipoEvento.choices)
     orgao_emissor = models.ForeignKey(
         OrgaoEmissor, on_delete=models.PROTECT, related_name="eventos_esocial"
+    )
+    # Sujeito do evento quando aplicável (ex.: S-1010 é por rubrica). Eventos de
+    # tabela do empregador (S-1000/S-1005) não usam. Vínculo/folha entram nos
+    # eventos periódicos (ondas seguintes).
+    rubrica = models.ForeignKey(
+        "payroll.Rubrica", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="eventos_esocial",
     )
     id_evento = models.CharField(
         "ID do evento", max_length=36, unique=True,

@@ -27,7 +27,7 @@ class RubricaListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rubrica
-        fields = ["id", "codigo", "nome", "tipo", "tipo_display", "ativo"]
+        fields = ["id", "codigo", "nome", "tipo", "tipo_display", "natureza_esocial", "ativo"]
         read_only_fields = fields
 
 
@@ -47,6 +47,11 @@ class RubricaDetailSerializer(serializers.ModelSerializer):
             "incide_irrf",
             "incide_fgts",
             "incide_rpps",
+            "natureza_esocial",
+            "cod_inc_cp",
+            "cod_inc_irrf",
+            "cod_inc_fgts",
+            "cod_inc_cprp",
             "formula",
             "ativo",
             "criado_em",
@@ -68,10 +73,23 @@ class RubricaWriteSerializer(serializers.ModelSerializer):
             "incide_irrf",
             "incide_fgts",
             "incide_rpps",
+            "natureza_esocial",
+            "cod_inc_cp",
+            "cod_inc_irrf",
+            "cod_inc_fgts",
+            "cod_inc_cprp",
             "formula",
             "ativo",
         ]
         read_only_fields = ["id"]
+
+    def validate_natureza_esocial(self, value: str) -> str:
+        valor = (value or "").strip()
+        if valor and (len(valor) != 4 or not valor.isdigit()):
+            raise serializers.ValidationError(
+                "Natureza eSocial (Tabela 3) deve ter 4 dígitos."
+            )
+        return valor
 
     def validate_codigo(self, value: str) -> str:
         valor = (value or "").strip().upper()

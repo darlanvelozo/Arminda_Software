@@ -35,10 +35,12 @@ import {
   type GerarEventoInput,
 } from "@/lib/queries/esocial";
 import { useOrgaosEmissoresList } from "@/lib/queries/orgaos-sindicatos";
+import { useRubricasList } from "@/lib/queries/rubricas";
 
 const TIPOS = [
   { value: "S-1000", label: "S-1000 — Informações do empregador" },
   { value: "S-1005", label: "S-1005 — Tabela de estabelecimentos" },
+  { value: "S-1010", label: "S-1010 — Tabela de rubricas" },
 ] as const;
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -50,18 +52,28 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "
 export default function EsocialPage() {
   const { data: eventos, isLoading } = useEventosEsocial();
   const { data: orgaos } = useOrgaosEmissoresList();
+  const { data: rubricas } = useRubricasList({ ativo: true, ordering: "codigo" });
   const gerar = useGerarEvento();
 
   const [orgao, setOrgao] = useState("");
   const [tipo, setTipo] = useState<GerarEventoInput["tipo"]>("S-1000");
+  const [rubrica, setRubrica] = useState("");
 
   async function onGerar() {
     if (!orgao) {
       toast.error("Selecione o órgão emissor.");
       return;
     }
+    if (tipo === "S-1010" && !rubrica) {
+      toast.error("Selecione a rubrica para o S-1010.");
+      return;
+    }
     try {
-      await gerar.mutateAsync({ tipo, orgao_emissor: Number(orgao) });
+      await gerar.mutateAsync({
+        tipo,
+        orgao_emissor: Number(orgao),
+        ...(tipo === "S-1010" ? { rubrica: Number(rubrica) } : {}),
+      });
       toast.success("Evento gerado e validado contra o XSD.");
     } catch (e) {
       toast.error(extractDomainErrorMessage(e) ?? "Falha ao gerar o evento.");
@@ -117,10 +129,35 @@ export default function EsocialPage() {
             </SelectContent>
           </Select>
         </div>
+        {tipo === "S-1010" && (
+          <div className="flex-1 min-w-[240px]">
+            <label className="text-xs text-muted-foreground">Rubrica</label>
+            <Select value={rubrica} onValueChange={setRubrica} disabled={gerar.isPending}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione…" />
+              </SelectTrigger>
+              <SelectContent>
+                {(rubricas?.results ?? []).map((r) => (
+                  <SelectItem key={r.id} value={String(r.id)}>
+                    {r.codigo} · {r.nome}
+                    {r.natureza_esocial ? ` (nat. ${r.natureza_esocial})` : " — sem natureza"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <Button onClick={onGerar} disabled={gerar.isPending}>
           {gerar.isPending ? "Gerando…" : "Gerar evento"}
         </Button>
       </div>
+      {tipo === "S-1010" && (
+        <p className="text-xs text-muted-foreground">
+          O S-1010 exige a <strong>natureza eSocial (Tabela 3)</strong> na rubrica.
+          Rubricas sem natureza aparecem marcadas — preencha-as em{" "}
+          <strong>Rubricas</strong> antes de gerar.
+        </p>
+      )}
 
       <div className="rounded-md border bg-card">
         <Table>

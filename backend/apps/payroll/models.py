@@ -71,6 +71,27 @@ class Rubrica(TimeStampedModel):
         blank=True,
         help_text="DSL de calculo (sera implementada no Bloco 2)",
     )
+    # eSocial — mapeamento para a Tabela 3 (natureza) e tabelas de incidência.
+    # Pré-requisito dos eventos S-1010 e periódicos (Onda 4.3 — ADR-0021).
+    natureza_esocial = models.CharField(
+        "Natureza eSocial (Tabela 3)", max_length=4, blank=True,
+        help_text="Código da natureza da rubrica no eSocial (Tabela 3). Ex.: 1000 = salário.",
+    )
+    cod_inc_cp = models.CharField(
+        "Cód. incidência CP (eSocial)", max_length=2, blank=True,
+        help_text="Incidência da contribuição previdenciária — RGPS/INSS (Tabela 20).",
+    )
+    cod_inc_irrf = models.CharField(
+        "Cód. incidência IRRF (eSocial)", max_length=2, blank=True,
+        help_text="Incidência do imposto de renda (Tabela 21).",
+    )
+    cod_inc_fgts = models.CharField(
+        "Cód. incidência FGTS (eSocial)", max_length=2, blank=True,
+    )
+    cod_inc_cprp = models.CharField(
+        "Cód. incidência CP-RPPS (eSocial)", max_length=2, blank=True,
+        help_text="Incidência da contribuição ao regime próprio (setor público).",
+    )
     ativo = models.BooleanField(default=True)
 
     class Meta:

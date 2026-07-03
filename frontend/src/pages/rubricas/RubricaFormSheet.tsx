@@ -61,6 +61,14 @@ const rubricaSchema = z.object({
   incide_irrf: z.boolean(),
   incide_fgts: z.boolean(),
   incide_rpps: z.boolean(),
+  natureza_esocial: z
+    .string()
+    .regex(/^(\d{4})?$/, "Natureza eSocial (Tabela 3) deve ter 4 dígitos.")
+    .optional(),
+  cod_inc_cp: z.string().max(2).optional(),
+  cod_inc_irrf: z.string().max(2).optional(),
+  cod_inc_fgts: z.string().max(2).optional(),
+  cod_inc_cprp: z.string().max(2).optional(),
   formula: z.string(),
   ativo: z.boolean(),
 });
@@ -86,6 +94,11 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
       incide_irrf: false,
       incide_fgts: false,
       incide_rpps: false,
+      natureza_esocial: "",
+      cod_inc_cp: "",
+      cod_inc_irrf: "",
+      cod_inc_fgts: "",
+      cod_inc_cprp: "",
       formula: "",
       ativo: true,
     },
@@ -101,6 +114,11 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
         incide_irrf: rubrica.incide_irrf,
         incide_fgts: rubrica.incide_fgts,
         incide_rpps: rubrica.incide_rpps,
+        natureza_esocial: rubrica.natureza_esocial || "",
+        cod_inc_cp: rubrica.cod_inc_cp || "",
+        cod_inc_irrf: rubrica.cod_inc_irrf || "",
+        cod_inc_fgts: rubrica.cod_inc_fgts || "",
+        cod_inc_cprp: rubrica.cod_inc_cprp || "",
         formula: rubrica.formula || "",
         ativo: rubrica.ativo,
       });
@@ -113,6 +131,11 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
         incide_irrf: false,
         incide_fgts: false,
         incide_rpps: false,
+        natureza_esocial: "",
+        cod_inc_cp: "",
+        cod_inc_irrf: "",
+        cod_inc_fgts: "",
+        cod_inc_cprp: "",
         formula: "",
         ativo: true,
       });
@@ -313,6 +336,49 @@ export function RubricaFormSheet({ open, onOpenChange, rubrica }: RubricaFormShe
                     </label>
                   )}
                 />
+              </div>
+            </fieldset>
+
+            <fieldset className="rounded-md border p-3 space-y-3">
+              <legend className="px-1 text-xs text-muted-foreground">
+                eSocial (Tabela 3 e incidências) — preencha para gerar o S-1010
+              </legend>
+              <FormField
+                control={form.control}
+                name="natureza_esocial"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Natureza (Tabela 3)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex.: 1000" maxLength={4} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {(
+                  [
+                    ["cod_inc_cp", "Inc. CP"],
+                    ["cod_inc_irrf", "Inc. IRRF"],
+                    ["cod_inc_fgts", "Inc. FGTS"],
+                    ["cod_inc_cprp", "Inc. CP-RPPS"],
+                  ] as const
+                ).map(([name, label]) => (
+                  <FormField
+                    key={name}
+                    control={form.control}
+                    name={name}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs">{label}</FormLabel>
+                        <FormControl>
+                          <Input maxLength={2} placeholder="00" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                ))}
               </div>
             </fieldset>
 

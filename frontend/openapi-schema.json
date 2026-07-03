@@ -323,9 +323,11 @@ paths:
           enum:
           - S-1000
           - S-1005
+          - S-1010
         description: |-
           * `S-1000` - S-1000 — Informações do empregador
           * `S-1005` - S-1005 — Tabela de estabelecimentos
+          * `S-1010` - S-1010 — Tabela de rubricas
       tags:
       - esocial
       security:
@@ -4388,6 +4390,13 @@ components:
         orgao_cnpj:
           type: string
           readOnly: true
+        rubrica:
+          type: integer
+          readOnly: true
+          nullable: true
+        rubrica_codigo:
+          type: string
+          readOnly: true
         id_evento:
           type: string
           readOnly: true
@@ -4418,6 +4427,8 @@ components:
       - orgao_cnpj
       - orgao_emissor
       - orgao_nome
+      - rubrica
+      - rubrica_codigo
       - status
       - status_display
       - tipo
@@ -4443,10 +4454,12 @@ components:
       enum:
       - S-1000
       - S-1005
+      - S-1010
       type: string
       description: |-
         * `S-1000` - S-1000 — Informações do empregador
         * `S-1005` - S-1005 — Tabela de estabelecimentos
+        * `S-1010` - S-1010 — Tabela de rubricas
     FeriasItem:
       type: object
       description: Programação de férias de um vínculo numa folha (Onda 3.3).
@@ -5901,6 +5914,32 @@ components:
         incide_rpps:
           type: boolean
           description: Compõe a base da previdência municipal própria (Onda 2.4).
+        natureza_esocial:
+          type: string
+          title: Natureza eSocial (Tabela 3)
+          description: 'Código da natureza da rubrica no eSocial (Tabela 3). Ex.:
+            1000 = salário.'
+          maxLength: 4
+        cod_inc_cp:
+          type: string
+          title: Cód. incidência CP (eSocial)
+          description: Incidência da contribuição previdenciária — RGPS/INSS (Tabela
+            20).
+          maxLength: 2
+        cod_inc_irrf:
+          type: string
+          title: Cód. incidência IRRF (eSocial)
+          description: Incidência do imposto de renda (Tabela 21).
+          maxLength: 2
+        cod_inc_fgts:
+          type: string
+          title: Cód. incidência FGTS (eSocial)
+          maxLength: 2
+        cod_inc_cprp:
+          type: string
+          title: Cód. incidência CP-RPPS (eSocial)
+          description: Incidência da contribuição ao regime próprio (setor público).
+          maxLength: 2
         formula:
           type: string
           title: Formula de calculo
@@ -6195,6 +6234,32 @@ components:
         incide_rpps:
           type: boolean
           description: Compõe a base da previdência municipal própria (Onda 2.4).
+        natureza_esocial:
+          type: string
+          title: Natureza eSocial (Tabela 3)
+          description: 'Código da natureza da rubrica no eSocial (Tabela 3). Ex.:
+            1000 = salário.'
+          maxLength: 4
+        cod_inc_cp:
+          type: string
+          title: Cód. incidência CP (eSocial)
+          description: Incidência da contribuição previdenciária — RGPS/INSS (Tabela
+            20).
+          maxLength: 2
+        cod_inc_irrf:
+          type: string
+          title: Cód. incidência IRRF (eSocial)
+          description: Incidência do imposto de renda (Tabela 21).
+          maxLength: 2
+        cod_inc_fgts:
+          type: string
+          title: Cód. incidência FGTS (eSocial)
+          maxLength: 2
+        cod_inc_cprp:
+          type: string
+          title: Cód. incidência CP-RPPS (eSocial)
+          description: Incidência da contribuição ao regime próprio (setor público).
+          maxLength: 2
         formula:
           type: string
           title: Formula de calculo
@@ -6236,6 +6301,12 @@ components:
         tipo_display:
           type: string
           readOnly: true
+        natureza_esocial:
+          type: string
+          readOnly: true
+          title: Natureza eSocial (Tabela 3)
+          description: 'Código da natureza da rubrica no eSocial (Tabela 3). Ex.:
+            1000 = salário.'
         ativo:
           type: boolean
           readOnly: true
@@ -6243,6 +6314,7 @@ components:
       - ativo
       - codigo
       - id
+      - natureza_esocial
       - nome
       - tipo
       - tipo_display
@@ -6273,6 +6345,32 @@ components:
         incide_rpps:
           type: boolean
           description: Compõe a base da previdência municipal própria (Onda 2.4).
+        natureza_esocial:
+          type: string
+          title: Natureza eSocial (Tabela 3)
+          description: 'Código da natureza da rubrica no eSocial (Tabela 3). Ex.:
+            1000 = salário.'
+          maxLength: 4
+        cod_inc_cp:
+          type: string
+          title: Cód. incidência CP (eSocial)
+          description: Incidência da contribuição previdenciária — RGPS/INSS (Tabela
+            20).
+          maxLength: 2
+        cod_inc_irrf:
+          type: string
+          title: Cód. incidência IRRF (eSocial)
+          description: Incidência do imposto de renda (Tabela 21).
+          maxLength: 2
+        cod_inc_fgts:
+          type: string
+          title: Cód. incidência FGTS (eSocial)
+          maxLength: 2
+        cod_inc_cprp:
+          type: string
+          title: Cód. incidência CP-RPPS (eSocial)
+          description: Incidência da contribuição ao regime próprio (setor público).
+          maxLength: 2
         formula:
           type: string
           title: Formula de calculo

@@ -17,6 +17,7 @@ from apps.esocial.models import EventoESocial
 from apps.esocial.serializers import EventoESocialSerializer, GerarEventoSerializer
 from apps.esocial.services.geracao import gerar_evento
 from apps.esocial.services.validacao import ErroValidacaoXSD
+from apps.payroll.models import Rubrica
 from apps.people.models import OrgaoEmissor
 
 
@@ -48,10 +49,20 @@ class EventoESocialViewSet(viewsets.ReadOnlyModelViewSet):
                 {"detail": "Órgão emissor não encontrado."},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        rubrica = None
+        if dados.get("rubrica"):
+            try:
+                rubrica = Rubrica.objects.get(pk=dados["rubrica"])
+            except Rubrica.DoesNotExist:
+                return Response(
+                    {"detail": "Rubrica não encontrada."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
         try:
             evento = gerar_evento(
                 orgao,
                 dados["tipo"],
+                rubrica=rubrica,
                 competencia=dados.get("competencia"),
                 class_trib=dados.get("class_trib", "60"),
             )

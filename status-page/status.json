@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-06-29",
+  "ultima_atualizacao": "2026-07-03",
   "bloco_atual": 4,
-  "progresso_geral_pct": 31,
+  "progresso_geral_pct": 32,
   "blocos": [
     {
       "numero": 0,
@@ -110,9 +110,9 @@
       "data_fim_prevista": "2026-11-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 12,
+      "progresso_pct": 20,
       "entregas": [
-        "✅ eSocial — fundação: app, evento genérico, geração de XML (S-1000/S-1005) e validação contra XSD oficial S-1.3 (ADR-0020) — Onda 4.1",
+        "✅ eSocial — fundação (S-1000/S-1005) + natureza de rubrica (Tabela 3) e evento S-1010, geração de XML validada contra o XSD oficial S-1.3 (ADR-0020/0021) — Ondas 4.1 e 4.3",
         "Assinatura digital (XML-DSig, certificado ICP-Brasil) — onda futura",
         "Transmissão ao ambiente do governo + reconciliação de retornos — onda futura",
         "Demais eventos: S-1010, S-1020, S-2200/S-2299, S-1200/S-1210, etc.",
@@ -249,6 +249,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-07-03",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.20.0 (eSocial S-1010)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 512 verde (2 testes novos: S-1010 válido contra XSD e regra de natureza obrigatória). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Tipos regenerados. Pronto para tag v0.20.0.",
+      "descricao": "Onda 4.3 passou pela validação integral. Migrations payroll.0007 e esocial.0002. XSD do S-1010 (evtTabRubrica) validado; patch documentado no tipos.xsd. 512 passed (510 + 2)."
+    },
+    {
+      "data": "2026-07-03",
+      "tipo": "entrega",
+      "titulo": "eSocial: tabela de rubricas (natureza + S-1010) — Onda 4.3",
+      "resumo_executivo": "O eSocial avançou para a tabela de rubricas. Cada rubrica da folha agora pode receber a natureza oficial (a classificação do governo que diz o que aquela verba é) e os códigos de incidência de previdência, imposto de renda e FGTS. Com isso preenchido, o sistema gera o evento S-1010 (tabela de rubricas) e o valida contra o esquema oficial do eSocial. É a peça que faltava para, nas próximas etapas, informar a remuneração de cada servidor (inclusive a dos estatutários, no evento específico do setor público). Esta entrega nasceu do estudo de uma base real de folha municipal, que confirmou a importância desse de-para.",
+      "descricao": "Onda 4.3 (ADR-0021). A Rubrica ganhou natureza_esocial (Tabela 3) e códigos de incidência (CP/IRRF/FGTS/CP-RPPS). Novo evento S-1010 (evtTabRubrica) gerado por rubrica e validado contra o XSD oficial S-1.3. Front: seção eSocial no formulário da rubrica e opção S-1010 na tela de eSocial com seletor de rubrica. É pré-requisito dos eventos periódicos (S-1200/S-1202). A onda derivou da engenharia reversa da base real do Fiorilli (São João Batista-MA); a base bruta é PII e fica fora do repositório."
+    },
     {
       "data": "2026-06-29",
       "tipo": "validacao",

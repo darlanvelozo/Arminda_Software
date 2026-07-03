@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-06-29";
+const LAST_UPDATED = "2026-07-03";
 
 interface TocItem {
   id: string;
@@ -682,6 +682,24 @@ function SectionCalculo() {
         <code className="bg-muted px-1 rounded">/gerar/</code> e{" "}
         <code className="bg-muted px-1 rounded">/{"{id}"}/baixar/</code>. Assinatura
         (XML-DSig) e transmissão entram em ondas seguintes.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">eSocial — natureza de rubrica + S-1010 (Onda 4.3 — ADR-0021)</h3>
+      <p>
+        A <code className="bg-muted px-1 rounded">Rubrica</code> ganhou o de-para
+        eSocial: <code className="bg-muted px-1 rounded">natureza_esocial</code>{" "}
+        (Tabela 3, 4 dígitos) +{" "}
+        <code className="bg-muted px-1 rounded">cod_inc_cp/irrf/fgts/cprp</code>. O
+        evento <strong>S-1010</strong> (<code className="bg-muted px-1 rounded">evtTabRubrica</code>)
+        é gerado por rubrica (FK opcional{" "}
+        <code className="bg-muted px-1 rounded">EventoESocial.rubrica</code>) e
+        validado contra o XSD. Pré-requisito dos periódicos (S-1200/S-1202). Nota: o
+        snapshot do XSD do mirror não trazia{" "}
+        <code className="bg-muted px-1 rounded">TS_natRubr</code>; foi adicionado ao{" "}
+        <code className="bg-muted px-1 rounded">tipos.xsd</code> (patch documentado,
+        natureza = <code className="bg-muted px-1 rounded">\d{"{4}"}</code>). Esta onda
+        nasceu da engenharia reversa da base real do Fiorilli (ver ADR-0021 e{" "}
+        <code className="bg-muted px-1 rounded">docs/referencia/</code>).
       </p>
 
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
