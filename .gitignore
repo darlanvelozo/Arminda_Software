@@ -104,6 +104,16 @@ docker-compose.override.yml
 *SIP*.FDB*
 backups/
 dumps/
+# Certificados digitais (ICP-Brasil A1) e chaves — NUNCA no git. Cofre fora do repo.
+*.pfx
+*.p12
+*.cer
+*.crt
+*.key
+*.jks
+*.pem
+certs/
+certificados/
 data/
 sip-bases/
 uploads/
