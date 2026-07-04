@@ -256,3 +256,15 @@ CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/1")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://localhost:6379/2")
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
+
+
+# ============================================================
+# eSocial — cofre de certificados digitais (Onda 4.2 — ADR-0022)
+# ============================================================
+# Chave Fernet (base64, 32 bytes) que cifra o .pfx e a senha no banco.
+# EM PRODUÇÃO é obrigatória via env (segredo real). O default abaixo serve
+# só para dev/testes e NÃO deve ser usado em produção.
+ESOCIAL_CERT_KEY = env(
+    "ESOCIAL_CERT_KEY",
+    default="a7Sjy6mkq3KpkmeF1LanxkPj_q8xeOyeDrkVpyQ8TvI=",  # só dev/testes
+)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import EventoESocial
+from .models import CertificadoDigital, EventoESocial
 
 
 @admin.register(EventoESocial)
@@ -15,3 +15,18 @@ class EventoESocialAdmin(admin.ModelAdmin):
     raw_id_fields = ("orgao_emissor", "rubrica")
     readonly_fields = ("id_evento", "xml", "versao_layout")
     date_hierarchy = "criado_em"
+
+
+@admin.register(CertificadoDigital)
+class CertificadoDigitalAdmin(admin.ModelAdmin):
+    """Só metadados. O PFX/senha cifrados nunca aparecem no admin."""
+
+    list_display = ("orgao_emissor", "titular", "cnpj", "validade_fim")
+    search_fields = ("titular", "cnpj", "orgao_emissor__nome")
+    raw_id_fields = ("orgao_emissor",)
+    # Campos cifrados fora do formulário — nunca exibir/editar aqui.
+    fields = (
+        "orgao_emissor", "titular", "cnpj", "emissor",
+        "validade_inicio", "validade_fim", "thumbprint",
+    )
+    readonly_fields = fields

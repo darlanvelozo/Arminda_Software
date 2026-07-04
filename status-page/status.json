@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-07-03",
   "bloco_atual": 4,
-  "progresso_geral_pct": 32,
+  "progresso_geral_pct": 33,
   "blocos": [
     {
       "numero": 0,
@@ -110,10 +110,10 @@
       "data_fim_prevista": "2026-11-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 20,
+      "progresso_pct": 28,
       "entregas": [
         "✅ eSocial — fundação (S-1000/S-1005) + natureza de rubrica (Tabela 3) e evento S-1010, geração de XML validada contra o XSD oficial S-1.3 (ADR-0020/0021) — Ondas 4.1 e 4.3",
-        "Assinatura digital (XML-DSig, certificado ICP-Brasil) — onda futura",
+        "✅ Assinatura digital (XML-DSig, certificado ICP-Brasil A1 em cofre cifrado) — Onda 4.2",
         "Transmissão ao ambiente do governo + reconciliação de retornos — onda futura",
         "Demais eventos: S-1010, S-1020, S-2200/S-2299, S-1200/S-1210, etc.",
         "SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD"
@@ -249,6 +249,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-07-03",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.21.0 (cofre + assinatura)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 517 verde (5 testes novos de cofre e assinatura, com verificação criptográfica real usando certificado sintético). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Pronto para tag v0.21.0.",
+      "descricao": "Onda 4.2 passou pela validação integral. Deps novas (cryptography, signxml) e variável de ambiente ESOCIAL_CERT_KEY (chave de cifragem do cofre, obrigatória em produção). Migration esocial.0003. 517 passed (512 + 5)."
+    },
+    {
+      "data": "2026-07-03",
+      "tipo": "entrega",
+      "titulo": "eSocial: cofre de certificados e assinatura digital (Onda 4.2)",
+      "resumo_executivo": "O sistema passou a guardar com segurança o certificado digital de cada órgão e a assinar os eventos do eSocial. O certificado (arquivo .pfx) é guardado cifrado — a senha nunca fica visível — e, com ele, o sistema aplica a assinatura digital oficial (ICP-Brasil) a cada evento gerado, que passa a ter validade jurídica perante o governo. A assinatura foi comprovada de ponta a ponta: o arquivo assinado é conferido tanto contra o modelo oficial do eSocial quanto na verificação criptográfica da própria assinatura. Falta agora apenas a transmissão ao ambiente do governo. Nada é enviado sem autorização e sem definição do ambiente de teste.",
+      "descricao": "Onda 4.2 (ADR-0022). Cofre: modelo CertificadoDigital por órgão, com .pfx e senha cifrados (Fernet) e metadados em claro (validade, titular, CNPJ). Assinatura: XML-DSig enveloped (Reference URI vazia, C14N, RSA-SHA256) via signxml; o XML assinado valida contra o XSD oficial completo. API de upload do certificado (multipart) e de assinatura do evento; PFX/senha nunca expostos. Front: cofre por órgão e botão Assinar. Chave de cifragem em variável de ambiente (ESOCIAL_CERT_KEY), obrigatória em produção."
+    },
     {
       "data": "2026-07-03",
       "tipo": "validacao",

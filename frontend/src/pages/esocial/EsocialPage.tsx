@@ -6,8 +6,8 @@
  * transmissão vêm depois — ADR-0020).
  */
 
-import { FileCode2 } from "lucide-react";
-import { useState } from "react";
+import { FileCode2, ShieldCheck, ShieldAlert } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,11 +27,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { extractDomainErrorMessage } from "@/lib/api";
 import {
   baixarEventoXml,
+  useAssinarEvento,
+  useCertificados,
   useEventosEsocial,
   useGerarEvento,
+  useUploadCertificado,
   type GerarEventoInput,
 } from "@/lib/queries/esocial";
 import { useOrgaosEmissoresList } from "@/lib/queries/orgaos-sindicatos";
@@ -43,9 +47,13 @@ const TIPOS = [
   { value: "S-1010", label: "S-1010 — Tabela de rubricas" },
 ] as const;
 
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline" | "success"
+> = {
   gerado: "secondary",
   validado: "default",
+  assinado: "success",
   rejeitado: "destructive",
 };
 
@@ -53,11 +61,44 @@ export default function EsocialPage() {
   const { data: eventos, isLoading } = useEventosEsocial();
   const { data: orgaos } = useOrgaosEmissoresList();
   const { data: rubricas } = useRubricasList({ ativo: true, ordering: "codigo" });
+  const { data: certificados } = useCertificados();
   const gerar = useGerarEvento();
+  const assinar = useAssinarEvento();
+  const uploadCert = useUploadCertificado();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [orgao, setOrgao] = useState("");
   const [tipo, setTipo] = useState<GerarEventoInput["tipo"]>("S-1000");
   const [rubrica, setRubrica] = useState("");
+  const [senhaCert, setSenhaCert] = useState("");
+
+  const certDoOrgao = orgao
+    ? (certificados?.results ?? []).find((c) => String(c.orgao_emissor) === orgao)
+    : undefined;
+
+  async function onUploadCert() {
+    const file = fileRef.current?.files?.[0];
+    if (!orgao) return toast.error("Selecione o órgão emissor primeiro.");
+    if (!file) return toast.error("Escolha o arquivo .pfx do certificado.");
+    if (!senhaCert) return toast.error("Informe a senha do certificado.");
+    try {
+      await uploadCert.mutateAsync({ orgao_emissor: Number(orgao), arquivo: file, senha: senhaCert });
+      toast.success("Certificado guardado no cofre (cifrado).");
+      setSenhaCert("");
+      if (fileRef.current) fileRef.current.value = "";
+    } catch (e) {
+      toast.error(extractDomainErrorMessage(e) ?? "Falha ao guardar o certificado.");
+    }
+  }
+
+  async function onAssinar(id: number) {
+    try {
+      await assinar.mutateAsync(id);
+      toast.success("Evento assinado digitalmente.");
+    } catch (e) {
+      toast.error(extractDomainErrorMessage(e) ?? "Falha ao assinar (há certificado no cofre?).");
+    }
+  }
 
   async function onGerar() {
     if (!orgao) {
@@ -159,6 +200,49 @@ export default function EsocialPage() {
         </p>
       )}
 
+      {orgao && (
+        <div className="rounded-md border bg-card p-3">
+          {certDoOrgao ? (
+            <div className="flex items-center gap-2 text-sm">
+              <ShieldCheck className="h-4 w-4 text-emerald-600" />
+              <span>
+                Certificado no cofre: <strong>{certDoOrgao.titular}</strong> · vence em{" "}
+                {certDoOrgao.validade_fim
+                  ? new Date(certDoOrgao.validade_fim).toLocaleDateString("pt-BR")
+                  : "—"}
+                {typeof certDoOrgao.dias_para_vencer === "number" &&
+                  ` (${certDoOrgao.dias_para_vencer} dias)`}
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <ShieldAlert className="h-4 w-4 text-amber-600" />
+                Sem certificado no cofre para este órgão — necessário para assinar.
+              </div>
+              <div className="flex flex-wrap items-end gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground">Certificado (.pfx)</label>
+                  <Input ref={fileRef} type="file" accept=".pfx,.p12" className="text-xs" />
+                </div>
+                <div className="w-40">
+                  <label className="text-xs text-muted-foreground">Senha</label>
+                  <Input
+                    type="password"
+                    value={senhaCert}
+                    onChange={(e) => setSenhaCert(e.target.value)}
+                    disabled={uploadCert.isPending}
+                  />
+                </div>
+                <Button variant="outline" onClick={onUploadCert} disabled={uploadCert.isPending}>
+                  {uploadCert.isPending ? "Guardando…" : "Guardar no cofre"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
@@ -203,6 +287,17 @@ export default function EsocialPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
+                  {e.status !== "assinado" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7"
+                      onClick={() => e.id && onAssinar(e.id)}
+                      disabled={assinar.isPending}
+                    >
+                      Assinar
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

@@ -4,10 +4,10 @@
 > **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
 > as regras de processo (validação integral, guias vivos, etc.).
 >
-> Última atualização: **2026-07-03** · Versão atual: **v0.20.0** ·
+> Última atualização: **2026-07-03** · Versão atual: **v0.21.0** ·
 > **Bloco 4 — Obrigações legais federais: em andamento (~20%)** — Ondas **4.1**
-> (S-1000/S-1005) e **4.3** (natureza de rubrica Tabela 3 + S-1010), geração de
-> XML validada contra o XSD oficial S-1.3. **Bloco 3 — Folhas especiais:
+> (S-1000/S-1005), **4.3** (natureza de rubrica + S-1010) e **4.2** (cofre de
+> certificados A1 + assinatura XML-DSig), tudo validado contra o XSD oficial S-1.3. **Bloco 3 — Folhas especiais:
 > concluído (100%)**. Blocos 0 e 1
 > concluídos. **Bloco 2 a 85%** — entregues as Ondas **2.1** (DSL de
 > fórmulas via Python AST), **2.2** (cálculo mensal + toposort + endpoint
@@ -16,7 +16,7 @@
 > e **2.6** (tela operacional `/folha`); falta só a **2.7** (paridade
 > Fiorilli). No **Bloco 3** entregues **3.1** (13º), **3.2** (rescisão),
 > **3.3** (férias), **3.4** (licença-prêmio) e **3.5** (folha complementar)
-> — bloco fechado. **512 testes backend verde** + 10 frontend.
+> — bloco fechado. **517 testes backend verde** + 10 frontend.
 > Em produção desde **maio/2026**: https://arminda.site (Hostinger VPS).
 
 ---
@@ -250,7 +250,7 @@ por bloco em [docs/PERSONAS.md](docs/PERSONAS.md). Snapshot:
 | 1 | Fundação multi-tenant e cadastros (inclui Ondas 1.1 a 1.6b) | ✅ Concluído (mai/2026) |
 | 2 | Engine de cálculo + DSL de rubricas | 🟡 Em andamento — 85% (Ondas 2.1–2.6 prontas; falta só a 2.7 — paridade Fiorilli) |
 | 3 | Folhas especiais (13º, rescisão, férias, licença-prêmio, complementar) | ✅ Concluído (jun/2026, antecipado) |
-| 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF, MANAD) | 🟡 Em andamento — ~20% (Ondas 4.1 S-1000/S-1005 + 4.3 natureza de rubrica/S-1010, geração XML + XSD) |
+| 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF, MANAD) | 🟡 Em andamento — ~28% (Ondas 4.1/4.3 geração+XSD S-1000/S-1005/S-1010 + 4.2 cofre de certificados + assinatura) |
 | 5 | Integração TCE (MA, PB, framework outros) | ⏳ Dez/2026 |
 | 6 | MVP piloto em produção (gate crítico) | ⏳ Jan/2027 |
 | 7 | Diferenciação (PWA, WhatsApp, BI, IA, Portal Servidor) | ⏳ Fev-Abr/2027 |

@@ -83,7 +83,7 @@ export default function GuiaPage() {
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
           <span className="ml-1 inline-flex items-center gap-2">
             <Badge variant="success">Blocos 0–1 · Bloco 2 (folha) · Bloco 3 (folhas especiais) ✓</Badge>
-            <Badge variant="info">Bloco 4 em andamento — eSocial S-1000/S-1005/S-1010 ✓ (v0.20.0)</Badge>
+            <Badge variant="info">Bloco 4 em andamento — eSocial (geração, XSD, cofre + assinatura) ✓ (v0.21.0)</Badge>
           </span>
         </p>
       </header>
@@ -842,6 +842,15 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         Com a natureza preenchida, gere o evento <strong>S-1010</strong> da rubrica no
         menu eSocial — também validado contra o XSD. Isso é o pré-requisito dos
         eventos de remuneração (S-1200/S-1202) que virão.
+      </p>
+      <p>
+        <strong>Certificado digital e assinatura (Onda 4.2):</strong> no menu eSocial,
+        ao escolher um órgão, você pode <strong>guardar o certificado digital (.pfx)</strong>{" "}
+        daquele CNPJ no cofre — ele fica <strong>cifrado</strong>, e a senha nunca é
+        exibida. Com o certificado guardado, o botão <strong>Assinar</strong> aplica a{" "}
+        <strong>assinatura digital (ICP-Brasil)</strong> ao evento, que passa a valer
+        perante o governo. Falta só a <strong>transmissão</strong> ao eSocial, na próxima
+        onda.
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

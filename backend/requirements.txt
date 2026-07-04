@@ -48,6 +48,10 @@ reportlab==4.2.5
 # Geração/validação de XML do eSocial contra XSD oficial — Bloco 4 (ADR-0020).
 lxml==6.1.1
 
+# Cofre de certificados (ICP-Brasil A1) + assinatura XML-DSig — Bloco 4 (ADR-0022).
+cryptography==49.0.0
+signxml==5.0.1
+
 # ============================================================
 # Dev dependencies
 # ============================================================

@@ -162,6 +162,66 @@ export interface paths {
         patch: operations["core_usuarios_partial_update"];
         trace?: never;
     };
+    "/api/esocial/certificados/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Cofre de certificados (metadados). Upload via /upload. Dados sensíveis
+         *     (PFX/senha) nunca são expostos. Requer papel financeiro.
+         */
+        get: operations["esocial_certificados_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/esocial/certificados/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Cofre de certificados (metadados). Upload via /upload. Dados sensíveis
+         *     (PFX/senha) nunca são expostos. Requer papel financeiro.
+         */
+        get: operations["esocial_certificados_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/esocial/certificados/upload/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Cofre de certificados (metadados). Upload via /upload. Dados sensíveis
+         *     (PFX/senha) nunca são expostos. Requer papel financeiro.
+         */
+        post: operations["esocial_certificados_upload_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/esocial/eventos/": {
         parameters: {
             query?: never;
@@ -190,6 +250,23 @@ export interface paths {
         get: operations["esocial_eventos_retrieve"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/esocial/eventos/{id}/assinar/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=. */
+        post: operations["esocial_eventos_assinar_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1411,6 +1488,26 @@ export interface components {
             nivel_escolaridade?: components["schemas"]["NivelEscolaridadeEnum"];
             ativo?: boolean;
         };
+        /** @description Metadados do certificado no cofre. NUNCA expõe o PFX/senha cifrados. */
+        CertificadoDigital: {
+            readonly id: number;
+            readonly orgao_emissor: number;
+            readonly orgao_nome: string;
+            readonly titular: string;
+            /** CNPJ do titular */
+            readonly cnpj: string;
+            /** Autoridade certificadora */
+            readonly emissor: string;
+            /** Format: date-time */
+            readonly validade_inicio: string | null;
+            /** Format: date-time */
+            readonly validade_fim: string | null;
+            readonly dias_para_vencer: number | null;
+            /** Impressão digital (SHA-1) */
+            readonly thumbprint: string;
+            /** Format: date-time */
+            readonly criado_em: string;
+        };
         /** @description Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019). */
         ComplementarItem: {
             readonly id: number;
@@ -1874,6 +1971,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["CargoList"][];
+        };
+        PaginatedCertificadoDigitalList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["CertificadoDigital"][];
         };
         PaginatedComplementarItemList: {
             /** @example 123 */
@@ -3257,6 +3369,79 @@ export interface operations {
             };
         };
     };
+    esocial_certificados_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                orgao_emissor?: number;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCertificadoDigitalList"];
+                };
+            };
+        };
+    };
+    esocial_certificados_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this certificado digital. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificadoDigital"];
+                };
+            };
+        };
+    };
+    esocial_certificados_upload_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": components["schemas"]["CertificadoDigital"];
+                "application/x-www-form-urlencoded": components["schemas"]["CertificadoDigital"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificadoDigital"];
+                };
+            };
+        };
+    };
     esocial_eventos_list: {
         parameters: {
             query?: {
@@ -3310,6 +3495,34 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoESocial"];
+                };
+            };
+        };
+    };
+    esocial_eventos_assinar_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this evento eSocial. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EventoESocial"];
+                "application/x-www-form-urlencoded": components["schemas"]["EventoESocial"];
+                "multipart/form-data": components["schemas"]["EventoESocial"];
+            };
+        };
         responses: {
             200: {
                 headers: {

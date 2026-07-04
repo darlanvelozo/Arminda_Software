@@ -65,3 +65,32 @@ class EventoESocial(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.tipo} · {self.orgao_emissor.cnpj} · {self.get_status_display()}"
+
+
+class CertificadoDigital(TimeStampedModel):
+    """
+    Cofre do certificado e-CNPJ (A1) de um órgão emissor (Onda 4.2 — ADR-0022).
+
+    O `.pfx` e a senha ficam **cifrados** (Fernet). Metadados em claro só para
+    operação (validade, titular). Nunca expor `arquivo_cifrado`/`senha_cifrada`
+    por API nem em log.
+    """
+
+    orgao_emissor = models.OneToOneField(
+        OrgaoEmissor, on_delete=models.CASCADE, related_name="certificado"
+    )
+    arquivo_cifrado = models.TextField(help_text="PFX cifrado (Fernet). Nunca expor.")
+    senha_cifrada = models.TextField(help_text="Senha do PFX cifrada (Fernet). Nunca expor.")
+    titular = models.CharField(max_length=200, blank=True)
+    cnpj = models.CharField("CNPJ do titular", max_length=18, blank=True)
+    emissor = models.CharField("Autoridade certificadora", max_length=200, blank=True)
+    validade_inicio = models.DateTimeField(null=True, blank=True)
+    validade_fim = models.DateTimeField(null=True, blank=True)
+    thumbprint = models.CharField("Impressão digital (SHA-1)", max_length=64, blank=True)
+
+    class Meta:
+        verbose_name = "certificado digital"
+        verbose_name_plural = "certificados digitais"
+
+    def __str__(self) -> str:
+        return f"Certificado {self.titular or self.cnpj} (até {self.validade_fim:%d/%m/%Y})"

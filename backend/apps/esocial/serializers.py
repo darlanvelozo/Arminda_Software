@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.esocial.models import EventoESocial
+from apps.esocial.models import CertificadoDigital, EventoESocial
 
 
 class EventoESocialSerializer(serializers.ModelSerializer):
@@ -34,3 +34,33 @@ class GerarEventoSerializer(serializers.Serializer):
     rubrica = serializers.IntegerField(required=False)
     competencia = serializers.DateField(required=False)
     class_trib = serializers.CharField(required=False, default="60", max_length=2)
+
+
+class CertificadoDigitalSerializer(serializers.ModelSerializer):
+    """Metadados do certificado no cofre. NUNCA expõe o PFX/senha cifrados."""
+
+    orgao_nome = serializers.CharField(source="orgao_emissor.nome", read_only=True)
+    dias_para_vencer = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CertificadoDigital
+        fields = [
+            "id", "orgao_emissor", "orgao_nome", "titular", "cnpj", "emissor",
+            "validade_inicio", "validade_fim", "dias_para_vencer", "thumbprint",
+            "criado_em",
+        ]
+        read_only_fields = fields
+
+    def get_dias_para_vencer(self, obj) -> int | None:
+        if not obj.validade_fim:
+            return None
+        from django.utils import timezone
+        return (obj.validade_fim - timezone.now()).days
+
+
+class UploadCertificadoSerializer(serializers.Serializer):
+    """Upload do .pfx + senha para o cofre de um órgão."""
+
+    orgao_emissor = serializers.IntegerField()
+    arquivo = serializers.FileField()
+    senha = serializers.CharField(max_length=200, write_only=True, style={"input_type": "password"})

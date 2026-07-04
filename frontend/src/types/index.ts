@@ -82,6 +82,9 @@ export type ComplementarItem = components["schemas"]["ComplementarItem"];
 // eSocial — eventos (Onda 4.1)
 export type EventoESocial = components["schemas"]["EventoESocial"];
 
+// eSocial — cofre de certificados (Onda 4.2)
+export type CertificadoDigital = components["schemas"]["CertificadoDigital"];
+
 /**
  * Resposta do POST /api/payroll/folhas/{id}/calcular/.
  *

@@ -17,20 +17,26 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.20.0` (Onda 4.3 — eSocial: natureza de rubrica + S-1010)
-- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~20%)** — eSocial: S-1000/S-1005 (4.1) + natureza de rubrica (Tabela 3) e S-1010 (4.3), geração de XML validada contra o XSD oficial S-1.3. Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
+- **Versão atual:** `v0.21.0` (Onda 4.2 — eSocial: cofre de certificados + assinatura)
+- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~28%)** — eSocial: S-1000/S-1005 (4.1), natureza de rubrica + S-1010 (4.3), e cofre de certificados A1 + assinatura XML-DSig (4.2), tudo validado contra o XSD oficial S-1.3. Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 512 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 517 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
-Próximos passos naturais (Bloco 4): assinatura digital dos eventos (XML-DSig,
-certificado ICP-Brasil) e transmissão ao governo; e os demais eventos eSocial
-(S-1010, S-1020, S-2200, S-1200…). Em paralelo, a **2.7** (paridade Fiorilli)
-fecha o Bloco 2 quando houver dados do SIP. Dívida do Bloco 3: folha
-complementar **modo acumulado** (via `Folha.folha_origem` — ADR-0019).
+Próximos passos naturais (Bloco 4): **transmissão** dos eventos assinados ao
+webservice do eSocial (lotes + reconciliação de retorno) — ambiente de
+homologação primeiro, só com autorização; snapshot de incidência + `ResumoFolha`
+(4.4); e os periódicos S-1200/S-1202/S-1210 (4.5). Também mapeado: qualificação
+cadastral e monitoramento fiscal na Receita (canal SERPRO/e-CAC — Bloco 10).
+Em paralelo, a **2.7** (paridade Fiorilli) fecha o Bloco 2 (base SJB disponível).
 Ver [CHANGELOG.md](CHANGELOG.md).
+
+> **Segredo novo em produção:** `ESOCIAL_CERT_KEY` (chave Fernet do cofre de
+> certificados) precisa estar no `.env` de produção — o default do código é só
+> para dev. Certificados reais (`.pfx`) ficam em `/opt/arminda-secrets/certs`
+> (fora do git), nunca commitados (ADR-0022).
 
 > **Onde você está rodando (desde 30/05/2026):** o desenvolvimento acontece
 > **na própria VPS**, em `/opt/arminda-dev` (banco `arminda_dev`, `.env` de dev,
@@ -48,7 +54,7 @@ Ver [CHANGELOG.md](CHANGELOG.md).
 3. **[docs/PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 4. **[CHANGELOG.md](CHANGELOG.md)** — memória do projeto, toda alteração registrada
 5. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — racional das decisões de stack
-6. **[docs/adr/](docs/adr/)** — 21 ADRs (decisões formais)
+6. **[docs/adr/](docs/adr/)** — 22 ADRs (decisões formais)
 7. **CONTEXT.md específicos** quando for mexer:
    - Backend: [backend/CONTEXT.md](backend/CONTEXT.md) → [`_MODELS`](backend/CONTEXT_MODELS.md) → [`_SERVICES`](backend/CONTEXT_SERVICES.md) → [`apps/CONTEXT.md`](backend/apps/CONTEXT.md)
    - Frontend: [frontend/CONTEXT.md](frontend/CONTEXT.md) → [`pages/CONTEXT.md`](frontend/src/pages/CONTEXT.md) → [`components/CONTEXT.md`](frontend/src/components/CONTEXT.md)
@@ -238,6 +244,7 @@ Estas ADRs já estão aceitas e implementadas. Reabrir só com motivo forte:
 | 0019 | Folha complementar: lançamentos explícitos (`ComplementarItem`), `folha_origem` como gancho do modo acumulado |
 | 0020 | eSocial: app `esocial`, modelo genérico `EventoESocial`, geração XML + validação XSD oficial (S-1.3); assinatura/transmissão depois |
 | 0021 | Lições da base real Fiorilli: snapshot de incidência, natureza de rubrica (Tabela 3), `ResumoFolha`/BASES, S-1202 RPPS; base bruta fora do git (PII) |
+| 0022 | eSocial: cofre de certificados A1 (Fernet) por órgão + assinatura XML-DSig (signxml); `ESOCIAL_CERT_KEY` via env |
 
 Papéis novos a criar (mapeados em [PERSONAS.md](docs/PERSONAS.md)):
 `gestor_municipio` (Bloco 7), `contador_municipio` (Bloco 9),

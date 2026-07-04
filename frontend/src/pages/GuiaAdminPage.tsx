@@ -702,6 +702,24 @@ function SectionCalculo() {
         <code className="bg-muted px-1 rounded">docs/referencia/</code>).
       </p>
 
+      <h3 className="text-base font-semibold mt-4">eSocial — cofre + assinatura (Onda 4.2 — ADR-0022)</h3>
+      <p>
+        Modelo <code className="bg-muted px-1 rounded">CertificadoDigital</code> (OneToOne
+        por <code className="bg-muted px-1 rounded">OrgaoEmissor</code>): guarda o{" "}
+        <code className="bg-muted px-1 rounded">.pfx</code> e a senha <strong>cifrados com
+        Fernet</strong> (chave em <code className="bg-muted px-1 rounded">settings.ESOCIAL_CERT_KEY</code>,
+        env em prod), metadados em claro (validade, titular, CNPJ). Serviço{" "}
+        <code className="bg-muted px-1 rounded">cofre</code> (guardar/validar/carregar) e{" "}
+        <code className="bg-muted px-1 rounded">assinatura</code> (XML-DSig enveloped via{" "}
+        <code className="bg-muted px-1 rounded">signxml</code>: Reference URI="", C14N,
+        RSA-SHA256). O XML assinado valida contra o XSD oficial <em>completo</em> (a
+        assinatura deixa de ser relaxada). API{" "}
+        <code className="bg-muted px-1 rounded">/esocial/certificados/upload/</code> e{" "}
+        <code className="bg-muted px-1 rounded">/esocial/eventos/{"{id}"}/assinar/</code>.
+        O PFX/senha nunca são expostos por API/admin/log. Transmissão fica para a próxima
+        onda; nada é enviado ao governo sem autorização explícita.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>
         <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}

@@ -271,6 +271,98 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/esocial/certificados/:
+    get:
+      operationId: esocial_certificados_list
+      description: |-
+        Cofre de certificados (metadados). Upload via /upload. Dados sensíveis
+        (PFX/senha) nunca são expostos. Requer papel financeiro.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: orgao_emissor
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - esocial
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCertificadoDigitalList'
+          description: ''
+  /api/esocial/certificados/{id}/:
+    get:
+      operationId: esocial_certificados_retrieve
+      description: |-
+        Cofre de certificados (metadados). Upload via /upload. Dados sensíveis
+        (PFX/senha) nunca são expostos. Requer papel financeiro.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this certificado digital.
+        required: true
+      tags:
+      - esocial
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificadoDigital'
+          description: ''
+  /api/esocial/certificados/upload/:
+    post:
+      operationId: esocial_certificados_upload_create
+      description: |-
+        Cofre de certificados (metadados). Upload via /upload. Dados sensíveis
+        (PFX/senha) nunca são expostos. Requer papel financeiro.
+      tags:
+      - esocial
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CertificadoDigital'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CertificadoDigital'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificadoDigital'
+          description: ''
   /api/esocial/eventos/:
     get:
       operationId: esocial_eventos_list
@@ -353,6 +445,40 @@ paths:
         required: true
       tags:
       - esocial
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoESocial'
+          description: ''
+  /api/esocial/eventos/{id}/assinar/:
+    post:
+      operationId: esocial_eventos_assinar_create
+      description: Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this evento eSocial.
+        required: true
+      tags:
+      - esocial
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
       security:
       - jwtAuth: []
       - cookieAuth: []
@@ -4072,6 +4198,64 @@ components:
       - codigo
       - id
       - nome
+    CertificadoDigital:
+      type: object
+      description: Metadados do certificado no cofre. NUNCA expõe o PFX/senha cifrados.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        orgao_emissor:
+          type: integer
+          readOnly: true
+        orgao_nome:
+          type: string
+          readOnly: true
+        titular:
+          type: string
+          readOnly: true
+        cnpj:
+          type: string
+          readOnly: true
+          title: CNPJ do titular
+        emissor:
+          type: string
+          readOnly: true
+          title: Autoridade certificadora
+        validade_inicio:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        validade_fim:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        dias_para_vencer:
+          type: integer
+          nullable: true
+          readOnly: true
+        thumbprint:
+          type: string
+          readOnly: true
+          title: Impressão digital (SHA-1)
+        criado_em:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - cnpj
+      - criado_em
+      - dias_para_vencer
+      - emissor
+      - id
+      - orgao_emissor
+      - orgao_nome
+      - thumbprint
+      - titular
+      - validade_fim
+      - validade_inicio
     ComplementarItem:
       type: object
       description: Lançamento explícito de uma folha complementar (Onda 3.5 — ADR-0019).
@@ -5154,6 +5338,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CargoList'
+    PaginatedCertificadoDigitalList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CertificadoDigital'
     PaginatedComplementarItemList:
       type: object
       required:

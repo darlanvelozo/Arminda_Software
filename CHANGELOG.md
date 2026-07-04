@@ -35,6 +35,44 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.2 — eSocial: cofre de certificados + assinatura digital · 2026-07-03
+
+> Terceira onda do Bloco 4 (ADR-0022). Guarda o certificado e-CNPJ (A1) cifrado
+> por órgão e assina os eventos com XML-DSig. Provado com um certificado real
+> fornecido pelo cliente (Prefeitura de Brejo) em ambiente de teste.
+
+#### Adicionado — Backend
+
+- **feat(esocial):** modelo `CertificadoDigital` (OneToOne por `OrgaoEmissor`) —
+  `.pfx` e senha **cifrados com Fernet**, metadados em claro (validade, titular,
+  CNPJ, emissor, thumbprint). Migration 0003.
+- **feat(esocial.services.cofre):** `guardar_certificado` (valida o PKCS#12,
+  confere validade, cifra, upsert) e `carregar_material` (decifra em memória —
+  uso interno). Chave em `settings.ESOCIAL_CERT_KEY` (env em produção).
+- **feat(esocial.services.assinatura):** `assinar_evento` — XML-DSig **enveloped**
+  (Reference URI="", C14N, RSA-SHA256) via `signxml`; o XML assinado valida
+  contra o XSD oficial completo (a assinatura deixa de ser relaxada).
+- **feat(esocial):** API `/esocial/certificados/upload/` (multipart) e
+  `/esocial/eventos/{id}/assinar/`. PFX/senha nunca expostos por API/admin/log.
+- Deps novas: `cryptography`, `signxml`. 5 testes novos (517 no total), com
+  verificação criptográfica real (certificado sintético no teste).
+
+#### Adicionado — Frontend
+
+- **feat(esocial):** na tela de eSocial, cofre do certificado por órgão
+  (upload .pfx + senha, mostra validade) e botão **Assinar** nos eventos.
+
+#### Por quê
+
+- ADR-0022: assinar é pré-requisito de transmitir ao eSocial e da integração
+  com a Receita. O cliente forneceu um A1 real para os testes de integração.
+
+#### Impacto
+
+- **Nova variável de ambiente obrigatória em produção: `ESOCIAL_CERT_KEY`**
+  (chave Fernet; o default do código serve só para dev). Novas deps —
+  `pip install -r requirements.txt` no deploy. Migration `esocial.0003`.
+
 ### Onda 4.3 — eSocial: natureza de rubrica (Tabela 3) + S-1010 · 2026-07-03
 
 > Segunda onda do Bloco 4 (ADR-0021, derivada da engenharia reversa da base
