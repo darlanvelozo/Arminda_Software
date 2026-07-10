@@ -78,6 +78,7 @@
         "✅ Tabelas legais 2024/2025/2026 (FAIXA_IRRF e FAIXA_INSS reais + salário mínimo dinâmico + admin Django para virar exercício sem deploy) — Onda 2.3",
         "✅ Incidências automáticas: FGTS + previdência própria RPPS (cálculo em duas fases, bases por flag, RegimePrevidenciario por município, FAIXA_RPPS, ADR-0013) — Onda 2.4",
         "✅ Geração de holerite PDF + JSON (ReportLab, endpoints por vínculo, download na tela de folha, ADR-0014) — Onda 2.5",
+        "✅ Exportação da folha inteira em PDF — quadro geral, linha por servidor e totais por lotação/órgão (Onda 4.4b)",
         "✅ Refinos operacionais: aba Servidores (resumo por servidor + holerite) e totais por lotação/órgão — v0.13.0",
         "✅ Tela /folha operacional (lista, criar, calcular/recalcular com confirmação, relatório do último cálculo, tabs de lançamentos e erros) — Onda 2.6",
         "Testes de paridade contra Fiorilli — Onda 2.7"
