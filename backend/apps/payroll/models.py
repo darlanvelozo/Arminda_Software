@@ -161,6 +161,14 @@ class Lancamento(TimeStampedModel):
         help_text="Quantidade, percentual ou dias",
     )
     valor = models.DecimalField(max_digits=12, decimal_places=2)
+    # Snapshot fiscal no momento do cálculo (Onda 4.4 — ADR-0021): congela as
+    # incidências e a natureza eSocial da rubrica. Editar a rubrica depois NÃO
+    # altera lançamentos já calculados — folha paga não muda retroativamente.
+    snap_incide_inss = models.BooleanField(default=False)
+    snap_incide_irrf = models.BooleanField(default=False)
+    snap_incide_fgts = models.BooleanField(default=False)
+    snap_incide_rpps = models.BooleanField(default=False)
+    snap_natureza_esocial = models.CharField(max_length=4, blank=True)
 
     class Meta:
         ordering = ["rubrica__codigo"]
@@ -169,6 +177,46 @@ class Lancamento(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.servidor.nome} | {self.rubrica.nome}: R$ {self.valor}"
+
+
+class ResumoFolha(TimeStampedModel):
+    """
+    Resumo consolidado por vínculo × folha (Onda 4.4 — ADR-0021; o "BASES" do
+    domínio). Persistido pelo cálculo: totais e bases por obrigação, prontos
+    para os eventos periódicos do eSocial (S-1200/S-1202/S-1210) e retificações.
+    """
+
+    folha = models.ForeignKey(Folha, on_delete=models.CASCADE, related_name="resumos")
+    vinculo = models.ForeignKey(
+        VinculoFuncional, on_delete=models.PROTECT, related_name="resumos_folha"
+    )
+    servidor = models.ForeignKey(
+        Servidor, on_delete=models.PROTECT, related_name="resumos_folha"
+    )
+    total_proventos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    total_descontos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    total_liquido = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    base_inss = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    base_irrf = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    base_fgts = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    base_rpps = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    # Exclusão por evento periódico do eSocial (retificações/casos especiais).
+    excluir_s1200 = models.BooleanField(default=False)
+    excluir_s1202 = models.BooleanField(default=False)
+    excluir_s1210 = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["vinculo__servidor__nome"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["folha", "vinculo"], name="resumo_unico_por_folha_vinculo"
+            ),
+        ]
+        verbose_name = "resumo de folha"
+        verbose_name_plural = "resumos de folha"
+
+    def __str__(self) -> str:
+        return f"{self.servidor.nome} · {self.folha.competencia:%m/%Y}: R$ {self.total_liquido}"
 
 
 class FeriasItem(TimeStampedModel):

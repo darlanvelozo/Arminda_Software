@@ -525,6 +525,26 @@ export interface paths {
         patch: operations["payroll_folhas_partial_update"];
         trace?: never;
     };
+    "/api/payroll/folhas/{id}/bases/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description GET /api/payroll/folhas/{id}/bases/ → resumo persistido por vínculo
+         *     (Onda 4.4): totais e bases INSS/IRRF/FGTS/RPPS, insumo do eSocial.
+         */
+        get: operations["payroll_folhas_bases_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/payroll/folhas/{id}/calcular/": {
         parameters: {
             query?: never;
@@ -4072,6 +4092,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FolhaWrite"];
+                };
+            };
+        };
+    };
+    payroll_folhas_bases_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaDetail"];
                 };
             };
         };

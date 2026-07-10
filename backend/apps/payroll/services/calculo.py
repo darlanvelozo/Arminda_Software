@@ -31,7 +31,15 @@ from apps.calculo.dependencias import RubricaParaOrdenar, ordenar_topologicament
 from apps.calculo.formula.avaliador import avaliar
 from apps.calculo.formula.contexto import ContextoFolha
 from apps.calculo.formula.errors import FormulaError
-from apps.payroll.models import Folha, Lancamento, Rubrica, TipoFolha, TipoRubrica
+from apps.payroll.models import (
+    Folha,
+    Lancamento,
+    ResumoFolha,
+    Rubrica,
+    StatusFolha,
+    TipoFolha,
+    TipoRubrica,
+)
 from apps.payroll.services.decimo import avos_no_ano
 from apps.payroll.services.ferias import vars_ferias
 from apps.payroll.services.licenca_premio import vars_licenca_premio
@@ -45,6 +53,10 @@ from apps.people.models import Dependente, VinculoFuncional
 
 if TYPE_CHECKING:
     from apps.payroll.models import RegimePrevidenciario
+
+
+class FolhaFechadaError(Exception):
+    """Folha fechada é imutável (Onda 4.4 — ADR-0021): não recalcula."""
 
 # Fallback do salário-mínimo caso a TabelaLegal não tenha sido seedada.
 # A partir da Onda 2.3, o valor real vem de `apps.calculo.tabelas.salario_minimo`
@@ -282,8 +294,12 @@ def _calcular_complementar(folha: Folha, relatorio: RelatorioCalculo) -> Relator
     total_proventos = Decimal("0")
     total_descontos = Decimal("0")
 
+    vinculos_processados_ids: set[int] = set()
+
     with transaction.atomic():
         for vinculo in vinculos:
+            prov_v = Decimal("0")
+            desc_v = Decimal("0")
             for item in vinculo._complementar_itens:
                 _, criado = Lancamento.objects.update_or_create(
                     folha=folha,
@@ -293,6 +309,11 @@ def _calcular_complementar(folha: Folha, relatorio: RelatorioCalculo) -> Relator
                         "servidor": vinculo.servidor,
                         "referencia": Decimal(0),
                         "valor": item.valor,
+                        "snap_incide_inss": item.rubrica.incide_inss,
+                        "snap_incide_irrf": item.rubrica.incide_irrf,
+                        "snap_incide_fgts": item.rubrica.incide_fgts,
+                        "snap_incide_rpps": item.rubrica.incide_rpps,
+                        "snap_natureza_esocial": item.rubrica.natureza_esocial,
                     },
                 )
                 if criado:
@@ -301,12 +322,17 @@ def _calcular_complementar(folha: Folha, relatorio: RelatorioCalculo) -> Relator
                     relatorio.lancamentos_atualizados += 1
                 pares_processados.add((vinculo.id, item.rubrica_id))
                 if item.rubrica.tipo == TipoRubrica.PROVENTO:
-                    total_proventos += item.valor
+                    prov_v += item.valor
                 elif item.rubrica.tipo == TipoRubrica.DESCONTO:
-                    total_descontos += item.valor
+                    desc_v += item.valor
+            total_proventos += prov_v
+            total_descontos += desc_v
+            _persistir_resumo(folha, vinculo, prov_v, desc_v)
+            vinculos_processados_ids.add(vinculo.id)
 
         _limpar_orfaos_e_fechar(
-            folha, pares_processados, total_proventos, total_descontos, relatorio
+            folha, pares_processados, total_proventos, total_descontos, relatorio,
+            vinculos_processados_ids=vinculos_processados_ids,
         )
     return relatorio
 
@@ -381,6 +407,14 @@ def _processar_rubrica(
             "servidor": vinculo.servidor,
             "referencia": Decimal(0),
             "valor": valor,
+            # Snapshot fiscal (Onda 4.4 — ADR-0021): congela incidências e
+            # natureza no momento do cálculo. Folha fechada nunca recalcula,
+            # então editar a rubrica depois não altera o histórico.
+            "snap_incide_inss": rubrica.incide_inss,
+            "snap_incide_irrf": rubrica.incide_irrf,
+            "snap_incide_fgts": rubrica.incide_fgts,
+            "snap_incide_rpps": rubrica.incide_rpps,
+            "snap_natureza_esocial": rubrica.natureza_esocial,
         },
     )
     if criado:
@@ -536,7 +570,33 @@ def _processar_vinculo(
         relatorio=relatorio,
         pares_processados=pares_processados,
     )
-    return total_proventos, total_descontos
+    return total_proventos, total_descontos, bases
+
+
+def _persistir_resumo(
+    folha: Folha,
+    vinculo: VinculoFuncional,
+    proventos: Decimal,
+    descontos: Decimal,
+    bases: dict[str, Decimal] | None = None,
+) -> None:
+    """Persiste o `ResumoFolha` do vínculo (Onda 4.4 — ADR-0021): totais e
+    bases por obrigação, insumo dos periódicos do eSocial. Idempotente."""
+    bases = bases or {}
+    ResumoFolha.objects.update_or_create(
+        folha=folha,
+        vinculo=vinculo,
+        defaults={
+            "servidor": vinculo.servidor,
+            "total_proventos": proventos,
+            "total_descontos": descontos,
+            "total_liquido": proventos - descontos,
+            "base_inss": bases.get("BASE_INSS", Decimal(0)),
+            "base_irrf": bases.get("BASE_IRRF", Decimal(0)),
+            "base_fgts": bases.get("BASE_FGTS", Decimal(0)),
+            "base_rpps": bases.get("BASE_RPPS", Decimal(0)),
+        },
+    )
 
 
 def _limpar_orfaos_e_fechar(
@@ -545,9 +605,14 @@ def _limpar_orfaos_e_fechar(
     total_proventos: Decimal,
     total_descontos: Decimal,
     relatorio: RelatorioCalculo,
+    vinculos_processados_ids: set[int] | None = None,
 ) -> None:
     """Remove lançamentos cujo par (vínculo, rubrica) não foi tocado nesta
     execução, atualiza totais e fecha a folha (aberta → calculada)."""
+    if vinculos_processados_ids is not None:
+        ResumoFolha.objects.filter(folha=folha).exclude(
+            vinculo_id__in=vinculos_processados_ids
+        ).delete()
     existentes = Lancamento.objects.filter(folha=folha)
     for lanc in existentes:
         chave = (lanc.vinculo_id, lanc.rubrica_id)
@@ -592,6 +657,15 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
             estrutura — não há como calcular nada, transação inteira é
             abortada.
     """
+    # Folha fechada é imutável (Onda 4.4 — ADR-0021): o snapshot fiscal dos
+    # lançamentos e o ResumoFolha valem como histórico; reabrir é processo
+    # controlado, não um recálculo silencioso.
+    if folha.status == StatusFolha.FECHADA:
+        raise FolhaFechadaError(
+            f"Folha {folha.competencia:%m/%Y} ({folha.get_tipo_display()}) está "
+            "fechada e não pode ser recalculada."
+        )
+
     relatorio = RelatorioCalculo(folha_id=folha.id, competencia=folha.competencia)
 
     # Folha complementar (Onda 3.5 — ADR-0019): caminho próprio, sem fórmulas
@@ -628,9 +702,11 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
     total_proventos = Decimal("0")
     total_descontos = Decimal("0")
 
+    vinculos_processados_ids: set[int] = set()
+
     with transaction.atomic():
         for vinculo in vinculos:
-            prov, desc = _processar_vinculo(
+            prov, desc, bases = _processar_vinculo(
                 folha=folha,
                 vinculo=vinculo,
                 proventos=proventos,
@@ -642,9 +718,12 @@ def calcular_folha(folha: Folha) -> RelatorioCalculo:
             )
             total_proventos += prov
             total_descontos += desc
+            _persistir_resumo(folha, vinculo, prov, desc, bases)
+            vinculos_processados_ids.add(vinculo.id)
 
         _limpar_orfaos_e_fechar(
-            folha, pares_processados, total_proventos, total_descontos, relatorio
+            folha, pares_processados, total_proventos, total_descontos, relatorio,
+            vinculos_processados_ids=vinculos_processados_ids,
         )
 
     return relatorio

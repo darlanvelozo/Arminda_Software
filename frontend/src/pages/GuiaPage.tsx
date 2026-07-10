@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-07-03";
+const LAST_UPDATED = "2026-07-10";
 
 interface TocItem {
   id: string;
@@ -851,6 +851,17 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         <strong>assinatura digital (ICP-Brasil)</strong> ao evento, que passa a valer
         perante o governo. Falta só a <strong>transmissão</strong> ao eSocial, na próxima
         onda.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Retrato fiscal da folha (Onda 4.4)</h3>
+      <p>
+        Cada lançamento calculado agora guarda um <strong>retrato fiscal congelado</strong>{" "}
+        (as incidências e a natureza eSocial da rubrica naquele momento) — editar uma
+        rubrica depois <strong>não altera folhas já calculadas</strong>, e folha{" "}
+        <strong>fechada não pode ser recalculada</strong> (exigência de auditoria). O
+        sistema também passa a guardar o <strong>resumo consolidado por servidor</strong>{" "}
+        em cada folha (totais + bases de INSS/IRRF/FGTS/RPPS) — é o insumo direto dos
+        eventos de remuneração do eSocial que vêm a seguir.
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

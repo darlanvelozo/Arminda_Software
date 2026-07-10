@@ -17,6 +17,7 @@ from apps.payroll.models import (
     LicencaPremioItem,
     ModoContribuicaoRPPS,
     RegimePrevidenciario,
+    ResumoFolha,
     Rubrica,
 )
 from apps.people.models import Regime
@@ -273,6 +274,23 @@ class LicencaPremioItemSerializer(serializers.ModelSerializer):
         if value > 29:
             raise serializers.ValidationError("Dias adicionais é de no máximo 29 (use meses).")
         return value
+
+
+class ResumoFolhaSerializer(serializers.ModelSerializer):
+    """Resumo persistido por vínculo × folha (Onda 4.4 — o 'BASES')."""
+
+    servidor_nome = serializers.CharField(source="servidor.nome", read_only=True)
+    servidor_matricula = serializers.CharField(source="servidor.matricula", read_only=True)
+
+    class Meta:
+        model = ResumoFolha
+        fields = [
+            "id", "folha", "vinculo", "servidor_nome", "servidor_matricula",
+            "total_proventos", "total_descontos", "total_liquido",
+            "base_inss", "base_irrf", "base_fgts", "base_rpps",
+            "excluir_s1200", "excluir_s1202", "excluir_s1210",
+        ]
+        read_only_fields = fields
 
 
 class ComplementarItemSerializer(serializers.ModelSerializer):

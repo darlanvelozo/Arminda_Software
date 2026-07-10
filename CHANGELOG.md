@@ -35,6 +35,38 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.4 — Snapshot fiscal + ResumoFolha (o "BASES") · 2026-07-10
+
+> Quarta onda do Bloco 4 (ADR-0021, decisões 1 e 3). Congela o contexto fiscal
+> de cada lançamento no cálculo e persiste o resumo por vínculo × folha —
+> insumo direto dos eventos de remuneração do eSocial (S-1200/S-1202/S-1210).
+
+#### Adicionado — Backend
+
+- **feat(payroll):** `Lancamento` ganha snapshot fiscal
+  (`snap_incide_inss/irrf/fgts/rpps` + `snap_natureza_esocial`), congelado no
+  momento do cálculo — editar a rubrica depois não altera folhas calculadas
+  (padrão MOVIMENTO do legado). Migration 0008.
+- **feat(payroll):** modelo `ResumoFolha` — 1 linha por vínculo × folha com
+  totais + bases INSS/IRRF/FGTS/RPPS e flags `excluir_s1200/s1202/s1210`
+  (retificações). Persistido pelo cálculo (mensal e complementar),
+  idempotente, com limpeza de órfãos. Endpoint `/payroll/folhas/{id}/bases/`.
+- **feat(payroll):** folha **fechada é imutável** — `calcular_folha` levanta
+  `FolhaFechadaError` (HTTP 400, code `FOLHA_FECHADA`).
+- 4 testes novos (521 no total), incluindo o de regressão do snapshot
+  (rubrica editada após o cálculo não muda o lançamento).
+
+#### Por quê
+
+- ADR-0021: "snapshot no momento do cálculo é inegociável" — folha paga não
+  pode mudar sozinha; e o `BASES` persistido é o que os eventos periódicos
+  do eSocial consomem.
+
+#### Impacto
+
+- Migration `payroll.0008`. Guias atualizados. Sem quebra de API (campos novos
+  são aditivos).
+
 ### Onda 4.2 — eSocial: cofre de certificados + assinatura digital · 2026-07-03
 
 > Terceira onda do Bloco 4 (ADR-0022). Guarda o certificado e-CNPJ (A1) cifrado

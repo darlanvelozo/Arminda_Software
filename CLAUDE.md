@@ -17,18 +17,17 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.21.0` (Onda 4.2 — eSocial: cofre de certificados + assinatura)
-- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~28%)** — eSocial: S-1000/S-1005 (4.1), natureza de rubrica + S-1010 (4.3), e cofre de certificados A1 + assinatura XML-DSig (4.2), tudo validado contra o XSD oficial S-1.3. Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
+- **Versão atual:** `v0.22.0` (Onda 4.4 — snapshot fiscal + ResumoFolha)
+- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~36%)** — eSocial: S-1000/S-1005 (4.1), S-1010 + natureza de rubrica (4.3), cofre de certificados + assinatura XML-DSig (4.2) e snapshot fiscal + `ResumoFolha` (4.4). Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 517 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 521 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
-Próximos passos naturais (Bloco 4): **transmissão** dos eventos assinados ao
-webservice do eSocial (lotes + reconciliação de retorno) — ambiente de
-homologação primeiro, só com autorização; snapshot de incidência + `ResumoFolha`
-(4.4); e os periódicos S-1200/S-1202/S-1210 (4.5). Também mapeado: qualificação
+Próximos passos naturais (Bloco 4): **4.5 — periódicos S-1200/S-1202/S-1210**
+(o ResumoFolha da 4.4 é o insumo); depois **transmissão** dos eventos assinados
+(homologação primeiro, só com autorização). Também mapeado: qualificação
 cadastral e monitoramento fiscal na Receita (canal SERPRO/e-CAC — Bloco 10).
 Em paralelo, a **2.7** (paridade Fiorilli) fecha o Bloco 2 (base SJB disponível).
 Ver [CHANGELOG.md](CHANGELOG.md).

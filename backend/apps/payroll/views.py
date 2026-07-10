@@ -40,6 +40,7 @@ from apps.payroll.models import (
     Lancamento,
     LicencaPremioItem,
     RegimePrevidenciario,
+    ResumoFolha,
     Rubrica,
 )
 from apps.payroll.serializers import (
@@ -51,11 +52,12 @@ from apps.payroll.serializers import (
     LancamentoSerializer,
     LicencaPremioItemSerializer,
     RegimePrevidenciarioSerializer,
+    ResumoFolhaSerializer,
     RubricaDetailSerializer,
     RubricaListSerializer,
     RubricaWriteSerializer,
 )
-from apps.payroll.services.calculo import calcular_folha
+from apps.payroll.services.calculo import FolhaFechadaError, calcular_folha
 from apps.payroll.services.holerite import gerar_pdf, montar_holerite
 from apps.payroll.services.resumo import resumo_por_area, resumo_por_servidor
 from apps.people.models import VinculoFuncional
@@ -202,6 +204,7 @@ class FolhaViewSet(viewsets.ModelViewSet):
         "holerite_pdf",
         "servidores",
         "resumo",
+        "bases",
     }
 
     def get_permissions(self):
@@ -245,6 +248,17 @@ class FolhaViewSet(viewsets.ModelViewSet):
         """GET /api/payroll/folhas/{id}/resumo/ → totais por lotação, por
         órgão emissor e geral da competência."""
         return Response(resumo_por_area(self.get_object()))
+
+    @action(detail=True, methods=["get"], url_path="bases")
+    def bases(self, request, pk=None):
+        """GET /api/payroll/folhas/{id}/bases/ → resumo persistido por vínculo
+        (Onda 4.4): totais e bases INSS/IRRF/FGTS/RPPS, insumo do eSocial."""
+        resumos = (
+            ResumoFolha.objects.filter(folha=self.get_object())
+            .select_related("servidor")
+            .order_by("servidor__nome")
+        )
+        return Response(ResumoFolhaSerializer(resumos, many=True).data)
 
     @action(detail=True, methods=["get"], url_path="holerite")
     def holerite(self, request, pk=None):
@@ -290,6 +304,11 @@ class FolhaViewSet(viewsets.ModelViewSet):
         folha: Folha = self.get_object()
         try:
             relatorio = calcular_folha(folha)
+        except FolhaFechadaError as exc:
+            return Response(
+                {"detail": str(exc), "code": "FOLHA_FECHADA"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except (DependenciaCiclicaError, DependenciaInexistenteError) as exc:
             return Response(
                 {"detail": str(exc.args[0]) if exc.args else str(exc), "code": exc.code},

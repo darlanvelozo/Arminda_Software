@@ -11,6 +11,7 @@ from .models import (
     Lancamento,
     LicencaPremioItem,
     RegimePrevidenciario,
+    ResumoFolha,
     Rubrica,
 )
 
@@ -95,6 +96,14 @@ class ComplementarItemAdmin(admin.ModelAdmin):
     list_filter = ("folha", "rubrica__tipo")
     search_fields = ("vinculo__servidor__nome", "rubrica__codigo")
     raw_id_fields = ("folha", "vinculo", "rubrica")
+
+
+@admin.register(ResumoFolha)
+class ResumoFolhaAdmin(admin.ModelAdmin):
+    list_display = ("servidor", "folha", "total_liquido", "base_inss", "base_irrf", "base_rpps")
+    list_filter = ("folha", "excluir_s1200", "excluir_s1202", "excluir_s1210")
+    search_fields = ("servidor__nome",)
+    raw_id_fields = ("folha", "vinculo", "servidor")
 
 
 @admin.register(Lancamento)

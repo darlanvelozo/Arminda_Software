@@ -1218,6 +1218,31 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/payroll/folhas/{id}/bases/:
+    get:
+      operationId: payroll_folhas_bases_retrieve
+      description: |-
+        GET /api/payroll/folhas/{id}/bases/ → resumo persistido por vínculo
+        (Onda 4.4): totais e bases INSS/IRRF/FGTS/RPPS, insumo do eSocial.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this folha.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolhaDetail'
+          description: ''
   /api/payroll/folhas/{id}/calcular/:
     post:
       operationId: payroll_folhas_calcular_create

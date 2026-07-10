@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-07-03";
+const LAST_UPDATED = "2026-07-10";
 
 interface TocItem {
   id: string;
@@ -718,6 +718,23 @@ function SectionCalculo() {
         <code className="bg-muted px-1 rounded">/esocial/eventos/{"{id}"}/assinar/</code>.
         O PFX/senha nunca são expostos por API/admin/log. Transmissão fica para a próxima
         onda; nada é enviado ao governo sem autorização explícita.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">Snapshot fiscal + ResumoFolha (Onda 4.4 — ADR-0021)</h3>
+      <p>
+        <code className="bg-muted px-1 rounded">Lancamento</code> ganhou{" "}
+        <code className="bg-muted px-1 rounded">snap_incide_inss/irrf/fgts/rpps</code> +{" "}
+        <code className="bg-muted px-1 rounded">snap_natureza_esocial</code>, congelados
+        no momento do cálculo (padrão MOVIMENTO do legado — folha paga nunca muda
+        retroativamente). Novo modelo{" "}
+        <code className="bg-muted px-1 rounded">ResumoFolha</code> (o "BASES"): 1 linha
+        por vínculo × folha com totais + bases por obrigação e flags{" "}
+        <code className="bg-muted px-1 rounded">excluir_s1200/s1202/s1210</code> —
+        insumo dos periódicos do eSocial. Endpoint{" "}
+        <code className="bg-muted px-1 rounded">/payroll/folhas/{"{id}"}/bases/</code>.
+        Folha <strong>fechada</strong> agora levanta{" "}
+        <code className="bg-muted px-1 rounded">FolhaFechadaError</code> no recálculo
+        (HTTP 400, code FOLHA_FECHADA).
       </p>
 
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
