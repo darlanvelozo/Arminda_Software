@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Relatório de desenvolvimento do Arminda — período 08/06 a 10/07/2026." />
+    <meta name="robots" content="noindex" />
+    <title>Arminda — Relatório Quinzenal #4 (08/06 – 10/07/2026)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/styles.css" />
+
+    <style>
+      .doc {
+        max-width: 820px;
+        margin: 64px auto;
+        padding: 0 24px;
+      }
+      .doc h1 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+      }
+      .doc .meta {
+        color: var(--cor-texto-fraco, #6b6b73);
+        font-size: 14px;
+        margin: 0 0 40px;
+      }
+      .doc h2 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(22px, 3vw, 30px);
+        font-weight: 600;
+        margin: 56px 0 16px;
+        letter-spacing: -0.015em;
+      }
+      .doc h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 32px 0 12px;
+      }
+      .doc p {
+        font-size: 16px;
+        line-height: 1.7;
+        margin: 12px 0;
+      }
+      .doc ul {
+        font-size: 16px;
+        line-height: 1.7;
+        padding-left: 22px;
+      }
+      .doc li {
+        margin: 6px 0;
+      }
+      .doc .resumo {
+        background: var(--cor-fundo-alt, #f7f6f3);
+        border-left: 3px solid var(--cor-marca, #2d3142);
+        padding: 20px 24px;
+        margin: 32px 0;
+        font-size: 15.5px;
+      }
+      .doc .tabela {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 32px;
+        font-size: 14.5px;
+      }
+      .doc .tabela th,
+      .doc .tabela td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--cor-borda, #e5e3dd);
+      }
+      .doc .tabela th {
+        font-weight: 600;
+        background: var(--cor-fundo-alt, #f7f6f3);
+      }
+      .doc .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin: 20px 0 40px;
+      }
+      .doc .kpi {
+        border: 1px solid var(--cor-borda, #e5e3dd);
+        border-radius: 6px;
+        padding: 16px 18px;
+      }
+      .doc .kpi-valor {
+        font-family: "Fraunces", serif;
+        font-size: 32px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .doc .kpi-label {
+        font-size: 12px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .doc .voltar {
+        display: inline-block;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: var(--cor-texto-fraco, #6b6b73);
+        text-decoration: none;
+      }
+      .doc .voltar:hover {
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        color: var(--cor-marca, #2d3142);
+      }
+      .doc .badge-prod {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .doc footer {
+        margin: 80px 0 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--cor-borda, #e5e3dd);
+        font-size: 13px;
+        color: var(--cor-texto-fraco, #6b6b73);
+      }
+      .doc code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.92em;
+        background: var(--cor-fundo-alt, #f7f6f3);
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="doc">
+      <a href="../index.html#relatorios" class="voltar">← Acompanhamento do desenvolvimento</a>
+
+      <h1>Relatório Quinzenal #4</h1>
+      <p class="meta">
+        Período: <strong>08/06/2026 a 10/07/2026</strong> · Publicado em 10/07/2026 ·
+        <span class="badge">Bloco 3 concluído → Bloco 4</span>
+        <span class="badge badge-prod">v0.21.0 em produção</span>
+      </p>
+
+      <div class="resumo">
+        <strong>Resumo executivo.</strong> O período fechou um capítulo e abriu outro.
+        O <strong>Bloco 3 (folhas especiais) foi concluído</strong> — entraram a
+        licença-prêmio e a folha complementar, completando os seis tipos de folha.
+        Em seguida o <strong>Bloco 4 (obrigações federais) foi iniciado pelo
+        eSocial</strong>, em três entregas: geração dos primeiros eventos com
+        <strong>validação contra o esquema oficial do governo</strong> (S-1000,
+        S-1005), a <strong>tabela de rubricas</strong> (natureza oficial em cada verba
+        + evento S-1010) e — o marco do período — o <strong>cofre de certificados
+        digitais e a assinatura digital ICP-Brasil</strong>, comprovada de ponta a
+        ponta com um certificado municipal real em ambiente de teste. O sistema hoje
+        <strong>gera, valida e assina</strong> eventos do eSocial; falta transmitir.
+        Também entraram no plano, formalmente especificados, o módulo de
+        <strong>regularidade fiscal (CND)</strong> e a qualificação cadastral. Em
+        números: Bloco 3 a <strong>100%</strong>, Bloco 4 a <strong>~28%</strong>,
+        <strong>517 testes</strong> verdes, v0.21.0 no ar.
+      </div>
+
+      <h2>O que foi entregue</h2>
+
+      <h3>Para o usuário-operador</h3>
+      <ul>
+        <li>
+          <strong>Licença-prêmio (v0.17.0).</strong> Folha própria para indenizar a
+          licença-prêmio não gozada: adiciona-se cada servidor com os meses (e dias) a
+          indenizar e o sistema calcula salário × meses, como verba indenizatória —
+          sem INSS nem IRRF, como manda a jurisprudência.
+        </li>
+        <li>
+          <strong>Folha complementar (v0.18.0) — fechou o Bloco 3.</strong> Para pagar
+          diferenças de um mês já fechado (reajuste retroativo, verba esquecida):
+          lança-se servidor + rubrica + valor. Sem cálculo automático de imposto no
+          complemento — decisão deliberada, porque INSS/IRRF são cumulativos no mês e
+          um cálculo isolado sairia errado; o recálculo automático está mapeado.
+        </li>
+        <li>
+          <strong>eSocial — primeiros eventos (v0.19.0).</strong> Novo menu eSocial:
+          escolhe-se o órgão emissor (cada CNPJ da prefeitura) e geram-se os eventos
+          S-1000 (empregador) e S-1005 (estabelecimentos). Cada arquivo é
+          <strong>validado contra o XSD oficial do layout S-1.3</strong> antes de
+          qualquer coisa, e pode ser baixado.
+        </li>
+        <li>
+          <strong>Tabela de rubricas do eSocial (v0.20.0).</strong> Cada rubrica
+          ganhou o de-para oficial: natureza (Tabela 3) e códigos de incidência.
+          Com isso o sistema gera o evento <strong>S-1010</strong> — pré-requisito
+          para informar a remuneração dos servidores nas próximas etapas.
+        </li>
+        <li>
+          <strong>Cofre de certificados + assinatura digital (v0.21.0).</strong> O
+          certificado digital (e-CNPJ A1) de cada órgão é guardado
+          <strong>cifrado</strong> — a senha nunca fica visível. Com ele, o botão
+          <strong>Assinar</strong> aplica a assinatura ICP-Brasil ao evento, que passa
+          a ter validade jurídica. A assinatura foi validada de ponta a ponta
+          (conferência no modelo oficial + verificação criptográfica) com um
+          certificado municipal real, em ambiente de teste.
+        </li>
+      </ul>
+
+      <h3>Para a fundação do produto</h3>
+      <ul>
+        <li>
+          <strong>Base real do sistema legado estudada.</strong> A engenharia reversa
+          de bases reais do Fiorilli SIP validou as decisões de arquitetura do Arminda
+          e reordenou o Bloco 4 com prioridades certeiras (snapshot fiscal da folha
+          fechada, resumo por servidor, eventos de remuneração — inclusive o S-1202,
+          específico do setor público). A base bruta ficou fora do repositório (LGPD);
+          só o conhecimento agregado foi versionado.
+        </li>
+        <li>
+          <strong>Paridade com o legado desbloqueada.</strong> Com a base real
+          disponível, o teste de comparação (nossa folha × folha histórica, mês a mês)
+          deixou de estar bloqueado — é um dos próximos passos.
+        </li>
+        <li>
+          <strong>Módulo de Regularidade Fiscal (CND) especificado.</strong> A partir
+          de requisitos reais de quem opera a regularização fiscal de municípios, o
+          módulo foi formalmente desenhado: situação fiscal do e-CAC, processos
+          administrativos com prazos de impugnação/recurso, alertas de caixa postal,
+          peças com fluxo de revisão e dois relatórios automáticos — com acesso
+          restrito por papel exclusivo. A fase 1 não depende de canais externos.
+        </li>
+        <li>
+          <strong>Segurança de credenciais endurecida.</strong> Certificados digitais
+          e bases com dados pessoais nunca entram no repositório (bloqueio automático
+          no controle de versão); o cofre cifra o certificado em repouso com chave
+          própria do ambiente de produção.
+        </li>
+      </ul>
+
+      <h2>Limitações conhecidas (transparência)</h2>
+      <ul>
+        <li>
+          <strong>O eSocial ainda não transmite.</strong> O ciclo atual é gerar →
+          validar → assinar. O envio ao ambiente do governo (lotes, recibos,
+          reconciliação) é a próxima fronteira e começa em homologação.
+        </li>
+        <li>
+          <strong>Eventos de remuneração (S-1200/S-1202) ainda não existem</strong> —
+          dependem do snapshot fiscal da folha fechada (onda 4.4), já planejado.
+        </li>
+        <li>
+          <strong>Folha complementar não recalcula diferenças sozinha</strong> (modo
+          acumulado mapeado como evolução).
+        </li>
+        <li>
+          <strong>Produção segue com tenant de demonstração</strong>; a entrada de um
+          município real é o gate do Bloco 6.
+        </li>
+      </ul>
+
+      <h2>Próximo período</h2>
+      <ul>
+        <li>
+          <strong>Onda 4.4</strong> — congelar o retrato fiscal ao fechar a folha +
+          resumo consolidado por servidor/competência (insumo dos eventos de
+          remuneração).
+        </li>
+        <li>
+          <strong>Onda 4.5</strong> — eventos S-1200, S-1202 (RPPS) e S-1210.
+        </li>
+        <li>
+          <strong>Transmissão ao eSocial</strong> em ambiente de homologação.
+        </li>
+        <li>
+          <strong>Qualificação cadastral</strong> e <strong>Regularidade Fiscal fase 1</strong>,
+          conforme os canais de acesso forem confirmados.
+        </li>
+      </ul>
+
+      <h2>Saúde do projeto</h2>
+      <p>
+        Cinco releases em produção no período (v0.17.0 a v0.21.0), fechando um bloco
+        inteiro e abrindo o mais crítico do produto com três entregas validadas contra
+        os esquemas oficiais do governo. A suíte de testes cresceu de 499 para
+        <strong>517 testes verdes</strong> no backend (+ 10 na interface), toda
+        entrega passou pela validação integral, e as decisões novas viraram ADRs
+        (21, 22 e 23 — total de 23 registros formais).
+      </p>
+      <p>
+        Em números: <strong>Bloco 2 a 85%</strong> (paridade desbloqueada),
+        <strong>Bloco 3 a 100%</strong>, <strong>Bloco 4 a ~28%</strong>,
+        <strong>~33% do roadmap total</strong>, <strong>v0.21.0 em produção</strong>.
+      </p>
+      <p>
+        <strong>Próximo relatório:</strong> previsto para 24/07/2026, cobrindo o
+        snapshot fiscal (4.4) e o avanço rumo aos eventos de remuneração.
+      </p>
+
+      <footer>
+        Arminda — Acompanhamento do desenvolvimento ·
+        <a href="../index.html">Voltar ao painel</a>
+      </footer>
+    </div>
+  </body>
+</html>

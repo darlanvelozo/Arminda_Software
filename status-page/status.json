@@ -5,7 +5,7 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-07-03",
+  "ultima_atualizacao": "2026-07-10",
   "bloco_atual": 4,
   "progresso_geral_pct": 33,
   "blocos": [
@@ -112,11 +112,11 @@
       "status": "em_andamento",
       "progresso_pct": 28,
       "entregas": [
-        "✅ eSocial — fundação (S-1000/S-1005) + natureza de rubrica (Tabela 3) e evento S-1010, geração de XML validada contra o XSD oficial S-1.3 (ADR-0020/0021) — Ondas 4.1 e 4.3",
-        "✅ Assinatura digital (XML-DSig, certificado ICP-Brasil A1 em cofre cifrado) — Onda 4.2",
-        "Transmissão ao ambiente do governo + reconciliação de retornos — onda futura",
-        "Demais eventos: S-1010, S-1020, S-2200/S-2299, S-1200/S-1210, etc.",
-        "SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD"
+        "✅ eSocial — geração com validação no XSD oficial S-1.3: S-1000 (empregador), S-1005 (estabelecimentos) e S-1010 (tabela de rubricas, com natureza oficial por rubrica) — Ondas 4.1 e 4.3",
+        "✅ Cofre de certificados digitais (e-CNPJ A1 cifrado por órgão) + assinatura digital ICP-Brasil (XML-DSig), validada de ponta a ponta — Onda 4.2",
+        "Transmissão ao ambiente do governo + reconciliação de retornos — próxima etapa",
+        "Snapshot fiscal da folha fechada + resumo por servidor (4.4) e eventos de remuneração S-1200/S-1202/S-1210 (4.5)",
+        "Demais eventos (S-1020, S-2200/S-2299…) e SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD (com gabaritos reais disponíveis para paridade)"
       ]
     },
     {
@@ -237,6 +237,7 @@
       "entregas": [
         "Portal da transparência (Lei 12.527/2011): folha pública por servidor com filtros por área, cargo, faixa salarial",
         "LGPD: consentimentos rastreados, anonimização de dados sensíveis, exclusão sob demanda do titular",
+        "Regularidade fiscal / CND por prefeitura (especificado — ADR-0023): situação fiscal do e-CAC, processos com prazos de impugnação/recurso, alertas de caixa postal, peças com fluxo de revisão e relatórios automáticos, com acesso restrito por papel exclusivo",
         "Certificação digital A1/A3: assinatura eletrônica em declarações, contracheques e contratos oficiais",
         "Auditoria avançada com UI navegável: timeline de quem editou o quê e quando, com diff campo a campo",
         "Acessibilidade WCAG 2.1 AA (Lei 13.146/2015): contraste, navegação por teclado, leitores de tela, descrições alternativas",
@@ -615,6 +616,11 @@
     }
   ],
   "relatorios": [
+    {
+      "data": "2026-07-10",
+      "titulo": "Relatório Quinzenal #4 — Período 08/06 a 10/07 (Bloco 3 fechado, eSocial no ar)",
+      "url": "relatorios/2026-07-10-quinzenal-04.html"
+    },
     {
       "data": "2026-06-07",
       "titulo": "Relatório Quinzenal #3 — Terceira quinzena (25/05 a 07/06)",
