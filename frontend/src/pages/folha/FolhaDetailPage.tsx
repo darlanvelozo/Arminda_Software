@@ -15,6 +15,7 @@ import {
   Calculator,
   CircleAlert,
   CircleCheck,
+  FileDown,
   FileText,
   ListChecks,
   RefreshCw,
@@ -47,7 +48,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { extractDomainErrorMessage } from "@/lib/api";
+import { api, extractDomainErrorMessage } from "@/lib/api";
 import {
   abrirHoleritePdf,
   useCalcularFolha,
@@ -112,6 +113,21 @@ export default function FolhaDetailPage() {
   const [page, setPage] = useState(1);
 
   const calcMut = useCalcularFolha();
+
+  async function exportarPdf() {
+    if (id === null || !folha) return;
+    const { data } = await api.get(`/payroll/folhas/${id}/relatorio-pdf/`, {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(data as Blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `folha-${folha.tipo}-${folha.competencia.slice(0, 7)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
   const { data: lancamentos, isLoading: loadingLanc, refetch: refetchLanc } =
     useLancamentosList({
       folha: id ?? undefined,
@@ -200,6 +216,15 @@ export default function FolhaDetailPage() {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              disabled={folha.status === "aberta"}
+              onClick={exportarPdf}
+            >
+              <FileDown className="h-4 w-4" />
+              Exportar PDF
+            </Button>
             <Button
               onClick={() => setConfirmaOpen(true)}
               disabled={!podeRecalcular || calcMut.isPending}

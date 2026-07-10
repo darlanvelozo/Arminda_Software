@@ -4,7 +4,7 @@
 > **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
 > as regras de processo (validação integral, guias vivos, etc.).
 >
-> Última atualização: **2026-07-10** · Versão atual: **v0.22.0** ·
+> Última atualização: **2026-07-10** · Versão atual: **v0.23.0** ·
 > **Bloco 4 — Obrigações legais federais: em andamento (~36%)** — Ondas **4.1**
 > (S-1000/S-1005), **4.3** (natureza de rubrica + S-1010), **4.2** (cofre de
 > certificados A1 + assinatura XML-DSig) e **4.4** (snapshot fiscal +
@@ -17,7 +17,7 @@
 > e **2.6** (tela operacional `/folha`); falta só a **2.7** (paridade
 > Fiorilli). No **Bloco 3** entregues **3.1** (13º), **3.2** (rescisão),
 > **3.3** (férias), **3.4** (licença-prêmio) e **3.5** (folha complementar)
-> — bloco fechado. **521 testes backend verde** + 10 frontend.
+> — bloco fechado. **523 testes backend verde** + 10 frontend.
 > Em produção desde **maio/2026**: https://arminda.site (Hostinger VPS).
 
 ---

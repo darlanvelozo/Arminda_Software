@@ -863,6 +863,13 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         em cada folha (totais + bases de INSS/IRRF/FGTS/RPPS) — é o insumo direto dos
         eventos de remuneração do eSocial que vêm a seguir.
       </p>
+      <p>
+        <strong>Exportar a folha em PDF:</strong> na tela da folha, o botão{" "}
+        <strong>Exportar PDF</strong> gera o relatório analítico completo — quadro
+        geral, uma linha por servidor (proventos/descontos/líquido) e totais por
+        lotação e por órgão emissor. Pronto para imprimir, anexar a processo ou
+        enviar ao controle interno.
+      </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">

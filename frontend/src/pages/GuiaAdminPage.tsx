@@ -736,6 +736,13 @@ function SectionCalculo() {
         <code className="bg-muted px-1 rounded">FolhaFechadaError</code> no recálculo
         (HTTP 400, code FOLHA_FECHADA).
       </p>
+      <p>
+        <strong>Relatório da folha em PDF:</strong>{" "}
+        <code className="bg-muted px-1 rounded">GET /payroll/folhas/{"{id}"}/relatorio-pdf/</code>{" "}
+        (ReportLab, serviço <code className="bg-muted px-1 rounded">relatorio_folha</code>) —
+        quadro geral + linha por servidor + totais por lotação/órgão; usa os mesmos
+        serviços de resumo da tela, então funciona para qualquer folha calculada.
+      </p>
 
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>

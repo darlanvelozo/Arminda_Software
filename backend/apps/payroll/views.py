@@ -59,6 +59,7 @@ from apps.payroll.serializers import (
 )
 from apps.payroll.services.calculo import FolhaFechadaError, calcular_folha
 from apps.payroll.services.holerite import gerar_pdf, montar_holerite
+from apps.payroll.services.relatorio_folha import gerar_relatorio_pdf
 from apps.payroll.services.resumo import resumo_por_area, resumo_por_servidor
 from apps.people.models import VinculoFuncional
 
@@ -205,6 +206,7 @@ class FolhaViewSet(viewsets.ModelViewSet):
         "servidores",
         "resumo",
         "bases",
+        "relatorio_pdf",
     }
 
     def get_permissions(self):
@@ -248,6 +250,18 @@ class FolhaViewSet(viewsets.ModelViewSet):
         """GET /api/payroll/folhas/{id}/resumo/ → totais por lotação, por
         órgão emissor e geral da competência."""
         return Response(resumo_por_area(self.get_object()))
+
+    @action(detail=True, methods=["get"], url_path="relatorio-pdf")
+    def relatorio_pdf(self, request, pk=None):
+        """GET /api/payroll/folhas/{id}/relatorio-pdf/ → PDF analítico da folha
+        inteira: quadro geral, linha por servidor, totais por lotação/órgão."""
+        folha = self.get_object()
+        pdf = gerar_relatorio_pdf(folha)
+        resp = HttpResponse(pdf, content_type="application/pdf")
+        resp["Content-Disposition"] = (
+            f'attachment; filename="folha-{folha.tipo}-{folha.competencia:%Y-%m}.pdf"'
+        )
+        return resp
 
     @action(detail=True, methods=["get"], url_path="bases")
     def bases(self, request, pk=None):

@@ -253,6 +253,20 @@
     {
       "data": "2026-07-10",
       "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.23.0 (folha em PDF)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 523 verde (2 testes novos do relatório em PDF). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Pronto para tag v0.23.0.",
+      "descricao": "Onda 4.4b passou pela validação integral. Sem migration; feature aditiva."
+    },
+    {
+      "data": "2026-07-10",
+      "tipo": "entrega",
+      "titulo": "Folha inteira exportável em PDF (Onda 4.4b)",
+      "resumo_executivo": "A folha de pagamento agora pode ser exportada em PDF com um clique: o relatório analítico traz o quadro geral da competência, uma linha por servidor (proventos, descontos e líquido) e os totais por lotação e por órgão emissor — pronto para imprimir, anexar a processo administrativo ou enviar ao controle interno. Complementa o contracheque individual que já existia.",
+      "descricao": "Novo serviço de relatório em PDF (ReportLab, mesmo padrão do holerite — ADR-0014) e endpoint GET /payroll/folhas/{id}/relatorio-pdf/. Botão Exportar PDF no cabeçalho da tela da folha. Funciona para qualquer folha calculada, de qualquer tipo (mensal, 13º, rescisão, férias, licença-prêmio, complementar)."
+    },
+    {
+      "data": "2026-07-10",
+      "tipo": "validacao",
       "titulo": "Validação integral antes do v0.22.0 (snapshot fiscal + BASES)",
       "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 521 verde (4 testes novos: snapshot congelado após edição de rubrica, folha fechada bloqueada, bases do resumo coerentes com os lançamentos, API de bases). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Pronto para tag v0.22.0.",
       "descricao": "Onda 4.4 passou pela validação integral. Migration payroll.0008. 521 passed (517 + 4)."

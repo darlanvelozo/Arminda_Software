@@ -35,6 +35,20 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.4b — Exportação da folha em PDF · 2026-07-10
+
+> A folha inteira exportável: relatório analítico da competência em PDF.
+
+#### Adicionado
+
+- **feat(payroll):** serviço `relatorio_folha.gerar_relatorio_pdf` (ReportLab)
+  — quadro geral, uma linha por servidor (proventos/descontos/líquido) e
+  totais por lotação e por órgão emissor. Endpoint
+  `GET /payroll/folhas/{id}/relatorio-pdf/` (download).
+- **feat(folha):** botão **Exportar PDF** no cabeçalho da tela da folha
+  (desabilitado enquanto a folha está aberta/sem cálculo).
+- 2 testes novos (523 no total). Guias atualizados.
+
 ### Onda 4.4 — Snapshot fiscal + ResumoFolha (o "BASES") · 2026-07-10
 
 > Quarta onda do Bloco 4 (ADR-0021, decisões 1 e 3). Congela o contexto fiscal
