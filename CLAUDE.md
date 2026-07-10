@@ -54,7 +54,7 @@ Ver [CHANGELOG.md](CHANGELOG.md).
 3. **[docs/PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 4. **[CHANGELOG.md](CHANGELOG.md)** — memória do projeto, toda alteração registrada
 5. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — racional das decisões de stack
-6. **[docs/adr/](docs/adr/)** — 22 ADRs (decisões formais)
+6. **[docs/adr/](docs/adr/)** — 23 ADRs (decisões formais)
 7. **CONTEXT.md específicos** quando for mexer:
    - Backend: [backend/CONTEXT.md](backend/CONTEXT.md) → [`_MODELS`](backend/CONTEXT_MODELS.md) → [`_SERVICES`](backend/CONTEXT_SERVICES.md) → [`apps/CONTEXT.md`](backend/apps/CONTEXT.md)
    - Frontend: [frontend/CONTEXT.md](frontend/CONTEXT.md) → [`pages/CONTEXT.md`](frontend/src/pages/CONTEXT.md) → [`components/CONTEXT.md`](frontend/src/components/CONTEXT.md)
@@ -245,6 +245,7 @@ Estas ADRs já estão aceitas e implementadas. Reabrir só com motivo forte:
 | 0020 | eSocial: app `esocial`, modelo genérico `EventoESocial`, geração XML + validação XSD oficial (S-1.3); assinatura/transmissão depois |
 | 0021 | Lições da base real Fiorilli: snapshot de incidência, natureza de rubrica (Tabela 3), `ResumoFolha`/BASES, S-1202 RPPS; base bruta fora do git (PII) |
 | 0022 | eSocial: cofre de certificados A1 (Fernet) por órgão + assinatura XML-DSig (signxml); `ESOCIAL_CERT_KEY` via env |
+| 0023 | Módulo Regularidade Fiscal/CND: app `fiscal` restrito (papel `assessor_fiscal`), fase 1 por importação manual, fase 2 com canal (ACT/SERPRO) |
 
 Papéis novos a criar (mapeados em [PERSONAS.md](docs/PERSONAS.md)):
 `gestor_municipio` (Bloco 7), `contador_municipio` (Bloco 9),

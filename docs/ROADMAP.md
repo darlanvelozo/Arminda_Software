@@ -309,17 +309,19 @@ Sem isso, está em risco regulatório mesmo com a folha funcionando.
 - **Certificação digital A1/A3** — assinatura eletrônica em
   declarações, contracheques e contratos oficiais (MP 2.200-2/2001).
   Reutiliza o **cofre de certificados por órgão** entregue no Bloco 4 (4.2).
-- **Monitoramento fiscal na Receita Federal (por prefeitura)** — usando o
-  certificado próprio de cada órgão, integrar-se aos serviços da Receita para:
-  (a) **consultar intimações** na Caixa Postal do e-CAC / **DTE** (Domicílio
-  Tributário Eletrônico); (b) **monitorar prazos de recurso administrativo**
-  derivados de cada intimação, com alertas antes do vencimento; (c) **puxar
-  pendências da malha fiscal** (situação fiscal do CNPJ). Integrado à folha
-  que originou a obrigação (eSocial/DCTFWeb → intimação → prazo). **Depende**
-  do cofre de certificados (4.2) e de um **canal oficial de integração**
-  (SERPRO — Integra Contador / API DTE; contrato à parte, pois a Receita não
-  expõe API pública aberta para isso). Alternativa de contingência: automação
-  assistida do e-CAC (frágil, sujeita aos termos de uso).
+- **Módulo de Regularidade Fiscal / CND (por prefeitura)** — ver **ADR-0023**
+  (escopo detalhado, com requisitos reais da assessoria que atende os
+  municípios-alvo). O indicador-rei é a **CND válida**: o módulo organiza a
+  situação fiscal do e-CAC (pendências SIEF/SIDA/SISPAR), os **processos
+  administrativos com prazos** de impugnação/recurso (inclusive TIF e RFFP),
+  as peças com workflow de revisão→protocolo, **alertas de Caixa Postal/prazo**
+  e gera automaticamente os **dois relatórios** (contabilidade × assessoria
+  jurídica) hoje feitos à mão. Acesso restrito por papel exclusivo
+  (`assessor_fiscal`). **Fase 1** (sem canal externo): importação manual dos
+  artefatos do e-CAC — já entrega valor e pode ser antecipada. **Fase 2**:
+  coleta automática via certificado/procuração digital, dependendo do canal
+  (ACT com a RFB — frente conduzida pelo cliente —, SERPRO Integra
+  Contador/DTE, ou automação assistida do e-CAC).
 - **Auditoria avançada com UI navegável** — timeline de quem editou
   o quê e quando, com diff campo a campo (UI do simple-history que
   já existe no backend).
