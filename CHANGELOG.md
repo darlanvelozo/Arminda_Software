@@ -35,6 +35,14 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Correção — layout do relatório da folha em PDF · 2026-07-10
+
+- **fix(payroll):** células de texto do relatório (servidor, lotação, grupos)
+  agora quebram linha dentro da coluna — nomes longos de lotação não estouram
+  mais sobre a coluna de valores. Teste de regressão com lotação longa.
+- **feat(payroll):** linha de **TOTAL** ao fim da tabela de servidores
+  (contagem + somas em negrito).
+
 ### Onda 4.4b — Exportação da folha em PDF · 2026-07-10
 
 > A folha inteira exportável: relatório analítico da competência em PDF.

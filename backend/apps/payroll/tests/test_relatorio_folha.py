@@ -29,7 +29,12 @@ COMP = date(2026, 7, 1)
 def _setup():
     call_command("seed_rubricas_incidencia")
     cargo = Cargo.objects.create(codigo="C1", nome="Aux", nivel_escolaridade=NivelEscolaridade.MEDIO)
-    lot = Lotacao.objects.create(codigo="L1", nome="Administração", natureza=NaturezaLotacao.ADMINISTRACAO)
+    # nome longo de propósito: regressão do estouro de coluna no PDF
+    lot = Lotacao.objects.create(
+        codigo="L1",
+        nome="Secretaria Municipal de Educação, Cultura, Esporte e Lazer",
+        natureza=NaturezaLotacao.ADMINISTRACAO,
+    )
     for i in (1, 2):
         srv = Servidor.objects.create(matricula=f"RF{i}", nome=f"Servidor {i}", cpf=f"00{i}.000.000-00",
                                       data_nascimento=date(1980, 1, 1), sexo=Sexo.MASCULINO)

@@ -52,6 +52,10 @@ def gerar_relatorio_pdf(folha: Folha) -> bytes:
         title=f"Folha {folha.get_tipo_display()} — {folha.competencia:%m/%Y}",
     )
     styles = getSampleStyleSheet()
+    # Células de texto quebram linha dentro da coluna (nomes/lotações longos).
+    from reportlab.lib.styles import ParagraphStyle
+
+    cel = ParagraphStyle("cel", parent=styles["Normal"], fontSize=8, leading=10)
     corpo: list = []
 
     # Cabeçalho
@@ -106,19 +110,37 @@ def gerar_relatorio_pdf(folha: Folha) -> bytes:
         linhas.append(
             [
                 s["servidor_matricula"],
-                s["servidor_nome"],
-                s["lotacao"] or "—",
+                Paragraph(s["servidor_nome"], cel),
+                Paragraph(s["lotacao"] or "—", cel),
                 _fmt_moeda(s["proventos"]),
                 _fmt_moeda(s["descontos"]),
                 _fmt_moeda(s["liquido"]),
             ]
         )
+    linhas.append(
+        [
+            "",
+            "TOTAL",
+            f"{len(servidores)} servidor(es)",
+            _fmt_moeda(geral["proventos"]),
+            _fmt_moeda(geral["descontos"]),
+            _fmt_moeda(geral["liquido"]),
+        ]
+    )
     t = Table(
         linhas,
-        colWidths=[20 * mm, 55 * mm, 39 * mm, 22 * mm, 22 * mm, 24 * mm],
+        colWidths=[18 * mm, 52 * mm, 44 * mm, 22 * mm, 22 * mm, 24 * mm],
         repeatRows=1,
     )
     t.setStyle(estilo_tabela)
+    t.setStyle(
+        TableStyle(
+            [
+                ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+                ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#e8ede9")),
+            ]
+        )
+    )
     corpo.append(t)
     corpo.append(Spacer(1, 6 * mm))
 
@@ -135,7 +157,7 @@ def gerar_relatorio_pdf(folha: Folha) -> bytes:
         for g in grupos:
             linhas.append(
                 [
-                    g["nome"],
+                    Paragraph(g["nome"], cel),
                     _fmt_moeda(g["proventos"]),
                     _fmt_moeda(g["descontos"]),
                     _fmt_moeda(g["liquido"]),
