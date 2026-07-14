@@ -107,6 +107,25 @@ class TestINSS:
         teto_inss = inss(Decimal("8157.41"), self.COMP)
         assert inss(Decimal("12000.00"), self.COMP) == teto_inss
 
+    def test_truncamento_por_faixa(self):
+        # Convenção do Fiorilli SIP (Onda 2.7 / ADR-0025): trunca a parcela
+        # de cada faixa antes de somar. Difere do padrão por centavos.
+        #   1518×7,5%             = 113,85    → 113,85
+        #   (2793,88-1518)×9%     = 114,8292  → 114,82 (trunca)
+        #   (4190,83-2793,88)×12% = 167,634   → 167,63 (trunca)
+        #   (8000-4190,83)×14%    = 533,2838  → 533,28 (trunca)
+        #   Total truncado = 929,58  (vs 929,60 no arred. total)
+        assert inss(Decimal("8000.00"), self.COMP) == Decimal("929.60")
+        assert inss(Decimal("8000.00"), self.COMP, arredondamento="truncar") == Decimal(
+            "929.58"
+        )
+
+    def test_truncamento_nao_afeta_faixa_exata(self):
+        # Quando as parcelas já são exatas em centavos, os dois métodos batem.
+        assert inss(Decimal("1518.00"), self.COMP, arredondamento="truncar") == inss(
+            Decimal("1518.00"), self.COMP
+        )
+
 
 # ============================================================
 # IRRF 2026 — faixas progressivas + dedução por dependente

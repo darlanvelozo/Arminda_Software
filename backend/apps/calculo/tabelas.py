@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal
+from decimal import ROUND_DOWN, Decimal
 from functools import lru_cache
 from typing import Any
 
@@ -144,13 +144,23 @@ def _parse_faixas(
     return faixas
 
 
-def inss(base: Decimal, competencia: date | str) -> Decimal:
+def inss(
+    base: Decimal, competencia: date | str, *, arredondamento: str = "round"
+) -> Decimal:
     """
     Calcula contribuição INSS progressiva sobre `base` na competência.
 
     Aplica alíquota efetiva em cada faixa (regra brasileira: a alíquota
     de uma faixa só incide sobre a parte da base que cai naquela faixa,
     NÃO sobre toda a base). Respeita o teto previdenciário.
+
+    `arredondamento` controla a convenção de centavos:
+    - `"round"` (padrão): soma exata das faixas e arredonda o total ao fim
+      (meio-a-cima). É o método alinhado à calculadora oficial.
+    - `"truncar"`: trunca a parcela de CADA faixa para centavos antes de
+      somar. É a convenção do Fiorilli SIP (e de vários sistemas legados);
+      difere do padrão por 1–2 centavos em algumas bases. Ver ADR-0025 e a
+      paridade da Onda 2.7.
     """
     comp = _resolver_competencia(competencia)
     base_d = Decimal(str(base))
@@ -164,6 +174,7 @@ def inss(base: Decimal, competencia: date | str) -> Decimal:
     teto_raw = valores.get("teto")
     teto = Decimal(str(teto_raw)) if teto_raw is not None else None
 
+    truncar_faixa = arredondamento == "truncar"
     base_aplicada = min(base_d, teto) if teto is not None else base_d
     contribuicao = Decimal(0)
     limite_inferior = Decimal(0)
@@ -173,9 +184,12 @@ def inss(base: Decimal, competencia: date | str) -> Decimal:
             break
         parte = min(base_aplicada, teto_faixa) - limite_inferior
         if parte > 0:
-            contribuicao += parte * f.aliquota
+            valor_faixa = parte * f.aliquota
+            if truncar_faixa:
+                valor_faixa = valor_faixa.quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+            contribuicao += valor_faixa
         limite_inferior = teto_faixa
-    # Arredonda para 2 casas (centavos)
+    # Arredonda o total para 2 casas (centavos)
     return contribuicao.quantize(Decimal("0.01"))
 
 

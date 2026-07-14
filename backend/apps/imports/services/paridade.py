@@ -93,6 +93,8 @@ class RelatorioParidade:
     regimes: dict[str, int] = field(default_factory=dict)
     # Alíquota efetiva de previdência observada (RPPS): {rate_str: contagem}
     rpps_aliquotas: dict[str, int] = field(default_factory=dict)
+    # Resíduo que nem o truncamento explica — casos RPPS (config do tenant)
+    residuo_rpps: dict[str, int] = field(default_factory=dict)
 
     def tributo(self, nome: str) -> ResultadoTributo:
         if nome not in self.tributos:
@@ -130,13 +132,32 @@ def comparar_competencia(
             rel.regimes[regime] = rel.regimes.get(regime, 0) + 1
 
         # --- Previdência (tabela progressiva) ---
+        # Compara os dois métodos de arredondamento: o padrão (arred. no
+        # total, alinhado à calculadora oficial) e o truncamento por faixa
+        # (convenção do SIP). O casamento sobe de ~70% para ~94% com o
+        # truncamento — o resíduo é a população RPPS (teto/aposentado), que
+        # depende da config de regime do tenant (ver categorização abaixo).
         base_prev = _dec(row.get("baseprevidenciames"))
         valor_prev = _dec(row.get("valorprevidenciames"))
         if base_prev > 0:
             aliq = (valor_prev / base_prev).quantize(Decimal("0.0001"))
             rel.rpps_aliquotas[str(aliq)] = rel.rpps_aliquotas.get(str(aliq), 0) + 1
-            nosso_prev = inss(base_prev, competencia)
-            rel.tributo("Previdência (progressiva)").registrar(nosso_prev, valor_prev)
+            rel.tributo("Previdência (arred. total)").registrar(
+                inss(base_prev, competencia), valor_prev
+            )
+            trunc = inss(base_prev, competencia, arredondamento="truncar")
+            rel.tributo("Previdência (trunc. por faixa)").registrar(trunc, valor_prev)
+            # Caracteriza o resíduo: casos que não batem nem por truncamento
+            # são RPPS-específicos (imunidade de aposentado ou teto próprio).
+            if (trunc - valor_prev).copy_abs() > CENTAVO:
+                if valor_prev == 0:
+                    rel.residuo_rpps["aposentado/imune (base>0, valor=0)"] = (
+                        rel.residuo_rpps.get("aposentado/imune (base>0, valor=0)", 0) + 1
+                    )
+                else:
+                    rel.residuo_rpps["RPPS c/ teto ou regra própria"] = (
+                        rel.residuo_rpps.get("RPPS c/ teto ou regra própria", 0) + 1
+                    )
 
         # --- IRRF (federal, todos os regimes) ---
         # BASEIRRFMES é a base ANTES da dedução; DEDUIRRFMES é a dedução total

@@ -79,13 +79,25 @@ class TestParidadePrevidencia:
         # base 1518 (1º piso 2025) → INSS 7,5% = 113,85
         bases = [_base("1", baseprevidenciames="1518.00", valorprevidenciames="113.85")]
         rel = comparar_competencia(competencia=COMP, bases=bases)
-        assert rel.tributos["Previdência (progressiva)"].exatos == 1
+        assert rel.tributos["Previdência (trunc. por faixa)"].exatos == 1
 
     def test_aliquota_efetiva_registrada(self):
         bases = [_base("1", baseprevidenciames="1518.00", valorprevidenciames="113.85")]
         rel = comparar_competencia(competencia=COMP, bases=bases)
         # 113,85 / 1518 = 0,075 → registrada no histograma
         assert rel.rpps_aliquotas.get("0.0750") == 1
+
+    def test_residuo_aposentado_imune(self):
+        # Base > 0, valor = 0 → aposentado/imune; entra no resíduo RPPS.
+        bases = [_base("1", baseprevidenciames="3000.00", valorprevidenciames="0")]
+        rel = comparar_competencia(competencia=COMP, bases=bases)
+        assert rel.residuo_rpps.get("aposentado/imune (base>0, valor=0)") == 1
+
+    def test_residuo_rpps_teto(self):
+        # Valor que não bate nem por truncamento e ≠ 0 → RPPS com regra própria.
+        bases = [_base("1", baseprevidenciames="5000.00", valorprevidenciames="992.21")]
+        rel = comparar_competencia(competencia=COMP, bases=bases)
+        assert rel.residuo_rpps.get("RPPS c/ teto ou regra própria") == 1
 
 
 @pytest.mark.django_db
@@ -112,4 +124,4 @@ def test_relatorio_agrega_multiplos_servidores():
     assert rel.total_servidores == 3
     assert rel.tributos["IRRF"].comparados == 2
     assert rel.tributos["IRRF"].taxa_acerto == 50.0
-    assert rel.tributos["Previdência (progressiva)"].exatos == 1
+    assert rel.tributos["Previdência (trunc. por faixa)"].exatos == 1

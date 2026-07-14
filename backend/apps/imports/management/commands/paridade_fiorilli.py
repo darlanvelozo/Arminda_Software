@@ -134,6 +134,12 @@ class Command(BaseCommand):
                 ))
             w("")
 
+        if rel.residuo_rpps:
+            w(self.style.NOTICE("[Resíduo previdência — casos RPPS (config do tenant)]"))
+            for cat, n in sorted(rel.residuo_rpps.items(), key=lambda kv: -kv[1]):
+                w(f"  {cat}: {n}")
+            w("")
+
         if rel.rpps_aliquotas:
             w(self.style.NOTICE("[Previdência — alíquota efetiva observada (SIP)]"))
             top = sorted(rel.rpps_aliquotas.items(), key=lambda kv: -kv[1])[:8]
