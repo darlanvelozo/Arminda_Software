@@ -14,17 +14,25 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
 from apps.core.permissions import IsFinanceiroMunicipio, IsLeituraMunicipio
-from apps.esocial.models import CertificadoDigital, EventoESocial
+from apps.esocial.models import CertificadoDigital, EventoESocial, LoteESocial
 from apps.esocial.serializers import (
     CertificadoDigitalSerializer,
     EventoESocialSerializer,
     GerarEventoSerializer,
     GerarEventosFolhaSerializer,
+    LoteESocialSerializer,
+    MontarLoteSerializer,
     UploadCertificadoSerializer,
 )
 from apps.esocial.services.assinatura import SemCertificado, assinar_evento
 from apps.esocial.services.cofre import CertificadoInvalido, guardar_certificado
 from apps.esocial.services.geracao import gerar_evento, gerar_remuneracoes_da_folha
+from apps.esocial.services.transmissao import (
+    LoteInvalido,
+    TransmissaoDesabilitada,
+    enviar_lote,
+    montar_lote,
+)
 from apps.esocial.services.validacao import ErroValidacaoXSD
 from apps.payroll.models import Folha, Rubrica
 from apps.people.models import OrgaoEmissor
@@ -131,6 +139,59 @@ class EventoESocialViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
         return Response(self.get_serializer(evento).data)
+
+
+class LoteESocialViewSet(viewsets.ReadOnlyModelViewSet):
+    """Lotes de envio ao eSocial (Onda 4.6). Montagem via /montar; envio
+    gateado por configuração (primeiro envio será supervisionado)."""
+
+    queryset = LoteESocial.objects.select_related("orgao_emissor").all()
+    serializer_class = LoteESocialSerializer
+    filterset_fields = ["orgao_emissor", "status", "grupo"]
+    ordering = ["-criado_em"]
+
+    READ_ACTIONS = {"list", "retrieve", "baixar"}
+
+    def get_permissions(self):
+        if self.action in self.READ_ACTIONS:
+            return [IsLeituraMunicipio()]
+        return [IsFinanceiroMunicipio()]
+
+    @action(detail=False, methods=["post"], url_path="montar")
+    def montar(self, request):
+        entrada = MontarLoteSerializer(data=request.data)
+        entrada.is_valid(raise_exception=True)
+        dados = entrada.validated_data
+        try:
+            orgao = OrgaoEmissor.objects.get(pk=dados["orgao_emissor"])
+        except OrgaoEmissor.DoesNotExist:
+            return Response({"detail": "Órgão emissor não encontrado."},
+                            status=status.HTTP_404_NOT_FOUND)
+        eventos = list(EventoESocial.objects.filter(pk__in=dados["eventos"]))
+        try:
+            lote = montar_lote(orgao, eventos)
+        except LoteInvalido as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(self.get_serializer(lote).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="enviar")
+    def enviar(self, request, pk=None):
+        lote = self.get_object()
+        try:
+            enviar_lote(lote)
+        except TransmissaoDesabilitada as exc:
+            return Response(
+                {"detail": str(exc), "code": "TRANSMISSAO_DESABILITADA"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(self.get_serializer(lote).data)
+
+    @action(detail=True, methods=["get"], url_path="baixar")
+    def baixar(self, request, pk=None):
+        lote = self.get_object()
+        resp = HttpResponse(lote.xml_envio, content_type="application/xml; charset=utf-8")
+        resp["Content-Disposition"] = f'attachment; filename="lote-{lote.pk}.xml"'
+        return resp
 
 
 class CertificadoDigitalViewSet(viewsets.ReadOnlyModelViewSet):

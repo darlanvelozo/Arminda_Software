@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import CertificadoDigital, EventoESocial
+from .models import CertificadoDigital, EventoESocial, LoteESocial
 
 
 @admin.register(EventoESocial)
@@ -15,6 +15,14 @@ class EventoESocialAdmin(admin.ModelAdmin):
     raw_id_fields = ("orgao_emissor", "rubrica")
     readonly_fields = ("id_evento", "xml", "versao_layout")
     date_hierarchy = "criado_em"
+
+
+@admin.register(LoteESocial)
+class LoteESocialAdmin(admin.ModelAdmin):
+    list_display = ("id", "orgao_emissor", "grupo", "status", "protocolo_envio", "criado_em")
+    list_filter = ("grupo", "status")
+    raw_id_fields = ("orgao_emissor",)
+    readonly_fields = ("xml_envio", "xml_retorno", "protocolo_envio")
 
 
 @admin.register(CertificadoDigital)

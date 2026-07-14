@@ -885,6 +885,17 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         <strong>backup diário automatizado</strong> do banco de produção.
       </p>
 
+      <h3 className="text-base font-semibold mt-4">eSocial — lotes de envio prontos (Onda 4.6)</h3>
+      <p>
+        A camada de <strong>transmissão</strong> foi construída: os eventos{" "}
+        <strong>assinados</strong> agora podem ser agrupados em <strong>lotes de
+        envio</strong> no formato oficial do eSocial (validados contra o esquema de
+        comunicação do governo, com o certificado do cofre autenticando a conexão).
+        Por segurança, o <strong>botão de enviar fica bloqueado por configuração</strong>:
+        o primeiro envio real será feito em ambiente de homologação, em sessão
+        supervisionada — ligar é uma decisão explícita, nunca um acidente.
+      </p>
+
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>
       <ul className="space-y-3">
         <FlowItem

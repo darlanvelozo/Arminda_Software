@@ -56,6 +56,10 @@ class EventoESocial(TimeStampedModel):
         "people.VinculoFuncional", on_delete=models.PROTECT, null=True, blank=True,
         related_name="eventos_esocial",
     )
+    lote_envio = models.ForeignKey(
+        "LoteESocial", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="eventos",
+    )
     id_evento = models.CharField(
         "ID do evento", max_length=36, unique=True,
         help_text="ID único do eSocial (ID + inscrição + timestamp + sequencial).",
@@ -77,6 +81,42 @@ class EventoESocial(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.tipo} · {self.orgao_emissor.cnpj} · {self.get_status_display()}"
+
+
+class GrupoLote(models.IntegerChoices):
+    TABELAS = 1, "Eventos de tabela"
+    NAO_PERIODICOS = 2, "Eventos não periódicos"
+    PERIODICOS = 3, "Eventos periódicos"
+
+
+class StatusLote(models.TextChoices):
+    MONTADO = "montado", "Montado (validado)"
+    ENVIADO = "enviado", "Enviado"
+    PROCESSADO = "processado", "Processado"
+    ERRO = "erro", "Erro"
+
+
+class LoteESocial(TimeStampedModel):
+    """Lote de envio ao webservice do eSocial (Onda 4.6 — ADR-0024)."""
+
+    orgao_emissor = models.ForeignKey(
+        OrgaoEmissor, on_delete=models.PROTECT, related_name="lotes_esocial"
+    )
+    grupo = models.IntegerField(choices=GrupoLote.choices)
+    status = models.CharField(
+        max_length=12, choices=StatusLote.choices, default=StatusLote.MONTADO
+    )
+    protocolo_envio = models.CharField(max_length=60, blank=True)
+    xml_envio = models.TextField(blank=True)
+    xml_retorno = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+        verbose_name = "lote eSocial"
+        verbose_name_plural = "lotes eSocial"
+
+    def __str__(self) -> str:
+        return f"Lote #{self.pk} · {self.get_grupo_display()} · {self.get_status_display()}"
 
 
 class CertificadoDigital(TimeStampedModel):

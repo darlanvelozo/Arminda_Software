@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.esocial.models import CertificadoDigital, EventoESocial
+from apps.esocial.models import CertificadoDigital, EventoESocial, LoteESocial
 
 
 class EventoESocialSerializer(serializers.ModelSerializer):
@@ -42,6 +42,31 @@ class GerarEventosFolhaSerializer(serializers.Serializer):
     orgao_emissor = serializers.IntegerField()
     folha = serializers.IntegerField()
     incluir_pagamentos = serializers.BooleanField(required=False, default=False)
+
+
+class LoteESocialSerializer(serializers.ModelSerializer):
+    """Lote de envio (Onda 4.6). O XML completo sai no endpoint `baixar`."""
+
+    grupo_display = serializers.CharField(source="get_grupo_display", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+    orgao_nome = serializers.CharField(source="orgao_emissor.nome", read_only=True)
+    eventos_count = serializers.IntegerField(source="eventos.count", read_only=True)
+
+    class Meta:
+        model = LoteESocial
+        fields = [
+            "id", "orgao_emissor", "orgao_nome", "grupo", "grupo_display",
+            "status", "status_display", "protocolo_envio", "eventos_count",
+            "criado_em",
+        ]
+        read_only_fields = fields
+
+
+class MontarLoteSerializer(serializers.Serializer):
+    """Entrada para montar um lote com eventos assinados."""
+
+    orgao_emissor = serializers.IntegerField()
+    eventos = serializers.ListField(child=serializers.IntegerField(), min_length=1)
 
 
 class CertificadoDigitalSerializer(serializers.ModelSerializer):

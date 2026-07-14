@@ -761,6 +761,27 @@ function SectionCalculo() {
         em cron.daily (pg_dump -Fc + cópia do .env, retenção 14 dias, /opt/arminda-backups).
       </p>
 
+      <h3 className="text-base font-semibold mt-4">eSocial — transmissão em lotes (Onda 4.6 — ADR-0024)</h3>
+      <p>
+        Modelo <code className="bg-muted px-1 rounded">LoteESocial</code> (grupo 1/2/3,
+        status montado→enviado→processado/erro) + FK{" "}
+        <code className="bg-muted px-1 rounded">EventoESocial.lote_envio</code>.{" "}
+        <code className="bg-muted px-1 rounded">montar_lote</code> aceita só eventos{" "}
+        <strong>assinados</strong> do mesmo grupo (máx. 50) e valida o envelope{" "}
+        <code className="bg-muted px-1 rounded">envioLoteEventos</code> contra o XSD
+        oficial de comunicação (v1.5.0, versionado). Cliente SOAP 1.2 com{" "}
+        <strong>mTLS</strong> (material do cofre em PEM temporário efêmero).{" "}
+        <strong>Envio gateado</strong>:{" "}
+        <code className="bg-muted px-1 rounded">ESOCIAL_TRANSMISSAO_HABILITADA</code>{" "}
+        (default False) + <code className="bg-muted px-1 rounded">ESOCIAL_AMBIENTE</code>{" "}
+        (producao_restrita|producao) — sem isso,{" "}
+        <code className="bg-muted px-1 rounded">TransmissaoDesabilitada</code>. API{" "}
+        <code className="bg-muted px-1 rounded">/esocial/lotes/</code> (+{" "}
+        <code className="bg-muted px-1 rounded">montar</code>,{" "}
+        <code className="bg-muted px-1 rounded">{"{id}"}/enviar</code>,{" "}
+        <code className="bg-muted px-1 rounded">{"{id}"}/baixar</code>).
+      </p>
+
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>
       <p>
         <code className="bg-muted px-1 rounded">apps.payroll.services.resumo</code>{" "}

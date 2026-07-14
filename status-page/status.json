@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-07-13",
   "bloco_atual": 4,
-  "progresso_geral_pct": 36,
+  "progresso_geral_pct": 37,
   "blocos": [
     {
       "numero": 0,
@@ -111,11 +111,11 @@
       "data_fim_prevista": "2026-11-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 48,
+      "progresso_pct": 55,
       "entregas": [
         "✅ eSocial — geração com validação no XSD oficial S-1.3: S-1000 (empregador), S-1005 (estabelecimentos) e S-1010 (tabela de rubricas, com natureza oficial por rubrica) — Ondas 4.1 e 4.3",
         "✅ Cofre de certificados digitais (e-CNPJ A1 cifrado por órgão) + assinatura digital ICP-Brasil (XML-DSig), validada de ponta a ponta — Onda 4.2",
-        "Transmissão ao ambiente do governo + reconciliação de retornos — próxima etapa",
+        "✅ Transmissão em lotes — camada completa (lotes oficiais validados + cliente com o certificado autenticando a conexão), com o envio bloqueado por configuração até o teste supervisionado em homologação — Onda 4.6",
         "✅ Snapshot fiscal + ResumoFolha (4.4) e eventos de remuneração S-1200/S-1202 (RPPS) + pagamentos S-1210, gerados em lote por folha e validados no XSD oficial — Onda 4.5",
         "Demais eventos (S-1020, S-2200/S-2299…) e SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD (com gabaritos reais disponíveis para paridade)"
       ]
@@ -251,6 +251,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-07-13",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.25.0 (transmissão em lotes)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 534 verde (6 testes novos: lote válido contra o XSD de comunicação, eventos não assinados barrados, grupos misturados barrados, envio bloqueado por default, ambiente obrigatório, API montar+enviar gateado). Frontend sem mudanças de código (guias atualizados). Pronto para tag v0.25.0.",
+      "descricao": "Onda 4.6 passou pela validação integral. Migration esocial.0005; XSDs de comunicação v1.5.0 versionados; dependência nova requests."
+    },
+    {
+      "data": "2026-07-13",
+      "tipo": "entrega",
+      "titulo": "eSocial: lotes de envio prontos, com envio protegido (Onda 4.6)",
+      "resumo_executivo": "A última peça do ciclo do eSocial foi construída: os eventos assinados agora são agrupados em lotes no formato oficial do governo (validados contra o esquema de comunicação) e o sistema tem o cliente de envio pronto, autenticando a conexão com o certificado digital do órgão. Por segurança, o envio real fica bloqueado por configuração — ligar é uma decisão explícita, e o primeiro envio será feito em ambiente de homologação, em sessão supervisionada. Com isso o eSocial no sistema cobre o ciclo inteiro: cadastros, rubricas, remuneração por servidor, assinatura digital e lote de envio.",
+      "descricao": "Onda 4.6 (ADR-0024). Modelo LoteESocial (grupos 1/2/3, status, protocolo) e montagem que aceita apenas eventos assinados do mesmo grupo (máx. 50), com o envelope envioLoteEventos validado contra o XSD oficial de comunicação v1.5.0. Cliente SOAP 1.2 com mTLS usando o material do cofre (decifrado em memória, PEM temporário efêmero). Envio gateado por variáveis de ambiente (desabilitado por default; ambiente producao_restrita/producao explícito). API de lotes (montar, enviar, baixar) e admin."
+    },
     {
       "data": "2026-07-13",
       "tipo": "validacao",

@@ -52,6 +52,9 @@ lxml==6.1.1
 cryptography==49.0.0
 signxml==5.0.1
 
+# Cliente HTTP do webservice do eSocial (transmissão em lotes) — ADR-0024.
+requests==2.34.2
+
 # ============================================================
 # Dev dependencies
 # ============================================================

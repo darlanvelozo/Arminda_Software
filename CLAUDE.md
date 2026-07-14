@@ -17,17 +17,18 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.24.0` (Onda 4.5 — eSocial: remuneração S-1200/S-1202 + S-1210)
-- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~48%)** — eSocial: S-1000/S-1005 (4.1), S-1010 (4.3), cofre + assinatura (4.2), snapshot fiscal + `ResumoFolha` (4.4) e periódicos S-1200/S-1202/S-1210 em lote (4.5). Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
+- **Versão atual:** `v0.25.0` (Onda 4.6 — eSocial: transmissão em lotes, envio gateado)
+- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~55%)** — eSocial completo até o lote: geração (4.1/4.3), cofre+assinatura (4.2), snapshot+BASES (4.4), periódicos (4.5) e transmissão em lotes gateada (4.6). Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
-- **Testes:** 528 backend (pytest) + 10 frontend (vitest), todos verdes
+- **Testes:** 534 backend (pytest) + 10 frontend (vitest), todos verdes
 - **Repositório:** público no GitHub — **não commitar secrets** sob nenhuma hipótese
 - **Roadmap:** 11 blocos (0–10), previsão de v1 completa em dez/2027 (ver [docs/ROADMAP.md](docs/ROADMAP.md))
 
-Próximo passo natural (Bloco 4): **transmissão** dos eventos assinados ao
-webservice do eSocial (lotes + recibos + reconciliação) — homologação primeiro,
-só com autorização explícita. Também mapeado: qualificação
+Próximo passo natural: **primeiro envio supervisionado em homologação** (ligar
+ESOCIAL_TRANSMISSAO_HABILITADA + ESOCIAL_AMBIENTE=producao_restrita com o
+cliente presente) e a consulta de recibos/reconciliação; ou abrir a frente da
+qualificação cadastral / módulo fiscal (ADR-0023). Também mapeado: qualificação
 cadastral e monitoramento fiscal na Receita (canal SERPRO/e-CAC — Bloco 10).
 Em paralelo, a **2.7** (paridade Fiorilli) fecha o Bloco 2 (base SJB disponível).
 Ver [CHANGELOG.md](CHANGELOG.md).
@@ -53,7 +54,7 @@ Ver [CHANGELOG.md](CHANGELOG.md).
 3. **[docs/PERSONAS.md](docs/PERSONAS.md)** — quem usa o sistema (matriz Persona × Bloco)
 4. **[CHANGELOG.md](CHANGELOG.md)** — memória do projeto, toda alteração registrada
 5. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — racional das decisões de stack
-6. **[docs/adr/](docs/adr/)** — 23 ADRs (decisões formais)
+6. **[docs/adr/](docs/adr/)** — 24 ADRs (decisões formais)
 7. **CONTEXT.md específicos** quando for mexer:
    - Backend: [backend/CONTEXT.md](backend/CONTEXT.md) → [`_MODELS`](backend/CONTEXT_MODELS.md) → [`_SERVICES`](backend/CONTEXT_SERVICES.md) → [`apps/CONTEXT.md`](backend/apps/CONTEXT.md)
    - Frontend: [frontend/CONTEXT.md](frontend/CONTEXT.md) → [`pages/CONTEXT.md`](frontend/src/pages/CONTEXT.md) → [`components/CONTEXT.md`](frontend/src/components/CONTEXT.md)
@@ -245,6 +246,7 @@ Estas ADRs já estão aceitas e implementadas. Reabrir só com motivo forte:
 | 0021 | Lições da base real Fiorilli: snapshot de incidência, natureza de rubrica (Tabela 3), `ResumoFolha`/BASES, S-1202 RPPS; base bruta fora do git (PII) |
 | 0022 | eSocial: cofre de certificados A1 (Fernet) por órgão + assinatura XML-DSig (signxml); `ESOCIAL_CERT_KEY` via env |
 | 0023 | Módulo Regularidade Fiscal/CND: app `fiscal` restrito (papel `assessor_fiscal`), fase 1 por importação manual, fase 2 com canal (ACT/SERPRO) |
+| 0024 | eSocial: transmissão em lotes (XSD de comunicação, SOAP mTLS via cofre), envio gateado por `ESOCIAL_TRANSMISSAO_HABILITADA`+`ESOCIAL_AMBIENTE` |
 
 Papéis novos a criar (mapeados em [PERSONAS.md](docs/PERSONAS.md)):
 `gestor_municipio` (Bloco 7), `contador_municipio` (Bloco 9),

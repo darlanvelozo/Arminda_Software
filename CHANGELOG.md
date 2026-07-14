@@ -35,6 +35,33 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.6 — eSocial: transmissão em lotes (camada pronta, envio gateado) · 2026-07-13
+
+> Última peça do ciclo (ADR-0024): lotes no formato oficial + cliente SOAP
+> mTLS. O envio real fica bloqueado por configuração até o teste
+> supervisionado em homologação.
+
+#### Adicionado
+
+- **feat(esocial):** modelo `LoteESocial` (grupo, status, protocolo, XMLs) +
+  FK `EventoESocial.lote_envio` (migration 0005).
+- **feat(esocial.services.transmissao):** `montar_lote` — só eventos
+  **assinados**, mesmo grupo, máx. 50; envelope `envioLoteEventos` validado
+  contra o XSD oficial de comunicação (v1.5.0, versionado em
+  `schemas/comunicacao/`). `enviar_lote` — SOAP 1.2 com mTLS (certificado do
+  cofre em PEM temporário efêmero), **gateado** por
+  `ESOCIAL_TRANSMISSAO_HABILITADA` (default False) + `ESOCIAL_AMBIENTE`;
+  extrai `protocoloEnvio` do retorno.
+- **feat(esocial):** API `/esocial/lotes/` + actions `montar`, `{id}/enviar`
+  (400 `TRANSMISSAO_DESABILITADA` enquanto bloqueado) e `{id}/baixar`. Admin.
+- Dep nova: `requests`. 6 testes novos (534 no total).
+
+#### Impacto
+
+- Migration `esocial.0005`. Envs novos (opcionais; default seguro):
+  `ESOCIAL_TRANSMISSAO_HABILITADA`, `ESOCIAL_AMBIENTE`. O ciclo do eSocial
+  está completo — ligar o envio é decisão explícita de configuração.
+
 ### Onda 4.5 — eSocial: remuneração S-1200/S-1202 + pagamentos S-1210 · 2026-07-13
 
 > O coração do eSocial: a folha de cada servidor vira evento oficial. O

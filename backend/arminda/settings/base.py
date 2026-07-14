@@ -268,3 +268,9 @@ ESOCIAL_CERT_KEY = env(
     "ESOCIAL_CERT_KEY",
     default="a7Sjy6mkq3KpkmeF1LanxkPj_q8xeOyeDrkVpyQ8TvI=",  # só dev/testes
 )
+
+# eSocial — transmissão (Onda 4.6 — ADR-0024). O envio ao webservice do
+# governo fica DESABILITADO por default; ligar exige decisão explícita
+# (env) + ambiente definido. O primeiro envio será supervisionado.
+ESOCIAL_TRANSMISSAO_HABILITADA = env.bool("ESOCIAL_TRANSMISSAO_HABILITADA", default=False)
+ESOCIAL_AMBIENTE = env("ESOCIAL_AMBIENTE", default="")
