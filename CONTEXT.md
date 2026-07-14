@@ -4,7 +4,7 @@
 > **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
 > as regras de processo (validação integral, guias vivos, etc.).
 >
-> Última atualização: **2026-07-10** · Versão atual: **v0.25.0** ·
+> Última atualização: **2026-07-13** · Versão atual: **v0.26.0** ·
 > **Bloco 4 — Obrigações legais federais: em andamento (~55%)** — Ondas **4.1**
 > (S-1000/S-1005), **4.3** (natureza de rubrica + S-1010), **4.2** (cofre de
 > certificados A1 + assinatura XML-DSig) e **4.4** (snapshot fiscal +

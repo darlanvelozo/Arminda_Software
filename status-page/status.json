@@ -7,7 +7,7 @@
   },
   "ultima_atualizacao": "2026-07-13",
   "bloco_atual": 4,
-  "progresso_geral_pct": 37,
+  "progresso_geral_pct": 38,
   "blocos": [
     {
       "numero": 0,
@@ -71,7 +71,7 @@
       "data_fim_prevista": "2026-08-31",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 85,
+      "progresso_pct": 90,
       "entregas": [
         "✅ Linguagem de fórmulas configurável (DSL via Python AST whitelist, ADR-0012) — Onda 2.1",
         "✅ Cálculo de folha mensal ordinária (toposort de rubricas + serviço idempotente + endpoint /calcular/) — Onda 2.2",
@@ -81,7 +81,7 @@
         "✅ Exportação da folha inteira em PDF — quadro geral, linha por servidor e totais por lotação/órgão (Onda 4.4b)",
         "✅ Refinos operacionais: aba Servidores (resumo por servidor + holerite) e totais por lotação/órgão — v0.13.0",
         "✅ Tela /folha operacional (lista, criar, calcular/recalcular com confirmação, relatório do último cálculo, tabs de lançamentos e erros) — Onda 2.6",
-        "Testes de paridade contra Fiorilli — Onda 2.7"
+        "✅ Testes de paridade contra o sistema atual da prefeitura — motor tributário validado centavo a centavo sobre a folha real de um município (~1.260 servidores/mês): imposto de renda ~99% e previdência do regime geral em 100% da população aplicável. O resíduo é o regime próprio (RPPS), que depende da norma previdenciária do município — Onda 2.7"
       ]
     },
     {
@@ -251,6 +251,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-07-13",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.26.0 (paridade Fiorilli)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 547 verde (13 testes novos: harness de paridade com bases sintéticas, modo de truncamento do INSS por faixa, categorização do resíduo previdenciário). Frontend: lint sem erros, tsc limpo, vitest 10 verde, build ok. Pronto para tag v0.26.0.",
+      "descricao": "Onda 2.7. Nenhuma mudança de comportamento em produção — o modo de truncamento é opt-in. Base bruta e dados pessoais fora do repositório."
+    },
+    {
+      "data": "2026-07-13",
+      "tipo": "entrega",
+      "titulo": "Motor de cálculo validado contra o sistema atual (Onda 2.7)",
+      "resumo_executivo": "O coração do sistema — o cálculo de impostos e contribuições da folha — foi conferido centavo a centavo contra a folha real de um município de cerca de 1.260 servidores por mês, competências de 2024 e 2025. O resultado confirma a paridade do motor: o imposto de renda bate em cerca de 99% dos casos e a previdência do regime geral em 100% da população aplicável. A diferença restante se concentra no regime próprio de previdência (RPPS), que depende da norma previdenciária de cada município para ser configurado. Esse trabalho também comprovou, de brinde, que a migração de uma base real (quase 2.900 vínculos) roda sem erros — reduzindo o risco do piloto. A conferência é feita por uma ferramenta interna que só lê a folha antiga e compara totais, sem expor nenhum dado pessoal.",
+      "descricao": "Onda 2.7 (ADR-0025). Harness manage.py paridade_fiorilli (read-only, relatório agregado sem PII); inss() com modo de arredondamento opt-in (truncamento por faixa, convenção do sistema legado); importador robusto a base real. 547 testes verdes."
+    },
     {
       "data": "2026-07-13",
       "tipo": "validacao",

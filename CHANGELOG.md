@@ -35,6 +35,46 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 2.7 — Paridade Fiorilli: motor tributário validado (v0.26.0) · 2026-07-13
+
+> Fecha a lacuna de validação do Bloco 2: o cálculo do Arminda foi comparado,
+> centavo a centavo, contra a folha real do sistema atual (Fiorilli SIP) de um
+> município de ~1.260 servidores/mês, competências 2024–2025 (ADR-0025).
+
+#### Adicionado
+
+- **feat(imports.paridade):** harness `manage.py paridade_fiorilli` — lê a
+  folha calculada do SIP (tabela `BASES`) direto do Firebird (read-only, nada
+  persistido) e roda as **nossas** funções de produção (`apps.calculo.tabelas`)
+  sobre as mesmas bases, medindo o casamento (tolerância 1 centavo). Relatório
+  **agregado e sem PII** — só contagens, taxas e faixas de magnitude.
+- **feat(calculo):** `inss()` ganha `arredondamento="round"|"truncar"`. O
+  padrão preserva o comportamento oficial e todos os testes; `"truncar"`
+  reproduz a convenção do SIP (trunca cada faixa) e é **opt-in**.
+- **feat(imports):** importador robusto a base real — auth legada do Firebird
+  (`--auth-plugin`/`--no-wire-crypt`), fallback de lotação (`DIVISAO` +
+  sentinela). Validado end-to-end: ~2.900 vínculos, 0 erros.
+- **docs:** ADR-0025 (truncamento INSS, seleção por-município, RPPS pendente).
+- 13 testes novos (547 no total).
+
+#### Resultado
+
+- **IRRF: 98,8%–99,5%** exato à vista. Motor em paridade.
+- **Previdência: 94,2%** com truncamento por faixa — 100% da população RGPS
+  aplicável. O resíduo (~6%) é **exclusivamente RPPS** (teto próprio +
+  imunidade de aposentado), que depende da regulação do município.
+
+#### Impacto
+
+- Nenhuma mudança de comportamento em produção: o modo `truncar` é opt-in e
+  ainda não está fiado no cálculo da folha. Motor tributário validado.
+
+#### Próximos passos
+
+- Fiar o truncamento na folha (decisão de produto: default global vs
+  por-município). Carregar o RPPS real do município + modelar a imunidade de
+  aposentado para fechar a previdência a 100%.
+
 ### Onda 4.6 — eSocial: transmissão em lotes (camada pronta, envio gateado) · 2026-07-13
 
 > Última peça do ciclo (ADR-0024): lotes no formato oficial + cliente SOAP

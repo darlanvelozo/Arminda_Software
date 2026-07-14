@@ -17,8 +17,8 @@
 de pessoal para prefeituras brasileiras**. Substitui Fiorilli SIP e
 similares com paridade legal + UX moderna + multi-tenant nativo.
 
-- **Versão atual:** `v0.25.0` (Onda 4.6 — eSocial: transmissão em lotes, envio gateado)
-- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~55%)** — eSocial completo até o lote: geração (4.1/4.3), cofre+assinatura (4.2), snapshot+BASES (4.4), periódicos (4.5) e transmissão em lotes gateada (4.6). Bloco 3 concluído. Bloco 2 a 85% (a 2.7 está desbloqueada — base real do SIP disponível)
+- **Versão atual:** `v0.26.0` (Onda 2.7 — paridade Fiorilli: motor tributário validado vs base real)
+- **Bloco corrente:** **Bloco 4 — Obrigações legais federais: em andamento (~55%)** — eSocial completo até o lote: geração (4.1/4.3), cofre+assinatura (4.2), snapshot+BASES (4.4), periódicos (4.5) e transmissão em lotes gateada (4.6). Bloco 3 concluído. **Bloco 2 a ~90%** — Onda 2.7 validou o motor tributário em paridade contra a base real do SIP (IRRF ~99%, previdência RGPS 100% da população aplicável com truncamento por faixa; resíduo é exclusivamente RPPS, dependente da norma do município — ADR-0025)
 - **Produção:** https://arminda.site (Hostinger VPS, HTTPS válido, Postgres dedicado, gunicorn + Nginx + systemd)
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/ (GitHub Pages, atualiza via push em `main`)
 - **Testes:** 534 backend (pytest) + 10 frontend (vitest), todos verdes

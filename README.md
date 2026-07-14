@@ -10,7 +10,7 @@ Sistema SaaS de folha de pagamento e gestão de pessoal para prefeituras brasile
 
 🟢 **Em produção** — https://arminda.site (Hostinger VPS, HTTPS, gunicorn + Nginx + systemd).
 
-- **Versão atual:** `v0.25.0` (Onda 4.6 — eSocial: transmissão em lotes, envio gateado)
+- **Versão atual:** `v0.26.0` (Onda 2.7 — paridade Fiorilli: motor tributário validado vs base real)
 - **Bloco corrente:** Bloco 4 — Obrigações legais federais **em andamento** (eSocial: geração S-1000/S-1005/S-1010 + validação XSD, cofre de certificados A1 + assinatura digital). Bloco 3 concluído. Bloco 2 a 85% (2.7 desbloqueada — base real do SIP disponível)
 - **Testes:** 534 backend (pytest) + 10 frontend (vitest) verdes
 - **Painel público:** https://darlanvelozo.github.io/Arminda_Software/
