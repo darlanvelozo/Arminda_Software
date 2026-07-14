@@ -307,6 +307,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/esocial/eventos/gerar-folha/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description POST /esocial/eventos/gerar-folha/ — gera os eventos de remuneração
+         *     (S-1200/S-1202 conforme o regime; opcionalmente S-1210) de todos os
+         *     vínculos de uma folha calculada.
+         */
+        post: operations["esocial_eventos_gerar_folha_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/imports/csv/servidores/": {
         parameters: {
             query?: never;
@@ -611,6 +632,26 @@ export interface paths {
         };
         /** @description GET /api/payroll/folhas/{id}/holerite-pdf/?vinculo={id} → application/pdf. */
         get: operations["payroll_folhas_holerite_pdf_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payroll/folhas/{id}/relatorio-pdf/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description GET /api/payroll/folhas/{id}/relatorio-pdf/ → PDF analítico da folha
+         *     inteira: quadro geral, linha por servidor, totais por lotação/órgão.
+         */
+        get: operations["payroll_folhas_relatorio_pdf_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1680,9 +1721,12 @@ export interface components {
          * @description * `S-1000` - S-1000 — Informações do empregador
          *     * `S-1005` - S-1005 — Tabela de estabelecimentos
          *     * `S-1010` - S-1010 — Tabela de rubricas
+         *     * `S-1200` - S-1200 — Remuneração (RGPS)
+         *     * `S-1202` - S-1202 — Remuneração de servidor (RPPS)
+         *     * `S-1210` - S-1210 — Pagamentos
          * @enum {string}
          */
-        EventoESocialTipoEnum: "S-1000" | "S-1005" | "S-1010";
+        EventoESocialTipoEnum: "S-1000" | "S-1005" | "S-1010" | "S-1200" | "S-1202" | "S-1210";
         /** @description Programação de férias de um vínculo numa folha (Onda 3.3). */
         FeriasItem: {
             readonly id: number;
@@ -3485,8 +3529,11 @@ export interface operations {
                  * @description * `S-1000` - S-1000 — Informações do empregador
                  *     * `S-1005` - S-1005 — Tabela de estabelecimentos
                  *     * `S-1010` - S-1010 — Tabela de rubricas
+                 *     * `S-1200` - S-1200 — Remuneração (RGPS)
+                 *     * `S-1202` - S-1202 — Remuneração de servidor (RPPS)
+                 *     * `S-1210` - S-1210 — Pagamentos
                  */
-                tipo?: "S-1000" | "S-1005" | "S-1010";
+                tipo?: "S-1000" | "S-1005" | "S-1010" | "S-1200" | "S-1202" | "S-1210";
             };
             header?: never;
             path?: never;
@@ -3577,6 +3624,31 @@ export interface operations {
         };
     };
     esocial_eventos_gerar_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EventoESocial"];
+                "application/x-www-form-urlencoded": components["schemas"]["EventoESocial"];
+                "multipart/form-data": components["schemas"]["EventoESocial"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoESocial"];
+                };
+            };
+        };
+    };
+    esocial_eventos_gerar_folha_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -4169,6 +4241,28 @@ export interface operations {
         };
     };
     payroll_folhas_holerite_pdf_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this folha. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolhaDetail"];
+                };
+            };
+        };
+    };
+    payroll_folhas_relatorio_pdf_retrieve: {
         parameters: {
             query?: never;
             header?: never;

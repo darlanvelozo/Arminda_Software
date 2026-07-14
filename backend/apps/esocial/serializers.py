@@ -36,6 +36,14 @@ class GerarEventoSerializer(serializers.Serializer):
     class_trib = serializers.CharField(required=False, default="60", max_length=2)
 
 
+class GerarEventosFolhaSerializer(serializers.Serializer):
+    """Entrada da geração em lote dos eventos de remuneração de uma folha."""
+
+    orgao_emissor = serializers.IntegerField()
+    folha = serializers.IntegerField()
+    incluir_pagamentos = serializers.BooleanField(required=False, default=False)
+
+
 class CertificadoDigitalSerializer(serializers.ModelSerializer):
     """Metadados do certificado no cofre. NUNCA expõe o PFX/senha cifrados."""
 

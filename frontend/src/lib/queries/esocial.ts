@@ -45,6 +45,21 @@ export function useGerarEvento() {
   });
 }
 
+export function useGerarEventosFolha() {
+  const { activeTenant } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { orgao_emissor: number; folha: number; incluir_pagamentos: boolean }) => {
+      const { data } = await api.post<{ gerados: number; erros: { servidor: string; erro: string }[] }>(
+        `${BASE}gerar-folha/`,
+        vars,
+      );
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: key(activeTenant) }),
+  });
+}
+
 export function useAssinarEvento() {
   const { activeTenant } = useAuth();
   const qc = useQueryClient();

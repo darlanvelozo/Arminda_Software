@@ -416,10 +416,16 @@ paths:
           - S-1000
           - S-1005
           - S-1010
+          - S-1200
+          - S-1202
+          - S-1210
         description: |-
           * `S-1000` - S-1000 — Informações do empregador
           * `S-1005` - S-1005 — Tabela de estabelecimentos
           * `S-1010` - S-1010 — Tabela de rubricas
+          * `S-1200` - S-1200 — Remuneração (RGPS)
+          * `S-1202` - S-1202 — Remuneração de servidor (RPPS)
+          * `S-1210` - S-1210 — Pagamentos
       tags:
       - esocial
       security:
@@ -516,6 +522,36 @@ paths:
     post:
       operationId: esocial_eventos_gerar_create
       description: Eventos eSocial gerados. Filtra por ?orgao_emissor= e ?tipo=.
+      tags:
+      - esocial
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventoESocial'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoESocial'
+          description: ''
+  /api/esocial/eventos/gerar-folha/:
+    post:
+      operationId: esocial_eventos_gerar_folha_create
+      description: |-
+        POST /esocial/eventos/gerar-folha/ — gera os eventos de remuneração
+        (S-1200/S-1202 conforme o regime; opcionalmente S-1210) de todos os
+        vínculos de uma folha calculada.
       tags:
       - esocial
       requestBody:
@@ -1327,6 +1363,31 @@ paths:
     get:
       operationId: payroll_folhas_holerite_pdf_retrieve
       description: GET /api/payroll/folhas/{id}/holerite-pdf/?vinculo={id} → application/pdf.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this folha.
+        required: true
+      tags:
+      - payroll
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FolhaDetail'
+          description: ''
+  /api/payroll/folhas/{id}/relatorio-pdf/:
+    get:
+      operationId: payroll_folhas_relatorio_pdf_retrieve
+      description: |-
+        GET /api/payroll/folhas/{id}/relatorio-pdf/ → PDF analítico da folha
+        inteira: quadro geral, linha por servidor, totais por lotação/órgão.
       parameters:
       - in: path
         name: id
@@ -4664,11 +4725,17 @@ components:
       - S-1000
       - S-1005
       - S-1010
+      - S-1200
+      - S-1202
+      - S-1210
       type: string
       description: |-
         * `S-1000` - S-1000 — Informações do empregador
         * `S-1005` - S-1005 — Tabela de estabelecimentos
         * `S-1010` - S-1010 — Tabela de rubricas
+        * `S-1200` - S-1200 — Remuneração (RGPS)
+        * `S-1202` - S-1202 — Remuneração de servidor (RPPS)
+        * `S-1210` - S-1210 — Pagamentos
     FeriasItem:
       type: object
       description: Programação de férias de um vínculo numa folha (Onda 3.3).

@@ -4472,4 +4472,13 @@
             <xs:pattern value="\d{4}" />
         </xs:restriction>
     </xs:simpleType>
+    <!-- PATCH Arminda (ADR-0021): TS_notAFT referenciado no evtRemun.xsd mas
+         ausente neste snapshot do mirror. Nota do adquirente de frete/transporte
+         (string). Conferir contra o pacote oficial do gov.br quando disponível. -->
+    <xs:simpleType name="TS_notAFT">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1" />
+            <xs:maxLength value="40" />
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>

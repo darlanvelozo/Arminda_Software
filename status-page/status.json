@@ -5,9 +5,9 @@
     "inicio": "2026-04-27",
     "previsao_lancamento": "2027-12-31"
   },
-  "ultima_atualizacao": "2026-07-10",
+  "ultima_atualizacao": "2026-07-13",
   "bloco_atual": 4,
-  "progresso_geral_pct": 34,
+  "progresso_geral_pct": 36,
   "blocos": [
     {
       "numero": 0,
@@ -111,12 +111,12 @@
       "data_fim_prevista": "2026-11-30",
       "data_fim_real": null,
       "status": "em_andamento",
-      "progresso_pct": 36,
+      "progresso_pct": 48,
       "entregas": [
         "✅ eSocial — geração com validação no XSD oficial S-1.3: S-1000 (empregador), S-1005 (estabelecimentos) e S-1010 (tabela de rubricas, com natureza oficial por rubrica) — Ondas 4.1 e 4.3",
         "✅ Cofre de certificados digitais (e-CNPJ A1 cifrado por órgão) + assinatura digital ICP-Brasil (XML-DSig), validada de ponta a ponta — Onda 4.2",
         "Transmissão ao ambiente do governo + reconciliação de retornos — próxima etapa",
-        "✅ Snapshot fiscal da folha (lançamentos congelam incidências/natureza; folha fechada imutável) + ResumoFolha por servidor com bases por obrigação — Onda 4.4. Próximo: eventos de remuneração S-1200/S-1202/S-1210 (4.5)",
+        "✅ Snapshot fiscal + ResumoFolha (4.4) e eventos de remuneração S-1200/S-1202 (RPPS) + pagamentos S-1210, gerados em lote por folha e validados no XSD oficial — Onda 4.5",
         "Demais eventos (S-1020, S-2200/S-2299…) e SEFIP, CAGED, RAIS, DIRF, DCTFWeb, MANAD (com gabaritos reais disponíveis para paridade)"
       ]
     },
@@ -251,6 +251,20 @@
     }
   ],
   "changelog": [
+    {
+      "data": "2026-07-13",
+      "tipo": "validacao",
+      "titulo": "Validação integral antes do v0.24.0 (remuneração eSocial)",
+      "resumo_executivo": "Backend: ruff sem erros, django check ok, pytest 528 verde (5 testes novos: S-1200 e S-1202 válidos contra o XSD oficial, S-1210, barreira de regime errado, e lote com regimes mistos). Frontend: ESLint 0 erros, tsc 0, vitest 10/10, build OK. Pronto para tag v0.24.0.",
+      "descricao": "Onda 4.5 passou pela validação integral. Migration esocial.0004; XSDs evtRemun/evtRmnRPPS/evtPgtos versionados (patch documentado de tipo ausente no mirror). Backup diário automatizado do banco de produção instalado."
+    },
+    {
+      "data": "2026-07-13",
+      "tipo": "entrega",
+      "titulo": "eSocial: remuneração dos servidores (S-1200/S-1202) e pagamentos (Onda 4.5)",
+      "resumo_executivo": "O eSocial chegou ao seu coração: a folha de cada servidor agora vira evento oficial. Com um clique, o sistema gera para todos os servidores de uma folha calculada o evento de remuneração correto — o S-1202 para o servidor estatutário (regime próprio de previdência, o evento específico do setor público que folhas privadas não fazem) e o S-1200 para os demais — com cada verba detalhada por código oficial e valor, e opcionalmente o evento de pagamentos (S-1210) com o líquido. Tudo validado contra o esquema oficial do governo e pronto para assinar. O período também trouxe o backup diário automatizado do banco de produção.",
+      "descricao": "Onda 4.5 (ADR-0021). Eventos periódicos construídos sobre o retrato fiscal da Onda 4.4: o dmDev usa os lançamentos com natureza congelada no snapshot; o regime do vínculo escolhe o evento (mapa para as categorias da Tabela 1) com validação cruzada; o S-1210 usa o líquido do resumo por servidor. Geração em lote por folha (erros por vínculo não interrompem o restante), XSDs oficiais versionados e novo bloco na tela do eSocial. Backup: pg_dump diário com retenção de 14 dias, incluindo a cópia segura das variáveis de ambiente (chave do cofre de certificados)."
+    },
     {
       "data": "2026-07-10",
       "tipo": "validacao",

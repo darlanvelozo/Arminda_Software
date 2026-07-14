@@ -4,8 +4,8 @@
 > **Para Claude Code, ler também [CLAUDE.md](CLAUDE.md) na raiz** — tem
 > as regras de processo (validação integral, guias vivos, etc.).
 >
-> Última atualização: **2026-07-10** · Versão atual: **v0.23.0** ·
-> **Bloco 4 — Obrigações legais federais: em andamento (~36%)** — Ondas **4.1**
+> Última atualização: **2026-07-10** · Versão atual: **v0.24.0** ·
+> **Bloco 4 — Obrigações legais federais: em andamento (~48%)** — Ondas **4.1**
 > (S-1000/S-1005), **4.3** (natureza de rubrica + S-1010), **4.2** (cofre de
 > certificados A1 + assinatura XML-DSig) e **4.4** (snapshot fiscal +
 > ResumoFolha), XML validado contra o XSD oficial S-1.3. **Bloco 3 — Folhas especiais:
@@ -17,7 +17,7 @@
 > e **2.6** (tela operacional `/folha`); falta só a **2.7** (paridade
 > Fiorilli). No **Bloco 3** entregues **3.1** (13º), **3.2** (rescisão),
 > **3.3** (férias), **3.4** (licença-prêmio) e **3.5** (folha complementar)
-> — bloco fechado. **523 testes backend verde** + 10 frontend.
+> — bloco fechado. **528 testes backend verde** + 10 frontend.
 > Em produção desde **maio/2026**: https://arminda.site (Hostinger VPS).
 
 ---
@@ -251,7 +251,7 @@ por bloco em [docs/PERSONAS.md](docs/PERSONAS.md). Snapshot:
 | 1 | Fundação multi-tenant e cadastros (inclui Ondas 1.1 a 1.6b) | ✅ Concluído (mai/2026) |
 | 2 | Engine de cálculo + DSL de rubricas | 🟡 Em andamento — 85% (Ondas 2.1–2.6 prontas; falta só a 2.7 — paridade Fiorilli) |
 | 3 | Folhas especiais (13º, rescisão, férias, licença-prêmio, complementar) | ✅ Concluído (jun/2026, antecipado) |
-| 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF, MANAD) | 🟡 Em andamento — ~36% (4.1/4.3 geração+XSD, 4.2 cofre+assinatura, 4.4 snapshot fiscal+ResumoFolha) |
+| 4 | Obrigações legais federais (eSocial, SEFIP, RAIS, DIRF, MANAD) | 🟡 Em andamento — ~48% (4.1/4.3 geração+XSD, 4.2 cofre+assinatura, 4.4 snapshot+BASES, 4.5 periódicos S-1200/S-1202/S-1210) |
 | 5 | Integração TCE (MA, PB, framework outros) | ⏳ Dez/2026 |
 | 6 | MVP piloto em produção (gate crítico) | ⏳ Jan/2027 |
 | 7 | Diferenciação (PWA, WhatsApp, BI, IA, Portal Servidor) | ⏳ Fev-Abr/2027 |

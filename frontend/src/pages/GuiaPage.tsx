@@ -43,7 +43,7 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-07-10";
+const LAST_UPDATED = "2026-07-13";
 
 interface TocItem {
   id: string;
@@ -83,7 +83,7 @@ export default function GuiaPage() {
           Última atualização: <strong>{formatDate(LAST_UPDATED)}</strong> · Estado:
           <span className="ml-1 inline-flex items-center gap-2">
             <Badge variant="success">Blocos 0–1 · Bloco 2 (folha) · Bloco 3 (folhas especiais) ✓</Badge>
-            <Badge variant="info">Bloco 4 em andamento — eSocial (geração, XSD, cofre + assinatura) ✓ (v0.21.0)</Badge>
+            <Badge variant="info">Bloco 4 — eSocial: cadastros + rubricas + remuneração (S-1200/S-1202) ✓ (v0.24.0)</Badge>
           </span>
         </p>
       </header>
@@ -869,6 +869,20 @@ ARRED(SALARIO_BASE * 0.10, 2)         # arredondar p/ 2 casas`}
         geral, uma linha por servidor (proventos/descontos/líquido) e totais por
         lotação e por órgão emissor. Pronto para imprimir, anexar a processo ou
         enviar ao controle interno.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">eSocial — remuneração dos servidores (Onda 4.5)</h3>
+      <p>
+        O eSocial chegou ao seu coração: os <strong>eventos de remuneração</strong>. No
+        menu eSocial, escolha o órgão e uma <strong>folha calculada</strong> e clique{" "}
+        <strong>Gerar eventos da folha</strong> — para cada servidor, o sistema gera
+        automaticamente o evento correto pelo regime: <strong>S-1202</strong> para o
+        estatutário (regime próprio/RPPS, o evento específico do setor público) e{" "}
+        <strong>S-1200</strong> para os demais, com cada verba da folha detalhada
+        (código, tabela e valor). Opcionalmente gera também os{" "}
+        <strong>pagamentos (S-1210)</strong> com o líquido de cada servidor. Tudo
+        validado contra o XSD oficial e pronto para assinar. Também entrou o{" "}
+        <strong>backup diário automatizado</strong> do banco de produção.
       </p>
 
       <h3 className="text-base font-semibold mt-4">O que está pronto e o que vem</h3>

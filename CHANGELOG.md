@@ -35,6 +35,39 @@ Mudanças que afetam contrato de API, schema de banco ou semântica de cálculo 
 
 ## [Não lançado] — em construção
 
+### Onda 4.5 — eSocial: remuneração S-1200/S-1202 + pagamentos S-1210 · 2026-07-13
+
+> O coração do eSocial: a folha de cada servidor vira evento oficial. O
+> S-1202 (servidor estatutário/RPPS) é o diferencial do setor público
+> (ADR-0021). Consome o snapshot fiscal + `ResumoFolha` da Onda 4.4.
+
+#### Adicionado — Backend
+
+- **feat(esocial):** `EventoESocial` ganha FKs `folha`/`vinculo` (migration
+  0004) e os tipos S-1200/S-1202/S-1210.
+- **feat(esocial.services.geracao):** construtores dos periódicos — `dmDev`
+  montado dos lançamentos com `snap_natureza_esocial`; o regime do vínculo
+  decide o evento (estatutário → S-1202; demais → S-1200; mapa
+  regime→`codCateg`, Tabela 1) com validação cruzada; S-1210 usa o
+  `ResumoFolha.total_liquido`. XSDs oficiais `evtRemun`/`evtRmnRPPS`/
+  `evtPgtos` versionados (patch documentado do `TS_notAFT` ausente no mirror).
+- **feat(esocial):** geração em lote `POST /esocial/eventos/gerar-folha/` —
+  todos os vínculos da folha de uma vez; erros por vínculo não interrompem.
+- **ops:** backup diário automatizado do banco de produção
+  (`deploy/backup-db.sh` em cron.daily: `pg_dump -Fc` + cópia do `.env`,
+  retenção 14 dias).
+- 5 testes novos (528 no total).
+
+#### Adicionado — Frontend
+
+- **feat(esocial):** bloco "Remuneração da folha" na tela do eSocial — órgão +
+  folha calculada + opção de pagamentos → gera S-1200/S-1202/S-1210 em lote.
+
+#### Impacto
+
+- Migration `esocial.0004`. Guias atualizados. O eSocial agora cobre o ciclo
+  cadastros → rubricas → remuneração → assinatura; falta transmitir.
+
 ### Correção — layout do relatório da folha em PDF · 2026-07-10
 
 - **fix(payroll):** células de texto do relatório (servidor, lotação, grupos)

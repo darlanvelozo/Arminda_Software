@@ -45,7 +45,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-const LAST_UPDATED = "2026-07-10";
+const LAST_UPDATED = "2026-07-13";
 
 interface TocItem {
   id: string;
@@ -742,6 +742,23 @@ function SectionCalculo() {
         (ReportLab, serviço <code className="bg-muted px-1 rounded">relatorio_folha</code>) —
         quadro geral + linha por servidor + totais por lotação/órgão; usa os mesmos
         serviços de resumo da tela, então funciona para qualquer folha calculada.
+      </p>
+
+      <h3 className="text-base font-semibold mt-4">eSocial — periódicos S-1200/S-1202/S-1210 (Onda 4.5)</h3>
+      <p>
+        <code className="bg-muted px-1 rounded">EventoESocial</code> ganhou FKs{" "}
+        <code className="bg-muted px-1 rounded">folha</code>/<code className="bg-muted px-1 rounded">vinculo</code>.
+        Construtores montam o <code className="bg-muted px-1 rounded">dmDev</code> a partir
+        dos <strong>lançamentos com snapshot</strong> (só rubricas com{" "}
+        <code className="bg-muted px-1 rounded">snap_natureza_esocial</code>); o regime
+        decide o evento (<code className="bg-muted px-1 rounded">estatutario</code> →
+        S-1202; demais → S-1200; mapa regime→<code className="bg-muted px-1 rounded">codCateg</code>{" "}
+        da Tabela 1). S-1210 usa o <code className="bg-muted px-1 rounded">ResumoFolha.total_liquido</code>.
+        Geração em lote: <code className="bg-muted px-1 rounded">POST /esocial/eventos/gerar-folha/</code>{" "}
+        (erros por vínculo não interrompem o lote). XSDs novos versionados; patch documentado
+        do <code className="bg-muted px-1 rounded">TS_notAFT</code> ausente no mirror.
+        <strong> Backup diário</strong>: <code className="bg-muted px-1 rounded">deploy/backup-db.sh</code>{" "}
+        em cron.daily (pg_dump -Fc + cópia do .env, retenção 14 dias, /opt/arminda-backups).
       </p>
 
       <h3 className="text-base font-semibold mt-4">Resumos da folha (v0.13.0)</h3>

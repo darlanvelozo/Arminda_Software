@@ -19,13 +19,14 @@ from apps.esocial.serializers import (
     CertificadoDigitalSerializer,
     EventoESocialSerializer,
     GerarEventoSerializer,
+    GerarEventosFolhaSerializer,
     UploadCertificadoSerializer,
 )
 from apps.esocial.services.assinatura import SemCertificado, assinar_evento
 from apps.esocial.services.cofre import CertificadoInvalido, guardar_certificado
-from apps.esocial.services.geracao import gerar_evento
+from apps.esocial.services.geracao import gerar_evento, gerar_remuneracoes_da_folha
 from apps.esocial.services.validacao import ErroValidacaoXSD
-from apps.payroll.models import Rubrica
+from apps.payroll.models import Folha, Rubrica
 from apps.people.models import OrgaoEmissor
 
 
@@ -83,6 +84,32 @@ class EventoESocialViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(evento)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"], url_path="gerar-folha")
+    def gerar_folha(self, request):
+        """POST /esocial/eventos/gerar-folha/ — gera os eventos de remuneração
+        (S-1200/S-1202 conforme o regime; opcionalmente S-1210) de todos os
+        vínculos de uma folha calculada."""
+        entrada = GerarEventosFolhaSerializer(data=request.data)
+        entrada.is_valid(raise_exception=True)
+        dados = entrada.validated_data
+        try:
+            orgao = OrgaoEmissor.objects.get(pk=dados["orgao_emissor"])
+            folha = Folha.objects.get(pk=dados["folha"])
+        except OrgaoEmissor.DoesNotExist:
+            return Response({"detail": "Órgão emissor não encontrado."},
+                            status=status.HTTP_404_NOT_FOUND)
+        except Folha.DoesNotExist:
+            return Response({"detail": "Folha não encontrada."},
+                            status=status.HTTP_404_NOT_FOUND)
+        try:
+            resultado = gerar_remuneracoes_da_folha(
+                orgao, folha, incluir_pagamentos=dados["incluir_pagamentos"])
+        except ErroValidacaoXSD as exc:
+            return Response(
+                {"detail": "XML gerado não passou na validação XSD.", "erros": exc.erros},
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return Response(resultado, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"], url_path="baixar")
     def baixar(self, request, pk=None):

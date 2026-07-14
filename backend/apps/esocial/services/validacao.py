@@ -29,6 +29,9 @@ XSD_POR_TIPO = {
     "S-1000": "evtInfoEmpregador.xsd",
     "S-1005": "evtTabEstab.xsd",
     "S-1010": "evtTabRubrica.xsd",
+    "S-1200": "evtRemun.xsd",
+    "S-1202": "evtRmnRPPS.xsd",
+    "S-1210": "evtPgtos.xsd",
 }
 
 

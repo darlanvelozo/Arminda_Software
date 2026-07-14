@@ -19,6 +19,9 @@ class TipoEvento(models.TextChoices):
     S_1000 = "S-1000", "S-1000 — Informações do empregador"
     S_1005 = "S-1005", "S-1005 — Tabela de estabelecimentos"
     S_1010 = "S-1010", "S-1010 — Tabela de rubricas"
+    S_1200 = "S-1200", "S-1200 — Remuneração (RGPS)"
+    S_1202 = "S-1202", "S-1202 — Remuneração de servidor (RPPS)"
+    S_1210 = "S-1210", "S-1210 — Pagamentos"
 
 
 class StatusEvento(models.TextChoices):
@@ -42,6 +45,15 @@ class EventoESocial(TimeStampedModel):
     # eventos periódicos (ondas seguintes).
     rubrica = models.ForeignKey(
         "payroll.Rubrica", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="eventos_esocial",
+    )
+    # Eventos periódicos (S-1200/S-1202/S-1210 — Onda 4.5): folha + vínculo.
+    folha = models.ForeignKey(
+        "payroll.Folha", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="eventos_esocial",
+    )
+    vinculo = models.ForeignKey(
+        "people.VinculoFuncional", on_delete=models.PROTECT, null=True, blank=True,
         related_name="eventos_esocial",
     )
     id_evento = models.CharField(

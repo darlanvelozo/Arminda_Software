@@ -35,9 +35,11 @@ import {
   useCertificados,
   useEventosEsocial,
   useGerarEvento,
+  useGerarEventosFolha,
   useUploadCertificado,
   type GerarEventoInput,
 } from "@/lib/queries/esocial";
+import { useFolhasList } from "@/lib/queries/folhas";
 import { useOrgaosEmissoresList } from "@/lib/queries/orgaos-sindicatos";
 import { useRubricasList } from "@/lib/queries/rubricas";
 
@@ -63,7 +65,30 @@ export default function EsocialPage() {
   const { data: rubricas } = useRubricasList({ ativo: true, ordering: "codigo" });
   const { data: certificados } = useCertificados();
   const gerar = useGerarEvento();
+  const gerarFolha = useGerarEventosFolha();
+  const { data: folhas } = useFolhasList({});
+  const [folhaSel, setFolhaSel] = useState("");
+  const [incluirPgto, setIncluirPgto] = useState(true);
   const assinar = useAssinarEvento();
+
+  async function onGerarFolha() {
+    if (!orgao) return toast.error("Selecione o órgão emissor.");
+    if (!folhaSel) return toast.error("Selecione a folha.");
+    try {
+      const r = await gerarFolha.mutateAsync({
+        orgao_emissor: Number(orgao),
+        folha: Number(folhaSel),
+        incluir_pagamentos: incluirPgto,
+      });
+      if (r.erros.length === 0) {
+        toast.success(`${r.gerados} evento(s) de remuneração gerados e validados.`);
+      } else {
+        toast.warning(`${r.gerados} gerados; ${r.erros.length} vínculo(s) com erro — veja o primeiro: ${r.erros[0].servidor}: ${r.erros[0].erro}`);
+      }
+    } catch (e) {
+      toast.error(extractDomainErrorMessage(e) ?? "Falha ao gerar os eventos da folha.");
+    }
+  }
   const uploadCert = useUploadCertificado();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -240,6 +265,48 @@ export default function EsocialPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {orgao && (
+        <div className="rounded-md border bg-card p-3 space-y-2">
+          <p className="text-sm font-medium">Remuneração da folha (S-1200/S-1202)</p>
+          <p className="text-xs text-muted-foreground">
+            Gera, para cada servidor da folha, o evento de remuneração correto pelo
+            regime (estatutário → S-1202/RPPS; demais → S-1200) — todos validados no
+            XSD oficial. Opcionalmente gera também os pagamentos (S-1210).
+          </p>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[220px]">
+              <label className="text-xs text-muted-foreground">Folha calculada</label>
+              <Select value={folhaSel} onValueChange={setFolhaSel} disabled={gerarFolha.isPending}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(folhas?.results ?? [])
+                    .filter((f) => f.status !== "aberta")
+                    .map((f) => (
+                      <SelectItem key={f.id} value={String(f.id)}>
+                        {f.tipo_display} · {f.competencia.slice(0, 7)} ({f.status_display})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <label className="flex items-center gap-2 text-sm cursor-pointer pb-2">
+              <input
+                type="checkbox"
+                checked={incluirPgto}
+                onChange={(e) => setIncluirPgto(e.target.checked)}
+                className="h-4 w-4 rounded border-input"
+              />
+              Incluir pagamentos (S-1210)
+            </label>
+            <Button onClick={onGerarFolha} disabled={gerarFolha.isPending}>
+              {gerarFolha.isPending ? "Gerando…" : "Gerar eventos da folha"}
+            </Button>
+          </div>
         </div>
       )}
 
