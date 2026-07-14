@@ -29,11 +29,20 @@ class FirebirdConfig:
     user: str
     password: str
     charset: str = "WIN1252"
+    # Firebird 3 servindo backup de 2.5 costuma exigir auth legada
+    # (Legacy_Auth) e wire crypt desligado. None = deixa a lib negociar.
+    auth_plugin_name: str | None = None
+    wire_crypt: bool = True
 
 
 @contextmanager
 def open_connection(config: FirebirdConfig) -> Iterator[firebirdsql.Connection]:
     """Context manager que garante close() mesmo em exceção."""
+    extra = {}
+    if config.auth_plugin_name:
+        extra["auth_plugin_name"] = config.auth_plugin_name
+    if not config.wire_crypt:
+        extra["wire_crypt"] = False
     conn = firebirdsql.connect(
         host=config.host,
         port=config.port,
@@ -41,6 +50,7 @@ def open_connection(config: FirebirdConfig) -> Iterator[firebirdsql.Connection]:
         user=config.user,
         password=config.password,
         charset=config.charset,
+        **extra,
     )
     try:
         yield conn
@@ -147,7 +157,7 @@ def fetch_trabalhadores(
     """
     sql = (
         "SELECT T.EMPRESA, T.REGISTRO, T.MATRICULA, T.CONTRATO, "
-        "T.CPF, T.CARGOATUAL, T.LOCAL_TRABALHO, T.VINCULO, T.DEPDESPESA, "
+        "T.CPF, T.CARGOATUAL, T.LOCAL_TRABALHO, T.DIVISAO, T.VINCULO, T.DEPDESPESA, "
         "T.SITUACAO, T.DTADMISSAO, T.DTDEMISSAO, T.TIPOADMISSAO, "
         "T.HORASEMANAL, T.PROCESSO "
         "FROM TRABALHADOR T "

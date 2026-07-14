@@ -15,7 +15,24 @@ from django.db import transaction
 from apps.imports.models import SipImportRecord, TipoEntidadeSip
 from apps.imports.services.loaders import LoaderStats, grava_erro, grava_sucesso
 from apps.imports.services.mapping import map_vinculo, payload_hash
-from apps.people.models import UnidadeOrcamentaria, VinculoFuncional
+from apps.people.models import (
+    Lotacao,
+    NaturezaLotacao,
+    UnidadeOrcamentaria,
+    VinculoFuncional,
+)
+
+
+def _lotacao_fallback_id() -> int:
+    """Lotação-sentinela para vínculos cujo elo organizacional está sujo/
+    ausente no SIP. Não descarta o vínculo (o cálculo da folha não depende da
+    lotação); marca para revisão posterior."""
+    lot, _ = Lotacao.objects.get_or_create(
+        codigo="SIP-LT-NAO-INFORMADA",
+        defaults={"nome": "(lotação não informada — importação SIP)",
+                  "natureza": NaturezaLotacao.ADMINISTRACAO},
+    )
+    return lot.id
 
 
 def _resolver_unidade_orcamentaria(
@@ -42,7 +59,12 @@ def _resolver_fks_vinculo(
     """Resolve cargo_id, lotacao_id, servidor_id ou registra erro e devolve None."""
     empresa = str(row.get("empresa", "")).strip()
     cargo_codigo_sip = f"{empresa}-{str(row.get('cargoatual', '')).strip()}"
-    lotacao_codigo_sip = f"{empresa}-LT-{str(row.get('local_trabalho', '')).strip()}"
+    # A lotação do vínculo vem de LOCAL_TRABALHO; algumas bases SIP a deixam
+    # nula e usam DIVISAO (secretaria) como a lotação de fato. Cai para ela.
+    local = str(row.get("local_trabalho") or "").strip()
+    if not local:
+        local = str(row.get("divisao") or "").strip()
+    lotacao_codigo_sip = f"{empresa}-LT-{local}"
     cpf_servidor = str(row.get("cpf", "")).strip()
 
     cargo_id = cargos_map.get(cargo_codigo_sip)
@@ -55,10 +77,9 @@ def _resolver_fks_vinculo(
         grava_erro(TipoEntidadeSip.VINCULO, chave_sip, msg)
         return None
     if lotacao_id is None:
-        msg = f"Lotação SIP '{lotacao_codigo_sip}' não encontrada para vínculo {chave_sip}"
-        stats.log_erro(msg)
-        grava_erro(TipoEntidadeSip.VINCULO, chave_sip, msg)
-        return None
+        # Elo organizacional sujo (comum em base real): não descarta o vínculo,
+        # que carrega salário/servidor — usa a lotação-sentinela.
+        lotacao_id = _lotacao_fallback_id()
     if servidor_id is None:
         msg = f"Servidor com CPF '{cpf_servidor}' não importado (vínculo {chave_sip})"
         stats.log_erro(msg)

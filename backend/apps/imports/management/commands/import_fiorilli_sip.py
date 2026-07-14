@@ -98,6 +98,16 @@ class Command(BaseCommand):
             action="store_true",
             help="executa o pipeline mas faz rollback no fim",
         )
+        parser.add_argument(
+            "--auth-plugin",
+            default=None,
+            help="plugin de auth do Firebird (ex.: Legacy_Auth para backup de 2.5)",
+        )
+        parser.add_argument(
+            "--no-wire-crypt",
+            action="store_true",
+            help="desliga wire crypt (necessário com Legacy_Auth)",
+        )
 
     def handle(self, *args, **opts):
         tenant_schema = opts["tenant"]
@@ -120,6 +130,8 @@ class Command(BaseCommand):
             database=opts["database"],
             user=opts["user"],
             password=password,
+            auth_plugin_name=opts.get("auth_plugin"),
+            wire_crypt=not opts.get("no_wire_crypt"),
         )
 
         tabelas_pedidas = [t.strip() for t in opts["tabelas"].split(",") if t.strip()]
