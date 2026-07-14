@@ -220,6 +220,72 @@ def fetch_unidades_orcamentarias(
     return _rows_to_dicts(cur)
 
 
+def fetch_referencias(conn: firebirdsql.Connection) -> list[dict]:
+    """
+    Lista as competências (REFERENCIA) do SIP com contagem de BASES.
+
+    Só as mensais (TIPO='1') interessam à paridade. Usado pelo harness
+    para o usuário escolher qual competência comparar.
+    """
+    sql = (
+        "SELECT r.CODIGO, r.ANO, r.MES, r.TIPO, "
+        "(SELECT COUNT(*) FROM BASES b WHERE b.REFERENCIA = r.CODIGO) AS QTD_BASES "
+        "FROM REFERENCIA r ORDER BY r.ANO DESC, r.MES DESC"
+    )
+    cur = conn.cursor()
+    cur.execute(sql)
+    return _rows_to_dicts(cur)
+
+
+def fetch_bases_competencia(conn: firebirdsql.Connection, referencia: int) -> list[dict]:
+    """
+    Extrai a folha calculada (gabarito) de uma competência — tabela BASES.
+
+    Cada linha é o resultado final por servidor (REGISTRO): totais, bases
+    e valores de previdência, IRRF e FGTS que o Fiorilli publicou. É o
+    lado direito da comparação de paridade (Onda 2.7).
+
+    `referencia` é o REFERENCIA.CODIGO (ver fetch_referencias).
+    """
+    sql = (
+        "SELECT REGISTRO, TOTALPROVENTOS, TOTALDESCONTOS, LIQUIDO, "
+        "BASEPREVIDENCIAMES, VALORPREVIDENCIAMES, "
+        "BASEIRRFMES, VALORIRRFMES, DEDUIRRFMES, "
+        "BASEFGTSMES, VALORFGTSMES "
+        f"FROM BASES WHERE REFERENCIA = {int(referencia)}"
+    )
+    cur = conn.cursor()
+    cur.execute(sql)
+    return _rows_to_dicts(cur)
+
+
+def fetch_regime_por_registro(
+    conn: firebirdsql.Connection, referencia: int
+) -> dict[str, str]:
+    """
+    Classifica o regime previdenciário de cada servidor na competência,
+    lendo como o próprio Fiorilli marcou as linhas de MOVIMENTO.
+
+    Uma linha com SIPREV=1 indica RPPS (regime próprio); INSS=1 indica
+    RGPS. Devolve {registro: 'rpps'|'rgps'} — o ground-truth deles, sem
+    depender do cadastro importado.
+    """
+    sql = (
+        "SELECT REGISTRO, MAX(SIPREV) AS TEM_SIPREV, MAX(INSS) AS TEM_INSS "
+        f"FROM MOVIMENTO WHERE REFERENCIA = {int(referencia)} "
+        "GROUP BY REGISTRO"
+    )
+    cur = conn.cursor()
+    cur.execute(sql)
+    regimes: dict[str, str] = {}
+    for row in _rows_to_dicts(cur):
+        reg = str(row.get("registro", "")).strip()
+        tem_siprev = str(row.get("tem_siprev") or "0").strip() in ("1", "T", "True")
+        tem_inss = str(row.get("tem_inss") or "0").strip() in ("1", "T", "True")
+        regimes[reg] = "rpps" if tem_siprev else ("rgps" if tem_inss else "indefinido")
+    return regimes
+
+
 def fetch_eventos(conn: firebirdsql.Connection, *, limit: int | None = None) -> list[dict]:
     """
     Extrai rubricas (eventos) — vira Rubrica no Arminda.
